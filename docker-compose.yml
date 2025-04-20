@@ -1,0 +1,27 @@
+services:
+  db:
+    env_file: ${DB_ROOT}/.env
+    image: ${DOCKER_DB_IMAGE}
+    container_name: ${DOCKER_DB_CONTAINER}
+    build:
+      context: ${DB_ROOT}
+      args:
+        - WORKDIR=${DOCKER_DB_WORKDIR}
+    ports:
+      - 3306:3306
+  app:
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: "${APP_ROOT}/.env"
+    image: ${DOCKER_APP_IMAGE}
+    container_name: ${DOCKER_APP_CONTAINER}
+    build:
+      context: ${APP_ROOT}
+      args:
+        - WORKDIR=${DOCKER_APP_WORKDIR}
+        - PORT=${APP_PORT}
+        - USERNAME=${DOCKER_APP_USER}
+      network: host
+    ports:
+      - ${APP_PORT}:${APP_PORT}
