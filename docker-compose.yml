@@ -1,27 +1,36 @@
+name: ${DOCKER_COMPOSE_NAME:?DOCKER_COMPOSE_NAME must be non-empty}
+  
 services:
   db:
-    env_file: ${DB_ROOT}/.env
-    image: ${DOCKER_DB_IMAGE}
-    container_name: ${DOCKER_DB_CONTAINER}
+    env_file: ${DB_ROOT?DB_ROOT must exist}/.env
+    image: ${DOCKER_COMPOSE_NAME}/db
+    container_name: ${DOCKER_COMPOSE_NAME}-db
     build:
       context: ${DB_ROOT}
-      args:
-        - WORKDIR=${DOCKER_DB_WORKDIR}
     ports:
       - 3306:3306
+    networks:
+      - default
   app:
     depends_on:
       db:
         condition: service_healthy
-    env_file: "${APP_ROOT}/.env"
-    image: ${DOCKER_APP_IMAGE}
-    container_name: ${DOCKER_APP_CONTAINER}
+    env_file: "${APP_ROOT?APP_ROOT must exist}/.env"
+    environment:
+      - DB_HOST=db
+    image: ${DOCKER_COMPOSE_NAME}/app
+    container_name: ${DOCKER_COMPOSE_NAME}-app
     build:
       context: ${APP_ROOT}
       args:
-        - WORKDIR=${DOCKER_APP_WORKDIR}
-        - PORT=${APP_PORT}
-        - USERNAME=${DOCKER_APP_USER}
-      network: host
+        - WORKDIR=${DOCKER_WORKDIR?DOCKER_WORKDIR must exist}/app
+        - USER=${DOCKER_USER:?DOCKER_USER  must be non-empty}
+        - SERVER_PORT=${APP_PORT:?APP_PORT  must be non-empty}
     ports:
       - ${APP_PORT}:${APP_PORT}
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

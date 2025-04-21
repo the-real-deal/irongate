@@ -1,26 +1,24 @@
 FROM node:23-bookworm
 
 ARG WORKDIR
-ARG PORT
-ARG USERNAME
+ARG USER
+ARG SERVER_PORT
 
 RUN userdel -r node
 
 # # -U: create user group with same name
 # # -m: create user home
 # # -s: set default user shell
-RUN useradd -Ums /bin/bash ${USERNAME}
+RUN useradd -Ums /bin/bash ${USER}
 
-USER ${USERNAME}
+USER ${USER}
 
 WORKDIR ${WORKDIR}
 
 COPY . .
 
-RUN npm clean-install
+RUN npm clean-install --verbose
 
-ENV APP_PORT=${PORT}
-
-EXPOSE ${PORT}
+EXPOSE ${SERVER_PORT}
 
 CMD [ "npm", "run", "dev" ]
