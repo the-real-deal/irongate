@@ -2,4 +2,5 @@ services:
   app:
     volumes:
       - ..:/workspaces:cached
+      - ${HOME}${USERPROFILE}/.ssh:/home/${DOCKER_USER:?"DOCKER_USER  must be non-empty"}/.ssh
     command: sleep infinity
