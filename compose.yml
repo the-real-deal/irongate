@@ -1,5 +1,5 @@
 name: ${DOCKER_COMPOSE_NAME:?DOCKER_COMPOSE_NAME must be non-empty}
-  
+
 services:
   db:
     env_file: ${DB_ROOT?DB_ROOT must exist}/.env
