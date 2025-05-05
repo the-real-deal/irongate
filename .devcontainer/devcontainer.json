@@ -14,7 +14,7 @@
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-mysql",
 				"redhat.vscode-yaml",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-containers"
 			]
 		}
 	},
