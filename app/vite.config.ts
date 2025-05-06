@@ -1,16 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
-const port = process.env.SERVER_PORT; 
-if (!port) {
-  throw new Error("SERVER_PORT is undefined")
-}
+import env from './src/api/core/env'
 
 // https://vite.dev/config/
 export default defineConfig({
   server: {
     host: "0.0.0.0",
-    port: parseInt(port)
+    port: env.getRequired("SERVER_PORT", "number")
   },
   plugins: [react()],
 })

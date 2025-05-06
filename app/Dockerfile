@@ -13,6 +13,8 @@ RUN useradd -Ums /bin/bash ${USER}
 
 USER ${USER}
 
+ENV SERVER_PORT=${SERVER_PORT}
+
 WORKDIR ${WORKDIR}
 
 COPY . .

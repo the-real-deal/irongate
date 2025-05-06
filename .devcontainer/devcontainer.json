@@ -18,7 +18,8 @@
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-mysql",
 				"ms-azuretools.vscode-containers",
-				"ms-vsliveshare.vsliveshare"
+				"ms-vsliveshare.vsliveshare",
+				"vitest.explorer"
 			]
 		}
 	},

@@ -1,7 +1,7 @@
 import { Box, Button } from "@mui/joy"
-import ThemeSwitcher from "./components/ThemeSwitcher"
+import ThemeSwitcher from "../components/ThemeSwitcher"
 
-function App() {
+function Home() {
 
   return (
     <Box sx={{
@@ -14,4 +14,4 @@ function App() {
   )
 }
 
-export default App
+export default Home
