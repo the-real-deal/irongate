@@ -9,9 +9,12 @@
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers/features/git": {},
-		"ghcr.io/devcontainers/features/github-cli": {}
+		"ghcr.io/devcontainers/features/git": {}
 	},
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/${DOCKER_USER}/.ssh,type=bind,consistency=cached"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
