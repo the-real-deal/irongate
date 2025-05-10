@@ -1,4 +1,4 @@
-type EnvValueType = "string" | "number" | "boolean"
+export type EnvValueType = "string" | "number" | "boolean"
 type EnvTypeMap = {
     string: string
     number: number
@@ -10,13 +10,25 @@ function get<K extends EnvValueType>(key: string, type: K): EnvTypeMap[K] | unde
     if (value === undefined) {
         return undefined
     }
-    const parsed = JSON.parse(value)
-    console.log(parsed)
-    const parsedType = typeof parsed
-    if (parsedType === type) {
-        return parsed
+
+    switch (type) {
+        case "string":
+            return value as EnvTypeMap[K]
+        case "number":
+            const parsed = Number(value)
+            if (isNaN(parsed)) {
+                throw new Error(`env variable ${key}=${value} is not a valid number`)
+            }
+            return parsed as EnvTypeMap[K]
+        case "boolean":
+            if (value.toLowerCase() === "true" || value === "1") {
+                return true as EnvTypeMap[K]
+            } else if (value.toLowerCase() === "false" || value === "0") {
+                return false as EnvTypeMap[K]
+            } else {
+                throw new Error(`env variable ${key}=${value} is not a valid boolean`)
+            }
     }
-    throw new Error(`Env variable ${key}=${parsed} is not of type ${type}`)
 }
 
 function getRequired<K extends EnvValueType>(key: string, type: K): EnvTypeMap[K] {
