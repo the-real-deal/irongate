@@ -10,7 +10,7 @@
             "port": 3306,
             "driver": "MySQL",
             "name": "IronGate",
-            "database": "irongate",
+            "database": "IronGate",
             "username": "root",
             "password": "root"
         }
