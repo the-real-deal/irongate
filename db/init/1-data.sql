@@ -236,7 +236,6 @@ INSERT INTO `Cells`(
 ('SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 1, 1),
 ('SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1, 1);
 
-DELETE FROM `Inmates`;
 INSERT INTO `Inmates`(
     `Number`,
     `DocumentID`,
@@ -361,7 +360,6 @@ INSERT INTO `Movements`(
 ('2006-09-14 18:16:21', '22-897-5812', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 8), -- before isolation female
 ('2007-11-09 12:07:30', '22-897-5812', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1); -- isolation female
 
-DELETE FROM `Guests`;
 INSERT INTO `Guests`(
     `DocumentID`
 ) VALUES
@@ -371,7 +369,6 @@ INSERT INTO `Guests`(
 ('AU-678901235');
 
 
-DELETE FROM `Visits`;
 INSERT INTO `Visits`(
     `InmateNumber`,
     `DateTime`
@@ -383,7 +380,6 @@ INSERT INTO `Visits`(
 ('21-927-1468', '2008-09-15 15:00:00'),
 ('12-745-2335', '2016-12-01 11:30:00');
 
-DELETE FROM `Visitors`;
 INSERT INTO `Visitors`(
     `VisitInmateNumber`,
     `VisitDateTime`,
@@ -400,7 +396,6 @@ INSERT INTO `Visitors`(
 ('12-745-2335', '2016-12-01 11:30:00', 'NO-234567890');
 
 
-DELETE FROM `PersonnelTypes`;
 INSERT INTO `PersonnelTypes`(
     `ID`,
     `Name`
@@ -412,7 +407,6 @@ INSERT INTO `PersonnelTypes`(
 (4, 'Librarian');
 
 
-DELETE FROM `Personnel`;
 INSERT INTO `Personnel`(
     `ID`,
     `DocumentID`,
@@ -514,90 +508,256 @@ INSERT INTO `Personnel`(
 ('PER-628fc228-6d43-4fa3-ac88-ba1ae61d394c', 'KE-262524242', 1, 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc'),
 ('PER-4a5d087d-7a99-4c5e-b19a-09403c488ba6', 'IN-272625252', 1, 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc');
 
--- DELETE FROM `DeviceTypes`;
--- INSERT INTO `DeviceTypes`(
---     `ID`,
---     `Name`
--- ) VALUES
+INSERT INTO `DeviceTypes`(
+    `ID`,
+    `Name`
+) VALUES
+(0, 'Camera'),
+(1, 'Alarm'),
+(2, 'Lock'),
+(3, 'Computer'),
+(4, 'Metal detector');
+
+INSERT INTO `Devices`(
+    `Serial`,
+    `SectorID`,
+    `Number`,
+    `DeviceTypeID`
+) VALUES
+('1164422448', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, 0),
+('9112003239', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 2, 0),
+('2385928094', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 3, 0),
+('2440430420', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 4, 0),
+('0879924209', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 5, 0),
+('5745415045', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 6, 0),
+('6800458031', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 7, 0),
+('0747089078', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 8, 0),
+('6361168492', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 9, 1),
+('5932547154', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 10, 1),
+('8388215248', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 11, 1),
+('3215784726', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 12, 1),
+('3905159538', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 13, 2),
+('3208707053', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 14, 2),
+('3485807095', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 15, 2),
+('4158000874', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 16, 2),
+('6708576198', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 17, 2),
+('5286125816', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 18, 2),
+('1097388794', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 19, 2),
+('5809646050', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 20, 2),
+('2777950997', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 21, 3),
+('2124067656', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 22, 3),
+('9861544275', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 23, 3),
+('9186054023', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 24, 3),
+('1724472194', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 25, 4),
+('6441598809', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 26, 4),
+('3136183576', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 27, 4),
+('2725542170', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 28, 4),
+('6416424142', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 1, 0),
+('2957575655', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 2, 0),
+('3349992064', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 3, 0),
+('4493069244', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 4, 0),
+('9057610035', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 5, 0),
+('3089579731', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 6, 0),
+('1103876244', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 7, 0),
+('3557820602', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 8, 0),
+('0549395520', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 9, 1),
+('2061807216', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 10, 1),
+('8002219392', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 11, 1),
+('4050794977', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 12, 1),
+('0670542997', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 13, 2),
+('8724384402', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 14, 2),
+('0861600762', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 15, 2),
+('2204250007', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 16, 2),
+('4193076636', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 17, 2),
+('3946090265', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 18, 2),
+('5204329587', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 19, 2),
+('4040691326', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 20, 2),
+('0768094402', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 21, 3),
+('8967982321', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 22, 3),
+('9187423553', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 23, 3),
+('9731503692', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 24, 3),
+('9337789051', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 25, 4),
+('3276416476', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 26, 4),
+('1772233153', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 27, 4),
+('6542295968', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 28, 4),
+('8924457535', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 1, 0),
+('7114122624', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 2, 0),
+('4476113850', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 3, 0),
+('8993633932', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 4, 0),
+('4096063231', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 5, 0),
+('8850939396', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 6, 0),
+('9235704863', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 7, 1),
+('4498811143', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 8, 1),
+('4536249192', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 9, 1),
+('1411509382', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 10, 2),
+('9755875816', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 11, 2),
+('7019841597', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 12, 2),
+('6097890907', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 13, 2),
+('4586562900', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 14, 2),
+('9947110869', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 15, 3),
+('0674824881', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 16, 3),
+('7193783246', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 17, 3),
+('2326652843', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 18, 4),
+('6628133672', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 19, 4),
+('9849082798', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 20, 4),
+('5209914763', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, 0),
+('2188353617', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 2, 0),
+('5005001530', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 3, 0),
+('7558054621', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 4, 0),
+('5960448025', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 5, 0),
+('1862439788', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 6, 0),
+('5680072289', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 7, 1),
+('0493387269', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 8, 1),
+('9910122782', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 9, 1),
+('9822896166', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 10, 2),
+('9113133446', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 11, 2),
+('1905727380', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 12, 2),
+('9371710721', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 13, 2),
+('3055574893', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 14, 2),
+('8426238750', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 15, 3),
+('0868523895', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 16, 3),
+('1795127171', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 17, 3),
+('5887306114', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 18, 4),
+('2487315423', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 19, 4),
+('1333142633', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 20, 4),
+('1704410940', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 1, 0),
+('0556800613', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 2, 0),
+('9949636884', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 3, 0),
+('7869853682', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 4, 0),
+('7797678847', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 5, 1),
+('1893967417', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 6, 1),
+('8200463680', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 7, 2),
+('3791126237', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 8, 2),
+('6933516628', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 9, 3),
+('5756108750', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 10, 3),
+('8807236826', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 11, 4),
+('3048969403', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 12, 4),
+('5928525826', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 1, 0),
+('5940788777', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 2, 0),
+('3809398284', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 3, 0),
+('6915361642', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 4, 0),
+('8149973842', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 5, 1),
+('8059448862', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 6, 1),
+('7127889260', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 7, 2),
+('2453944738', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 8, 2),
+('1588162648', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 9, 3),
+('1786335913', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 10, 3),
+('8183287174', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 11, 4),
+('5200117119', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 12, 4),
+('0334141443', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 1, 0),
+('2776023782', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 2, 0),
+('8609186784', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 3, 1),
+('5415383301', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 4, 2),
+('6428945770', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 5, 3),
+('9564806119', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 6, 4),
+('1636200591', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1, 0),
+('9323671983', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 2, 0),
+('7064320517', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 3, 1),
+('2889743527', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 4, 2),
+('0980789648', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 5, 3),
+('7080176093', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 6, 4);
+
+INSERT INTO `Reports`(
+    -- `ID` is auto increment
+    `DateTime`,
+    `Description`,
+    `ResponsiblePersonnelID`
+) VALUES
+('2019-07-11 08:50:55', 'Inmates escape attempt trough multiple sectors busted', 'PER-b13327fc-9bf5-4b94-98db-57389a795034'),
+('2008-01-28 12:41:14', 'Computers upgrade', 'PER-caafd732-cf23-4f3b-82ab-58e9194c90ea'),
+('2018-11-21 09:01:54', 'Library inventory check', 'PER-207cc7f3-cdd3-493e-b842-60c9b564ae03'),
+('2020-03-14 10:26:10', 'Director summary of the week', 'PER-ecee39cb-5c88-4e17-aea8-3d04eab1a411');
+
+INSERT INTO `EngagedInmates`(
+    `ReportID`,
+    `InmateNumber`
+) VALUES
+(1, '72-733-3969'),
+(1, '83-628-8300');
+
+INSERT INTO `EngagedPersonnel`(
+    `ReportID`,
+    `PersonnelID`
+) VALUES
+(1, 'PER-3e2a9969-c7a8-4668-b080-818118411238'),
+(1, 'PER-c7379407-73fc-4ef2-9fe5-e6ac446a182c');
+
+INSERT INTO `EngagedSectors`(
+    `ReportID`,
+    `SectorID`
+) VALUES
+(1, 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0'),
+(1, 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'),
+(2, 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961'),
+(2, 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc'),
+(3, 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343');
+
+DELETE FROM `EngagedDevices`;
+INSERT INTO `EngagedDevices`(
+    `ReportID`,
+    `DeviceSerial`
+) VALUES
+(1, '1164422448'),
+(1, '9112003239'),
+(1, '9235704863'),
+(2, '8609186784'),
+(2, '7064320517');
+
+INSERT INTO `Couriers`(
+    `DocumentID`
+) VALUES
+('PE-789016543'),
+('DZ-901238765'),
+('NG-123450987'),
+('ET-456783210'),
+('UG-678905432'),
+('CM-890127654');
 
 
--- DELETE FROM `Devices`;
--- INSERT INTO `Devices`(
---     `Serial`,
---     `SectorID`,
---     `Number`,
---     `DeviceTypeID`
--- ) VALUES
+INSERT INTO `Vehicles`(
+    `PlateNumber`,
+    `CourierDocumentID`
+) VALUES
+('PLT9X7K2MJ', 'PE-789016543'),
+('RX3T8V1NQL', 'PE-789016543'),
+('BZ7W4K9PXM', 'DZ-901238765'),
+('QK2J6N8TLR', 'NG-123450987'),
+('MN5L3V7XQY', 'NG-123450987'),
+('XE8P1R6TWK', 'NG-123450987'),
+('CW9T2M5LQJ', 'ET-456783210'),
+('LK4X7B8PRN', 'UG-678905432'),
+('VJ1N9Q6WTE', 'CM-890127654');
 
 
--- DELETE FROM `Reports`;
--- ALTER TABLE `Reports` AUTO_INCREMENT = 1;
--- INSERT INTO `Reports`(
---     -- `ID` is auto increment
---     `DateTime`,
---     `Description`,
---     `ResponsiblePersonnelID`
--- ) VALUES
+INSERT INTO `GoodsTypes`(
+    `ID`,
+    `Name`
+) VALUES
+(0, 'Food'),
+(1, 'Weapons'),
+(2, 'Medical supplies'),
+(3, 'Utensils');
+
+INSERT INTO `Deliveries`(
+    `DateTime`,
+    `GoodsTypeID`,
+    `Quantity`,
+    `VehiclePlateNumber`
+) VALUES
+('2006-12-02 20:56:40', 0, 113, 'PLT9X7K2MJ'),
+('2019-11-03 18:55:24', 1, 143, 'RX3T8V1NQL'),
+('2008-09-04 06:45:26', 0, 135, 'BZ7W4K9PXM'),
+('2020-03-28 05:38:25', 2, 71, 'PLT9X7K2MJ'),
+('2009-08-02 13:15:45', 3, 64, 'QK2J6N8TLR'),
+('2008-06-19 13:33:26', 2, 79, 'MN5L3V7XQY'),
+('2018-02-15 10:23:07', 3, 115, 'XE8P1R6TWK'),
+('2020-06-26 06:22:48', 1, 104, 'XE8P1R6TWK'),
+('2021-10-15 02:05:27', 0, 148, 'CW9T2M5LQJ'),
+('2010-03-31 08:05:56', 2, 100, 'LK4X7B8PRN'),
+('2024-12-29 16:06:04', 3, 65, 'VJ1N9Q6WTE'),
+('2009-07-09 21:16:19', 2, 143, 'CW9T2M5LQJ');
 
 
--- DELETE FROM `EngagedInmates`;
--- INSERT INTO `EngagedInmates`(
---     `ReportID`,
---     `InmateNumber`
--- ) VALUES
-
-
--- DELETE FROM `EngagedPersonnel`;
--- INSERT INTO `EngagedPersonnel`(
---     `ReportID`,
---     `PersonnelID`
--- ) VALUES
-
-
--- DELETE FROM `EngagedSectors`;
--- INSERT INTO `EngagedSectors`(
---     `ReportID`,
---     `SectorID`
--- ) VALUES
-
-
--- DELETE FROM `EngagedDevices`;
--- INSERT INTO `EngagedDevices`(
---     `ReportID`,
---     `DeviceSerial`
--- ) VALUES
-
-
--- DELETE FROM `Couriers`;
--- INSERT INTO `Couriers`(
---     `DocumentID`
--- ) VALUES
-
-
--- DELETE FROM `Vehicles`;
--- INSERT INTO `Vehicles`(
---     `PlateNumber`,
---     `CourierDocumentID`
--- ) VALUES
-
-
--- DELETE FROM `GoodsTypes`;
--- INSERT INTO `GoodsTypes`(
---     `ID`,
---     `Name`
--- ) VALUES
-
-
--- DELETE FROM `Deliveries`;
--- INSERT INTO `Deliveries`(
---     `DateTime`,
---     `GoodsTypeID`,
---     `Quantity`,
---     `VehiclePlateNumber`
--- ) VALUES
-
-
--- DELETE FROM `Activities`;
 -- INSERT INTO `Activities`(
 --     `ID`,
 --     `Name`,
