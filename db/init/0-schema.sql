@@ -180,7 +180,6 @@ CREATE TABLE `Deliveries` (
 DROP TABLE IF EXISTS `Activities`;
 CREATE TABLE `Activities` (
     `ID` VARCHAR(40) PRIMARY KEY,
-    `Name` VARCHAR(30) NOT NULL,
     `Description` VARCHAR(200) NOT NULL,
     `Duration` INT NOT NULL
 );
@@ -223,23 +222,24 @@ CREATE TABLE `Surveillances` (
     )
 );
 
+-- TODO: choose on delete and update
 ALTER TABLE `Persons`
 ADD CONSTRAINT `Persons_Genders_FK` FOREIGN KEY (`GenderID`) REFERENCES `Genders`(`ID`);
 
 ALTER TABLE `Sectors`
-ADD CONSTRAINT `Sectors_Genders_FK` FOREIGN KEY (`GenderID`) REFERENCES `Genders`(`ID`); 
+ADD CONSTRAINT `Sectors_Genders_FK` FOREIGN KEY (`GenderID`) REFERENCES `Genders`(`ID`);
 
 ALTER TABLE `Sectors`
-ADD CONSTRAINT `Sectors_SecurityLevels_FK` FOREIGN KEY (`SecurityLevelID`) REFERENCES `SecurityLevels`(`ID`); 
+ADD CONSTRAINT `Sectors_SecurityLevels_FK` FOREIGN KEY (`SecurityLevelID`) REFERENCES `SecurityLevels`(`ID`);
 
 ALTER TABLE `Cells`
-ADD CONSTRAINT `Cells_Sectors_FK` FOREIGN KEY (`SectorID`) REFERENCES `Sectors`(`ID`);
+ADD CONSTRAINT `Cells_Sectors_FK` FOREIGN KEY (`SectorID`) REFERENCES `Sectors`(`ID`) ON DELETE CASCADE;
 
 ALTER TABLE `Inmates`
-ADD CONSTRAINT `Inmates_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`);
+ADD CONSTRAINT `Inmates_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`) ON DELETE CASCADE;
 
 ALTER TABLE `Inmates`
-ADD CONSTRAINT `Inmates_Cells_FK` FOREIGN KEY (`CellSectorID`, `CellNumber`) REFERENCES `Cells`(`SectorID`, `Number`); 
+ADD CONSTRAINT `Inmates_Cells_FK` FOREIGN KEY (`CellSectorID`, `CellNumber`) REFERENCES `Cells`(`SectorID`, `Number`);
 
 ALTER TABLE `Movements`
 ADD CONSTRAINT `Movements_Inmates_FK` FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`);
@@ -248,10 +248,10 @@ ALTER TABLE `Movements`
 ADD CONSTRAINT `Movements_Cells_FK` FOREIGN KEY (`CellSectorID`, `CellNumber`) REFERENCES `Cells`(`SectorID`, `Number`);
 
 ALTER TABLE `Guests`
-ADD CONSTRAINT `Guests_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`);
+ADD CONSTRAINT `Guests_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`) ON DELETE CASCADE;
 
 ALTER TABLE `Visits`
-ADD CONSTRAINT `Visits_Inmates_FK` FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`);
+ADD CONSTRAINT `Visits_Inmates_FK` FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`) ON DELETE CASCADE;
 
 ALTER TABLE `Visitors`
 ADD CONSTRAINT `Visitors_Visits_FK` FOREIGN KEY (`VisitInmateNumber`, `VisitDateTime`) REFERENCES `Visits`(`InmateNumber`, `DateTime`);
@@ -281,10 +281,10 @@ ALTER TABLE `EngagedInmates`
 ADD CONSTRAINT `EngagedInmates_Inmates_FK` FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`);
 
 ALTER TABLE `EngagedPersonnel`
-ADD CONSTRAINT `EngagedPersonnel_Reports_FK` FOREIGN KEY (`ReportID`) REFERENCES `Reports`(`ID`);   
+ADD CONSTRAINT `EngagedPersonnel_Reports_FK` FOREIGN KEY (`ReportID`) REFERENCES `Reports`(`ID`);
 
 ALTER TABLE `EngagedPersonnel`
-ADD CONSTRAINT `EngagedPersonnel_Personnel_FK` FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);  
+ADD CONSTRAINT `EngagedPersonnel_Personnel_FK` FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);
 
 ALTER TABLE `EngagedSectors`
 ADD CONSTRAINT `EngagedSectors_Reports_FK` FOREIGN KEY (`ReportID`) REFERENCES `Reports`(`ID`);
@@ -299,16 +299,16 @@ ALTER TABLE `EngagedDevices`
 ADD CONSTRAINT `EngagedDevices_Devices_FK` FOREIGN KEY (`DeviceSerial`) REFERENCES `Devices`(`Serial`);
 
 ALTER TABLE `Couriers`
-ADD CONSTRAINT `Couriers_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`); 
+ADD CONSTRAINT `Couriers_Persons_FK` FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`);
 
 ALTER TABLE `Vehicles`
-ADD CONSTRAINT `Vehicles_Couriers_FK` FOREIGN KEY (`CourierDocumentID`) REFERENCES `Couriers`(`DocumentID`); 
+ADD CONSTRAINT `Vehicles_Couriers_FK` FOREIGN KEY (`CourierDocumentID`) REFERENCES `Couriers`(`DocumentID`);
 
 ALTER TABLE `Deliveries`
-ADD CONSTRAINT `Deliveries_GoodsTypes_FK` FOREIGN KEY (`GoodsTypeID`) REFERENCES `GoodsTypes`(`ID`); 
+ADD CONSTRAINT `Deliveries_GoodsTypes_FK` FOREIGN KEY (`GoodsTypeID`) REFERENCES `GoodsTypes`(`ID`);
 
 ALTER TABLE `Deliveries`
-ADD CONSTRAINT `Deliveries_Vehicles_FK` FOREIGN KEY (`VehiclePlateNumber`) REFERENCES `Vehicles`(`PlateNumber`); 
+ADD CONSTRAINT `Deliveries_Vehicles_FK` FOREIGN KEY (`VehiclePlateNumber`) REFERENCES `Vehicles`(`PlateNumber`);
 
 ALTER TABLE `Availabilities`
 ADD CONSTRAINT `Availabilities_SecurityLevels_FK` FOREIGN KEY (`SecurityLevelID`) REFERENCES `SecurityLevels`(`ID`);

@@ -14,5 +14,12 @@
             "username": "root",
             "password": "root"
         }
-    ]
+    ],
+    "sqltools.autoConnectTo": [
+        "IronGate"
+    ],
+    "sqltools.format": {
+        "linesBetweenQueries": "preserve",
+        "reservedWordCase": "upper"
+    }
 }
