@@ -154,6 +154,8 @@ CREATE TABLE `EngagedDevices` (
     PRIMARY KEY(`ReportID`, `DeviceSerial`)
 );
 
+-- check er
+
 DROP TABLE IF EXISTS `Couriers`;
 CREATE TABLE `Couriers` (`DocumentID` VARCHAR(30) PRIMARY KEY);
 
