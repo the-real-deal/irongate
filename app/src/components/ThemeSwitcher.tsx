@@ -1,19 +1,15 @@
 import { Select, useColorScheme, Option } from "@mui/joy"
-import { useEffect, useState } from "react"
+import { SxProps } from "@mui/material"
 
-export default function ThemeSwitcher() {
+interface Props {
+    sx?: SxProps
+}
+
+export default function ThemeSwitcher({ sx }: Props) {
     const { mode, setMode } = useColorScheme()
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => {
-        setMounted(true)
-    }, [])
-
-    if (!mounted) {
-        return null
-    }
     return (
         <Select
+            sx={sx}
             variant="soft"
             value={mode}
             onChange={(_, newMode) => {
