@@ -8,11 +8,11 @@
       "path": "./tsconfig.node.json"
     }
   ],
-  "compilerOptions": {
-    "paths": {
-      "@mui/material": [
-        "./node_modules/@mui/joy"
-      ]
-    }
-  }
+  // "compilerOptions": {
+  //   "paths": {
+  //     "@mui/material": [
+  //       "./node_modules/@mui/joy"
+  //     ]
+  //   }
+  // }
 }

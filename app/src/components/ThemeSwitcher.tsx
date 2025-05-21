@@ -1,11 +1,7 @@
 import { Select, useColorScheme, Option } from "@mui/joy"
-import { SxProps } from "@mui/material"
+import { ComponentProps } from "./utils"
 
-interface Props {
-    sx?: SxProps
-}
-
-export default function ThemeSwitcher({ sx }: Props) {
+export default function ThemeSwitcher({ sx }: ComponentProps) {
     const { mode, setMode } = useColorScheme()
     return (
         <Select
