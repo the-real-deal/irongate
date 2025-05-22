@@ -1,6 +1,7 @@
 import { Box, Drawer, IconButton, Stack, Tab, TabList, TabPanel, Tabs, Tooltip, Typography } from "@mui/joy"
 import { FC, PropsWithChildren, ReactNode, useState } from "react"
 import { BaseProps } from "./utils"
+import { IconContext } from "react-icons"
 
 export interface TabStructure {
     title: string
@@ -22,7 +23,7 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
             onChange={() => setOpen(false)}
             orientation="vertical"
             sx={{
-                height: '100%',
+                height: "100%",
                 ...sx
             }}>
             <TabList sx={{
@@ -30,54 +31,66 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                 scrollSnapType: 'x mandatory',
                 '&::-webkit-scrollbar': { display: 'none' },
             }}>
-                <Tooltip title="Expand" placement="right" arrow>
-                    <IconButton
-                        onClick={() => setOpen(true)}
-                        sx={{
-                            width: "100%",
-                            borderRadius: 0
-                        }}>
-                        {expandButtonContent}
-                    </IconButton>
-                </Tooltip>
-                {
-                    tabs.map((t, i) => (
-                        <Tooltip title={t.title} placement="right" arrow>
-                            <Tab
-                                key={i}
-                                variant="plain"
-                                color="neutral"
-                                indicatorInset
-                                sx={{
-                                    width: "100%",
-                                    flex: 'none',
-                                    scrollSnapAlign: 'start',
-                                }}>
-                                {t.icon}
-                            </Tab>
-                        </Tooltip>
-                    ))
-                }
+                <IconContext.Provider value={{
+                    size: "var(--joy-fontSize-lg)"
+                }}>
+                    <Tooltip title="Expand" placement="right" arrow>
+                        <IconButton
+                            onClick={() => setOpen(true)}
+                            sx={{
+                                width: "100%",
+                                borderRadius: 0
+                            }}>
+                            {expandButtonContent}
+                        </IconButton>
+                    </Tooltip>
+                    {
+                        tabs.map((t, i) => (
+                            <Tooltip title={t.title} placement="right" arrow>
+                                <Tab
+                                    key={i}
+                                    variant="plain"
+                                    color="neutral"
+                                    sx={{
+                                        width: "100%",
+                                        flex: 'none',
+                                        scrollSnapAlign: 'start',
+                                    }}>
+                                    {t.icon}
+                                </Tab>
+                            </Tooltip>
+                        ))
+                    }
+                </IconContext.Provider>
             </TabList>
             <Drawer
                 open={open}
                 onClose={() => setOpen(false)}
-                sx={{
-                    height: "100%",
-                }}
+                size="sm"
             >
-                <TabList sx={{
+                <Stack sx={{
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
                     height: "100%",
-                    overflow: 'auto',
-                    scrollSnapType: 'x mandatory',
-                    '&::-webkit-scrollbar': { display: 'none' },
+                    width: "100%",
                 }}>
-                    <Stack sx={{
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        height: "100%",
-                    }}>
-                        <Box sx={{ width: "100%" }}>
+                    <Box sx={{ width: "100%" }}>
+                        <Typography
+                            level="h4"
+                            paddingInline={"1em"}
+                            paddingBlock={"0.5em"}>
+                            Pages
+                        </Typography>
+                        <TabList
+                            disableUnderline
+                            sx={{
+                                height: "100%",
+                                width: "100%",
+                                overflow: 'auto',
+                                scrollSnapType: 'x mandatory',
+                                '&::-webkit-scrollbar': { display: 'none' },
+                                fontWeight: "bold",
+                            }}>
                             {
                                 tabs.map((t, i) => (
                                     <Tab
@@ -91,21 +104,21 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                                             scrollSnapAlign: 'start',
                                             paddingInline: "1em",
                                         }}>
-                                        <Typography sx={{ fontWeight: "bold" }} startDecorator={t.icon}>{t.title}</Typography>
+                                        <Typography level="title-lg" startDecorator={t.icon}>{t.title}</Typography>
                                     </Tab>
                                 ))
                             }
-                        </Box>
-                        {children}
-                    </Stack>
-                </TabList>
+                        </TabList>
+                    </Box>
+                    {children}
+                </Stack>
             </Drawer>
             {
                 tabs.map((t, i) => (
                     <TabPanel value={i}>{t.content}</TabPanel>
                 ))
             }
-        </Tabs>
+        </Tabs >
     )
 }
 

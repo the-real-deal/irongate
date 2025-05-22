@@ -73,9 +73,13 @@ const App: FC = () => {
                         width: "100%",
                         padding: "1em"
                     }}>
-                        <Typography sx={{ fontWeight: "bold" }}>Theme</Typography>
+                        <Typography
+                            level="h4">
+                            Theme
+                        </Typography>
                         <ThemeSwitcher sx={{
                             width: "100%",
+                            marginTop: "0.5em",
                         }} />
                     </Box>
                 </Sidebar>
