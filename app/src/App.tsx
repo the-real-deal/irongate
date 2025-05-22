@@ -1,7 +1,7 @@
-import { Box, CssBaseline, CssVarsProvider, extendTheme, GlobalStyles, Tab, TabList, TabPanel, Tabs, Typography } from "@mui/joy"
+import { Box, CssBaseline, CssVarsProvider, extendTheme, Typography } from "@mui/joy"
 import OverviewPage from "./pages/OverviewPage"
-import { JSX } from "react"
-import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdPestControlRodent } from "react-icons/md"
+import { FC } from "react"
+import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from "react-icons/md"
 import InfrastructurePage from "./pages/InfrastructurePage"
 import PeoplePage from "./pages/PeoplePage"
 import InmatesPage from "./pages/InmatesPage"
@@ -9,14 +9,9 @@ import PersonnelPage from "./pages/PersonnelPage"
 import DeliveriesPage from "./pages/DeliveriesPage"
 import ActivitiesPage from "./pages/ActivitiesPage"
 import ThemeSwitcher from "./components/ThemeSwitcher"
+import Sidebar from "./components/Sidebar"
 
-interface TabStructure {
-    title: string
-    icon: JSX.Element
-    content: JSX.Element
-}
-
-const TABS: TabStructure[] = [
+const TABS = [
     {
         // statistiche
         title: "Overview",
@@ -63,83 +58,30 @@ const TABS: TabStructure[] = [
 
 const THEME = extendTheme()
 
-export default function App() {
+const App: FC = () => {
     return (
         <CssVarsProvider theme={THEME}>
             <CssBaseline />
-            <GlobalStyles styles={{
-                // The {selector} is the CSS selector to target the icon.
-                // We recommend using a class over a tag if possible.
-                '{selector}': {
-                    color: "var(--Icon-color)",
-                    margin: "var(--Icon-margin)",
-                    fontSize: "var(--Icon-fontSize, 20px)",
-                    width: "1em",
-                    height: "1em"
-                }
-            }} />
             <Box sx={{
                 height: '100dvh',
                 width: '100dvw',
                 padding: 0,
                 margin: 0
             }}>
-                <Tabs orientation="vertical" sx={{
-                    height: '100%',
-                }}>
-                    <TabList sx={{
-                        overflow: 'auto',
-                        scrollSnapType: 'x mandatory',
-                        '&::-webkit-scrollbar': { display: 'none' },
+                <Sidebar tabs={TABS} expandButtonContent={<MdMenu />}>
+                    <Box sx={{
+                        width: "100%",
+                        padding: "1em"
                     }}>
-                        <Box
-                            sx={{
-                                // background: "red",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                alignItems: "flex-start",
-                                height: "100%",
-                            }}
-                        >
-                            <Box>
-                                {
-                                    TABS.map((t, i) => (
-                                        <Tab
-                                            key={i}
-                                            variant="plain"
-                                            color="neutral"
-                                            indicatorInset
-                                            sx={{
-                                                width: "100%",
-                                                flex: 'none',
-                                                scrollSnapAlign: 'start'
-                                            }}
-                                        >
-                                            <Typography sx={{ fontWeight: "bold" }} startDecorator={t.icon}>{t.title}</Typography>
-                                        </Tab>
-                                    ))
-                                }
-                            </Box>
-                            <Box sx={{
-                                width: "100%",
-                                padding: "1em"
-                            }}>
-                                <Typography sx={{ fontWeight: "bold" }}>Theme</Typography>
-                                <ThemeSwitcher sx={{
-                                    width: "100%",
-
-                                }} />
-                            </Box>
-                        </Box>
-                    </TabList>
-                    {
-                        TABS.map((t, i) => (
-                            <TabPanel value={i}>{t.content}</TabPanel>
-                        ))
-                    }
-                </Tabs>
+                        <Typography sx={{ fontWeight: "bold" }}>Theme</Typography>
+                        <ThemeSwitcher sx={{
+                            width: "100%",
+                        }} />
+                    </Box>
+                </Sidebar>
             </Box>
-        </CssVarsProvider>
+        </CssVarsProvider >
     )
 }
+
+export default App

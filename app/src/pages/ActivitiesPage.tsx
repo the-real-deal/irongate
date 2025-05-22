@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/joy"
+import { FC } from "react"
 
-function ActivitiesPage() {
+const ActivitiesPage: FC = () => {
     return (
         <Box>
             <Typography level="h1">Activities</Typography>
