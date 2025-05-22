@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS `Sectors`;
 CREATE TABLE `Sectors` (
     `ID` VARCHAR(40) PRIMARY KEY,
     `Name` VARCHAR(20) NOT NULL,
-    `GenderID` INT NOT NULL,
+    `GenderID` INT,
     `SecurityLevelID` INT NOT NULL
 );
 
@@ -569,6 +569,7 @@ VALUES
 
 INSERT INTO `Sectors`(`ID`, `Name`, `GenderID`, `SecurityLevelID`)
 VALUES 
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 'Common space', NULL, 0),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 'Main - Male', 0, 0),
 ('SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 'Main - Female', 1, 0),
 ('SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 'Priority - Male', 0, 1),
@@ -1088,7 +1089,8 @@ VALUES
 (2, 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1');
 
 INSERT INTO `Zones`(`SectorID`, `Number`, `Name`, `Capacity`)
-VALUES 
+VALUES
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, 'Canteen', 200),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, 'Library', 50),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 2, 'Court', 80),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 3, 'Canteen', 100),
@@ -1107,13 +1109,18 @@ VALUES
 INSERT INTO `Routines`(`ZoneSectorID`, `ZoneNumber`, `DateTime`, `ActivityID`)
 VALUES 
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1'),
-('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185');
+('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1');
 
 INSERT INTO `Partecipations`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`, `SectorID`)
 VALUES
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0'),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'),
-('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df');
+('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df');
 
 INSERT INTO `Surveillances`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`, `PersonnelID`)
 VALUES 
@@ -1122,4 +1129,12 @@ VALUES
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'PER-c7379407-73fc-4ef2-9fe5-e6ac446a182c'),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'PER-275eff7d-b535-4819-a882-82ff91a114e2'),
 ('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'PER-f3aa690e-bd63-4d1f-9426-917a0782670f'),
-('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'PER-5fcbde84-a7c8-47f4-9eb0-3caa9f612ed0');
+('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'PER-5fcbde84-a7c8-47f4-9eb0-3caa9f612ed0'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-6384e8ba-5971-475b-9e7f-f01533c6b4c7'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-b8da78c0-bcf9-4f7a-bfeb-e5e9f5043050'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-d430fa7a-8649-4a01-b01d-4a5fb708669f'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-93ab0d5f-cbfe-44f1-ac86-518863386ce7'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-346a05a9-337b-455e-9a65-313c0d3278c0'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-3a4cf916-8a6b-4a6e-a553-c618ae6b7f4f'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-ae4ec946-4836-45d0-b6ce-4c1daa035de3'),
+('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'PER-c272adf9-d6b9-4c05-94c6-1824fe5d13eb');
