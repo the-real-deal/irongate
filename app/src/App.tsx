@@ -9,7 +9,7 @@ import DeliveriesPage from "./pages/deliveries/DeliveriesPage"
 import ActivitiesPage from "./pages/activities/ActivitiesPage"
 import ThemeSwitcher from "./components/core/ThemeSwitcher"
 import Sidebar from "./components/core/Sidebar"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ErrorNotification from "./components/errors/ErrorNotification"
 
 const TABS = [
@@ -120,9 +120,18 @@ const THEME = extendTheme({
 
 export default function App() {
     const [error, setError] = useState<Error | null>(null)
-    window.addEventListener('error', ({ error }) => {
-        setError(error)
-    })
+
+    useEffect(() => {
+        function handleError({ error }: ErrorEvent) {
+            setError(error)
+        }
+
+        window.addEventListener("error", handleError)
+
+        return () => {
+            window.removeEventListener("error", handleError)
+        }
+    }, [])
 
     return (
         <CssVarsProvider theme={THEME}>

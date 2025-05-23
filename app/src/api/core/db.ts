@@ -1,8 +1,6 @@
-import mysql, { PoolConnection, PoolOptions, ResultSetHeader, RowDataPacket } from "mysql2/promise"
+import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2/promise"
 import env from "./env"
 import { Pool } from "mysql2/promise"
-import { PathLike } from "node:fs"
-import fs from "node:fs/promises"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
     return options
@@ -10,27 +8,28 @@ function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
 
 const forcedOptions = defineForcedOptions({
     rowsAsArray: false,
+    namedPlaceholders: true,
     multipleStatements: false,
 })
 
 export type DBConfig = Omit<PoolOptions, keyof typeof forcedOptions>
 
-function init(config: DBConfig = {}) {
-    config.host ??= env.getRequired("DB_HOST", "string")
-    config.port ??= env.get("DB_PORT", "number") ?? 3306
-    config.database ??= env.getRequired("DB_NAME", "string")
-    config.user ??= env.getRequired("DB_USER", "string")
-    config.password ??= env.getRequired("DB_PASSWORD", "string")
-    return new DBManager(mysql.createPool({ ...config, ...forcedOptions }))
+export type ColumnValue = string | number | Date | null
+export type TableStructure = { [key: string]: ColumnValue }
+export type QueryEntry<T extends TableStructure> = {
+    [K in keyof T]: T[K]
 }
 
-export type QueryResult<T> = (T & RowDataPacket)[]
-
 export class DBManager {
-    private readonly pool: Pool
+    private pool: Pool
 
-    constructor(pool: Pool) {
-        this.pool = pool
+    constructor(config: DBConfig = {}) {
+        config.host ??= env.getRequired("DB_HOST", "string")
+        config.port ??= env.get("DB_PORT", "number") ?? 3306
+        config.database ??= env.getRequired("DB_NAME", "string")
+        config.user ??= env.getRequired("DB_USER", "string")
+        config.password ??= env.getRequired("DB_PASSWORD", "string")
+        this.pool = createPool({ ...config, ...forcedOptions })
     }
 
     async testConnection() {
@@ -46,23 +45,16 @@ export class DBManager {
         }
     }
 
-    async executeQuery<T extends RowDataPacket[] | ResultSetHeader>(
+    async executeQuery<T extends QueryEntry<TableStructure>[] | ResultSetHeader>(
         query: string,
-        values: any[] = [],
+        values: { [k: string]: any } = {},
     ): Promise<T> {
         const connection = await this.pool.getConnection()
         try {
-            const [result] = await connection.query<T>(query, values)
-            return result
+            const [result] = await connection.query(query, values)
+            return result as T
         } finally {
             connection.release()
         }
     }
-
-    async executeScript<T extends RowDataPacket[] | ResultSetHeader>(path: PathLike, values: any[]): Promise<T> {
-        const file = await fs.readFile(path)
-        return this.executeQuery(file.toString(), values)
-    }
 }
-
-export default { init }
