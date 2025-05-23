@@ -1,12 +1,9 @@
 import { Box, Typography } from "@mui/joy"
-import { FC } from "react"
 
-const InfrastructurePage: FC = () => {
+export default function InfrastructurePage() {
     return (
         <Box>
             <Typography level="h1">Infrastructure</Typography>
         </Box>
     )
 }
-
-export default InfrastructurePage

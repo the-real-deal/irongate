@@ -1,12 +1,10 @@
-import { Box, Typography } from "@mui/joy"
-import { FC } from "react"
+import { Box, Button, Typography } from "@mui/joy"
 
-const OverviewPage: FC = () => {
+export default function OverviewPage() {
     return (
         <Box>
             <Typography level="h1">Overview</Typography>
+            <Button onClick={() => { throw new Error("Test error") }}>get error</Button>
         </Box>
     )
 }
-
-export default OverviewPage

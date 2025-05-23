@@ -1,8 +1,7 @@
 import { Select, useColorScheme, Option } from "@mui/joy"
-import { FC } from "react"
-import { BaseProps } from "../api/ui/components"
+import { BaseProps } from "../../api/ui/components"
 
-const ThemeSwitcher: FC<BaseProps> = ({ sx }) => {
+export default function ThemeSwitcher({ sx }: BaseProps) {
     const { mode, setMode } = useColorScheme()
     return (
         <Select
@@ -49,5 +48,3 @@ const ThemeSwitcher: FC<BaseProps> = ({ sx }) => {
         </Select >
     )
 }
-
-export default ThemeSwitcher

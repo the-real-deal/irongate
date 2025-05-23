@@ -1,6 +1,5 @@
 import { Box, CssBaseline, CssVarsProvider, extendTheme, Typography } from "@mui/joy"
 import OverviewPage from "./pages/overview/OverviewPage"
-import { FC } from "react"
 import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from "react-icons/md"
 import InfrastructurePage from "./pages/infrastructure/InfrastructurePage"
 import PeoplePage from "./pages/people/PeoplePage"
@@ -8,8 +7,10 @@ import InmatesPage from "./pages/inmates/InmatesPage"
 import PersonnelPage from "./pages/personnel/PersonnelPage"
 import DeliveriesPage from "./pages/deliveries/DeliveriesPage"
 import ActivitiesPage from "./pages/activities/ActivitiesPage"
-import ThemeSwitcher from "./components/ThemeSwitcher"
-import Sidebar from "./components/Sidebar"
+import ThemeSwitcher from "./components/core/ThemeSwitcher"
+import Sidebar from "./components/core/Sidebar"
+import { useState } from "react"
+import ErrorNotification from "./components/errors/ErrorNotification"
 
 const TABS = [
     {
@@ -117,10 +118,19 @@ const THEME = extendTheme({
     }
 })
 
-const App: FC = () => {
+export default function App() {
+    const [error, setError] = useState<Error | null>(null)
+    window.addEventListener('error', ({ error }) => {
+        setError(error)
+    })
+
     return (
         <CssVarsProvider theme={THEME}>
             <CssBaseline />
+            <ErrorNotification
+                error={error}
+                onClose={() => setError(null)}
+            />
             <Box sx={{
                 height: '100dvh',
                 width: '100dvw',
@@ -148,5 +158,3 @@ const App: FC = () => {
         </CssVarsProvider >
     )
 }
-
-export default App

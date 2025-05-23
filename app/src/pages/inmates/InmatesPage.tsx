@@ -1,12 +1,9 @@
 import { Box, Typography } from "@mui/joy"
-import { FC } from "react"
 
-const InmatesPage: FC = () => {
+export default function InmatesPage() {
     return (
         <Box>
             <Typography level="h1">Inmates</Typography>
         </Box>
     )
 }
-
-export default InmatesPage

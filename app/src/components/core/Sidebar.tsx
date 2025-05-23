@@ -1,7 +1,7 @@
 import { Box, Drawer, IconButton, Stack, Tab, TabList, TabPanel, Tabs, Tooltip, Typography } from "@mui/joy"
-import { FC, PropsWithChildren, ReactNode, useState } from "react"
+import { PropsWithChildren, ReactNode, useState } from "react"
 import { IconContext } from "react-icons"
-import { BaseProps } from "../api/ui/components"
+import { BaseProps } from "../../api/ui/components"
 
 export interface TabStructure {
     title: string
@@ -12,10 +12,9 @@ export interface TabStructure {
 export interface Props extends BaseProps {
     tabs: TabStructure[]
     expandButtonContent: ReactNode
-    footer?: ReactNode
 }
 
-const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, children }) => {
+export default function Sidebar({ tabs, expandButtonContent, sx, children }: PropsWithChildren<Props>) {
     const [open, setOpen] = useState(false)
 
     return (
@@ -52,8 +51,8 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                             </IconButton>
                         </Tooltip>
                         {
-                            tabs.map((t, i) => (
-                                <Tooltip title={t.title} placement="right" arrow>
+                            tabs.map(({ title, icon }, i) => (
+                                <Tooltip title={title} placement="right" arrow>
                                     <Tab
                                         key={i}
                                         variant="solid"
@@ -63,7 +62,7 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                                             flex: 'none',
                                             scrollSnapAlign: 'start'
                                         }}>
-                                        {t.icon}
+                                        {icon}
                                     </Tab>
                                 </Tooltip>
                             ))
@@ -100,7 +99,7 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                                 fontWeight: "bold",
                             }}>
                             {
-                                tabs.map((t, i) => (
+                                tabs.map(({ title, icon }, i) => (
                                     <Tab
                                         key={i}
                                         variant="plain"
@@ -115,7 +114,7 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                                                 // backgroundColor: "neutral.500"
                                             }
                                         }}>
-                                        <Typography level="title-lg" startDecorator={t.icon}>{t.title}</Typography>
+                                        <Typography level="title-lg" startDecorator={icon}>{title}</Typography>
                                     </Tab>
                                 ))
                             }
@@ -125,12 +124,10 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                 </Stack>
             </Drawer>
             {
-                tabs.map((t, i) => (
-                    <TabPanel value={i}>{t.content}</TabPanel>
+                tabs.map(({ content }, i) => (
+                    <TabPanel value={i}>{content}</TabPanel>
                 ))
             }
         </Tabs >
     )
 }
-
-export default Sidebar
