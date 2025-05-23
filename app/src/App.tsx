@@ -56,7 +56,66 @@ const TABS = [
     }
 ]
 
-const THEME = extendTheme()
+const THEME = extendTheme({
+    "colorSchemes": {
+        "light": {
+            "palette": {
+                "primary": {
+                    "50": "#e0f2f1",
+                    "100": "#b2dfdb",
+                    "200": "#80cbc4",
+                    "300": "#4db6ac",
+                    "400": "#26a69a",
+                    "500": "#009688",
+                    "600": "#00897b",
+                    "700": "#00796b",
+                    "800": "#00695c",
+                    "900": "#004d40"
+                },
+                "neutral": {
+                    "50": "#f8fafc",
+                    "100": "#f1f5f9",
+                    "200": "#e2e8f0",
+                    "300": "#cbd5e1",
+                    "400": "#94a3b8",
+                    "500": "#64748b",
+                    "600": "#475569",
+                    "700": "#334155",
+                    "800": "#1e293b",
+                    "900": "#0f172a"
+                }
+            }
+        },
+        "dark": {
+            "palette": {
+                "primary": {
+                    "50": "#e0f2f1",
+                    "100": "#b2dfdb",
+                    "200": "#80cbc4",
+                    "300": "#4db6ac",
+                    "400": "#26a69a",
+                    "500": "#009688",
+                    "600": "#00897b",
+                    "700": "#00796b",
+                    "800": "#00695c",
+                    "900": "#004d40"
+                },
+                "neutral": {
+                    "50": "#f8fafc",
+                    "100": "#f1f5f9",
+                    "200": "#e2e8f0",
+                    "300": "#cbd5e1",
+                    "400": "#94a3b8",
+                    "500": "#64748b",
+                    "600": "#475569",
+                    "700": "#334155",
+                    "800": "#1e293b",
+                    "900": "#0f172a"
+                }
+            }
+        }
+    }
+})
 
 const App: FC = () => {
     return (
@@ -68,7 +127,9 @@ const App: FC = () => {
                 padding: 0,
                 margin: 0
             }}>
-                <Sidebar tabs={TABS} expandButtonContent={<MdMenu />}>
+                <Sidebar
+                    tabs={TABS}
+                    expandButtonContent={<MdMenu />}>
                     <Box sx={{
                         width: "100%",
                         padding: "1em"

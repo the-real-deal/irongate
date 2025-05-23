@@ -1,7 +1,7 @@
 import { Box, Drawer, IconButton, Stack, Tab, TabList, TabPanel, Tabs, Tooltip, Typography } from "@mui/joy"
 import { FC, PropsWithChildren, ReactNode, useState } from "react"
-import { BaseProps } from "./utils"
 import { IconContext } from "react-icons"
+import { BaseProps } from "../api/ui/components"
 
 export interface TabStructure {
     title: string
@@ -26,41 +26,49 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                 height: "100%",
                 ...sx
             }}>
-            <TabList sx={{
-                overflow: 'auto',
-                scrollSnapType: 'x mandatory',
-                '&::-webkit-scrollbar': { display: 'none' },
-            }}>
+            <TabList
+                variant="solid"
+                color="primary"
+                disableUnderline
+                sx={{
+                    overflow: 'auto',
+                    scrollSnapType: 'x mandatory',
+                    '&::-webkit-scrollbar': { display: 'none' }
+                }}>
                 <IconContext.Provider value={{
                     size: "var(--joy-fontSize-lg)"
                 }}>
-                    <Tooltip title="Expand" placement="right" arrow>
-                        <IconButton
-                            onClick={() => setOpen(true)}
-                            sx={{
-                                width: "100%",
-                                borderRadius: 0
-                            }}>
-                            {expandButtonContent}
-                        </IconButton>
-                    </Tooltip>
-                    {
-                        tabs.map((t, i) => (
-                            <Tooltip title={t.title} placement="right" arrow>
-                                <Tab
-                                    key={i}
-                                    variant="plain"
-                                    color="neutral"
-                                    sx={{
-                                        width: "100%",
-                                        flex: 'none',
-                                        scrollSnapAlign: 'start',
-                                    }}>
-                                    {t.icon}
-                                </Tab>
-                            </Tooltip>
-                        ))
-                    }
+                    <Box>
+                        <Tooltip title="Expand" placement="right" arrow>
+                            <IconButton
+                                onClick={() => setOpen(true)}
+                                variant="solid"
+                                color="primary"
+                                sx={{
+                                    width: "100%",
+                                    borderRadius: 0
+                                }}>
+                                {expandButtonContent}
+                            </IconButton>
+                        </Tooltip>
+                        {
+                            tabs.map((t, i) => (
+                                <Tooltip title={t.title} placement="right" arrow>
+                                    <Tab
+                                        key={i}
+                                        variant="solid"
+                                        color="primary"
+                                        sx={{
+                                            width: "100%",
+                                            flex: 'none',
+                                            scrollSnapAlign: 'start'
+                                        }}>
+                                        {t.icon}
+                                    </Tab>
+                                </Tooltip>
+                            ))
+                        }
+                    </Box>
                 </IconContext.Provider>
             </TabList>
             <Drawer
@@ -96,13 +104,16 @@ const Sidebar: FC<PropsWithChildren<Props>> = ({ tabs, expandButtonContent, sx, 
                                     <Tab
                                         key={i}
                                         variant="plain"
-                                        color="neutral"
+                                        color="primary"
                                         indicatorInset
                                         sx={{
                                             width: "100%",
                                             flex: 'none',
                                             scrollSnapAlign: 'start',
                                             paddingInline: "1em",
+                                            "&:hover, &:hover:not(.Mui-selected)": {
+                                                // backgroundColor: "neutral.500"
+                                            }
                                         }}>
                                         <Typography level="title-lg" startDecorator={t.icon}>{t.title}</Typography>
                                     </Tab>
