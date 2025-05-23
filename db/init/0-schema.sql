@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS `IronGate`;
 CREATE DATABASE `IronGate`;
 USE `IronGate`;
 
--- schema
+-- tables
 
 DROP TABLE IF EXISTS `Genders`;
 CREATE TABLE `Genders` (
