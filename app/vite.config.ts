@@ -9,9 +9,4 @@ export default defineConfig({
     port: env.getRequired("SERVER_PORT", "number")
   },
   plugins: [react()],
-  // resolve: {
-  //   alias: {
-  //     "@mui/material": "@mui/joy"
-  //   }
-  // }
 })
