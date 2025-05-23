@@ -10,8 +10,8 @@ CREATE TABLE `Genders` (
     `Name` VARCHAR(10) NOT NULL
 );
 
-DROP TABLE IF EXISTS `Persons`;
-CREATE TABLE `Persons` (
+DROP TABLE IF EXISTS `People`;
+CREATE TABLE `People` (
     `DocumentID` VARCHAR(30) PRIMARY KEY,
     `Name` VARCHAR(30) NOT NULL,
     `Surname` VARCHAR(30) NOT NULL,
@@ -240,8 +240,8 @@ CREATE TABLE `Surveillances` (
     )
 );
 
-ALTER TABLE `Persons`
-ADD CONSTRAINT `Persons_Genders_FK`
+ALTER TABLE `People`
+ADD CONSTRAINT `People_Genders_FK`
 FOREIGN KEY (`GenderID`) REFERENCES `Genders`(`ID`);
 
 ALTER TABLE `Sectors`
@@ -258,8 +258,8 @@ FOREIGN KEY (`SectorID`) REFERENCES `Sectors`(`ID`)
 ON DELETE CASCADE;
 
 ALTER TABLE `Inmates`
-ADD CONSTRAINT `Inmates_Persons_FK`
-FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`)
+ADD CONSTRAINT `Inmates_People_FK`
+FOREIGN KEY (`DocumentID`) REFERENCES `People`(`DocumentID`)
 ON DELETE CASCADE;
 
 ALTER TABLE `Inmates`
@@ -275,8 +275,8 @@ ADD CONSTRAINT `Movements_Cells_FK`
 FOREIGN KEY (`CellSectorID`, `CellNumber`) REFERENCES `Cells`(`SectorID`, `Number`);
 
 ALTER TABLE `Guests`
-ADD CONSTRAINT `Guests_Persons_FK`
-FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`)
+ADD CONSTRAINT `Guests_People_FK`
+FOREIGN KEY (`DocumentID`) REFERENCES `People`(`DocumentID`)
 ON DELETE CASCADE;
 
 ALTER TABLE `Visits`
@@ -292,8 +292,8 @@ ADD CONSTRAINT `Visitors_Guests_FK`
 FOREIGN KEY (`GuestDocumentID`) REFERENCES `Guests`(`DocumentID`);
 
 ALTER TABLE `Personnel`
-ADD CONSTRAINT `Personnel_Persons_FK`
-FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`)
+ADD CONSTRAINT `Personnel_People_FK`
+FOREIGN KEY (`DocumentID`) REFERENCES `People`(`DocumentID`)
 ON DELETE CASCADE;
 
 ALTER TABLE `Personnel`
@@ -346,8 +346,8 @@ ADD CONSTRAINT `EngagedDevices_Devices_FK`
 FOREIGN KEY (`DeviceSerial`) REFERENCES `Devices`(`Serial`);
 
 ALTER TABLE `Couriers`
-ADD CONSTRAINT `Couriers_Persons_FK`
-FOREIGN KEY (`DocumentID`) REFERENCES `Persons`(`DocumentID`)
+ADD CONSTRAINT `Couriers_People_FK`
+FOREIGN KEY (`DocumentID`) REFERENCES `People`(`DocumentID`)
 ON DELETE CASCADE;
 
 ALTER TABLE `Vehicles`
@@ -407,7 +407,7 @@ VALUES
 (0, 'Male'),
 (1, 'Female');
 
-INSERT INTO `Persons`(`DocumentID`, `Name`, `Surname`, `Birthday`, `BirthPlace`, `GenderID`)
+INSERT INTO `People`(`DocumentID`, `Name`, `Surname`, `Birthday`, `BirthPlace`, `GenderID`)
 VALUES
 ('IT-ABC12345A', 'Luca', 'Bianchi', '1980-05-12', 'Rome', 0),
 ('US-987654321', 'John', 'Smith', '1975-11-23', 'New York', 0),
