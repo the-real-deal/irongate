@@ -6,7 +6,8 @@ import env from './src/api/core/env'
 export default defineConfig({
   server: {
     host: "0.0.0.0",
-    port: env.getRequired("SERVER_PORT", "number")
+    port: env.getRequired("SERVER_PORT", "number"),
+    strictPort: true,
   },
   plugins: [react()],
 })
