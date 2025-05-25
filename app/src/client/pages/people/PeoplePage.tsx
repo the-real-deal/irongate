@@ -18,8 +18,8 @@ export default function PeoplePage() {
     }, [])
 
     return (
-        <Box height={"100%"}>
-            <Typography level="h1">People</Typography>
+        <Box>
+            <Typography level="h1" paddingBottom={"0.5em"}>People</Typography>
             <TableView<PeopleEntry>
                 structure={{
                     DocumentID: {

@@ -1,36 +1,46 @@
-import { Box, Drawer, IconButton, Stack, Tab, TabList, TabPanel, Tabs, Tooltip, Typography } from "@mui/joy"
-import { PropsWithChildren, ReactNode, useState } from "react"
+import { Box, Drawer, IconButton, Stack, Tab, TabList, Tabs, Tooltip, Typography } from "@mui/joy"
+import { PropsWithChildren, ReactNode, SyntheticEvent, useState } from "react"
 import { IconContext } from "react-icons"
 import { BaseProps } from "../../utils"
 
 export interface TabStructure {
     title: string
+    route: string
     icon: ReactNode
-    content: ReactNode
 }
 
 export interface Props extends BaseProps {
     tabs: TabStructure[]
+    currentRoute: string
+    fallbackRoute: string
     expandButtonContent: ReactNode
+    onChange: (e: SyntheticEvent | null, value: string) => void
 }
 
-export default function Sidebar({ tabs, expandButtonContent, sx, children }: PropsWithChildren<Props>) {
-    const [open, setOpen] = useState(false)
+export default function Sidebar({ tabs, currentRoute, fallbackRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<Props>) {
+    const [drawerOpen, setDrawerOpen] = useState(false)
 
     return (
         <Tabs
-            onChange={() => setOpen(false)}
+            value={currentRoute}
+            onChange={(e, value) => {
+                setDrawerOpen(false)
+                onChange(e, value?.toString() ?? fallbackRoute)
+            }}
             orientation="vertical"
-            sx={sx}>
+            sx={{
+                width: "fit-content",
+                ...sx
+            }}>
             <TabList
                 variant="solid"
                 color="primary"
                 disableUnderline
                 sx={{
-                    position: "fixed",
+                    position: "sticky",
                     top: 0,
-                    left: 0,
                     height: "100dvh",
+                    zIndex: 100
                 }}>
                 <IconContext.Provider value={{
                     size: "var(--joy-fontSize-lg)"
@@ -38,7 +48,7 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                     <Box>
                         <Tooltip title="Expand" placement="right" arrow>
                             <IconButton
-                                onClick={() => setOpen(true)}
+                                onClick={() => setDrawerOpen(true)}
                                 variant="solid"
                                 color="primary"
                                 sx={{
@@ -49,10 +59,10 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                             </IconButton>
                         </Tooltip>
                         {
-                            tabs.map(({ title, icon }, i) => (
+                            tabs.map(({ title, icon, route }) => (
                                 <Tooltip title={title} placement="right" arrow>
                                     <Tab
-                                        key={i}
+                                        value={route}
                                         variant="solid"
                                         color="primary"
                                         sx={{
@@ -69,8 +79,8 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                 </IconContext.Provider>
             </TabList>
             <Drawer
-                open={open}
-                onClose={() => setOpen(false)}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
                 size="sm"
             >
                 <Stack sx={{
@@ -97,9 +107,9 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                                 fontWeight: "bold",
                             }}>
                             {
-                                tabs.map(({ title, icon }, i) => (
+                                tabs.map(({ title, icon, route }) => (
                                     <Tab
-                                        key={i}
+                                        value={route}
                                         variant="plain"
                                         color="primary"
                                         indicatorInset
@@ -108,9 +118,6 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                                             flex: 'none',
                                             scrollSnapAlign: 'start',
                                             paddingInline: "1em",
-                                            "&:hover, &:hover:not(.Mui-selected)": {
-                                                // backgroundColor: "neutral.500"
-                                            }
                                         }}>
                                         <Typography level="title-lg" startDecorator={icon}>{title}</Typography>
                                     </Tab>
@@ -121,16 +128,6 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                     {children}
                 </Stack>
             </Drawer>
-            <Box sx={{
-                height: "100%",
-                paddingLeft: "3em"
-            }}>
-                {
-                    tabs.map(({ content }, i) => (
-                        <TabPanel value={i}>{content}</TabPanel>
-                    ))
-                }
-            </Box>
         </Tabs >
     )
 }

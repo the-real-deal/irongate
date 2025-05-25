@@ -1,25 +1,113 @@
-import { Outlet, Link } from 'react-router-dom'
+import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from 'react-icons/md'
+import { Outlet, useLocation, useNavigate, matchPath } from 'react-router'
+import Sidebar, { TabStructure } from '../components/core/Sidebar'
+import { Box, Typography, Sheet } from '@mui/joy'
+import ThemeSwitcher from '../components/core/ThemeSwitcher'
+import { SyntheticEvent, useEffect, useState } from 'react'
+
+const TABS: TabStructure[] = [
+    {
+        // statistiche
+        title: "Overview",
+        route: "/overview",
+        icon: <MdBarChart />,
+    },
+    {
+        // settori, celle, zone, dispositivi
+        title: "Infrastructure",
+        route: "/infrastructure",
+        icon: <MdApartment />,
+    },
+    {
+        // dati anagrafici + tipo di persona
+        title: "People",
+        route: "/people",
+        icon: <MdGroup />,
+    },
+    {
+        // prigionieri, movimenti di celle, visite
+        title: "Inmates",
+        route: "/inmates",
+        icon: <MdPestControlRodent />,
+    },
+    {
+        // personale, report
+        title: "Personnel",
+        route: "/personnel",
+        icon: <MdLocalPolice />,
+    },
+    {
+        // consegne, corrieri, veicoli
+        title: "Deliveries",
+        route: "/deliveries",
+        icon: <MdLocalShipping />,
+    },
+    {
+        // attività, routine, 
+        title: "Activities",
+        route: "/activities",
+        icon: <MdClass />,
+    }
+]
+
+const fallbackRoute = "/"
 
 export default function MainLayout() {
+    const location = useLocation()
+    const navigate = useNavigate()
+
+    const [currentRoute, setCurrentRoute] = useState<string>(fallbackRoute)
+
+    useEffect(() => {
+        const route = TABS.map(t => t.route).find((path) =>
+            matchPath({ path, end: false }, location.pathname)
+        )
+        setCurrentRoute(route === undefined ? fallbackRoute : route)
+        return () => {
+            setCurrentRoute(fallbackRoute)
+        }
+    }, [location.pathname])
+
+    function handleChange(_: SyntheticEvent | null, newRoute: string) {
+        setCurrentRoute(newRoute)
+        navigate(newRoute)
+    }
+
     return (
-        <div>
-            <header style={{ padding: '1rem', backgroundColor: '#f0f0f0' }}>
-                <nav style={{ display: 'flex', gap: '1rem' }}>
-                    <Link to="/">Home</Link>
-                    <Link to="/about">About</Link>
-                    <Link to="/contact">Contact</Link>
-                    <Link to="/users/123">User 123</Link>
-                    <Link to="/search?term=react&page=1">Search React</Link>
-                </nav>
-            </header>
-
-            <main style={{ padding: '1rem' }}>
-                <Outlet /> {/* This is where nested pages render */}
-            </main>
-
-            <footer style={{ padding: '1rem', backgroundColor: '#f0f0f0' }}>
-                © 2025 My App
-            </footer>
-        </div>
+        <Box sx={{
+            minHeight: "100dvh",
+            width: "100dvw",
+            display: "flex",
+            padding: 0,
+            margin: 0,
+        }}>
+            <Sidebar
+                tabs={TABS}
+                currentRoute={currentRoute}
+                fallbackRoute={fallbackRoute}
+                expandButtonContent={<MdMenu />}
+                onChange={handleChange}>
+                <Box sx={{
+                    width: "100%",
+                    padding: "1em"
+                }}>
+                    <Typography
+                        level="h4">
+                        Theme
+                    </Typography>
+                    <ThemeSwitcher sx={{
+                        width: "100%",
+                        marginTop: "0.5em",
+                    }} />
+                </Box>
+            </Sidebar>
+            <Sheet sx={{
+                width: "100%",
+                minHeight: "100%",
+                padding: "1em",
+            }}>
+                <Outlet />
+            </Sheet>
+        </Box>
     )
 }

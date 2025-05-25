@@ -1,61 +1,15 @@
-import { Box, CssBaseline, CssVarsProvider, extendTheme, Typography } from "@mui/joy"
+import { CssBaseline, CssVarsProvider, extendTheme } from "@mui/joy"
+import { useEffect, useState } from "react"
+import ErrorNotification from "./components/errors/ErrorNotification"
+import { Route, BrowserRouter, Routes, Navigate } from "react-router"
+import MainLayout from "./layouts/MainLayout"
 import OverviewPage from "./pages/overview/OverviewPage"
-import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from "react-icons/md"
 import InfrastructurePage from "./pages/infrastructure/InfrastructurePage"
 import PeoplePage from "./pages/people/PeoplePage"
 import InmatesPage from "./pages/inmates/InmatesPage"
 import PersonnelPage from "./pages/personnel/PersonnelPage"
 import DeliveriesPage from "./pages/deliveries/DeliveriesPage"
 import ActivitiesPage from "./pages/activities/ActivitiesPage"
-import ThemeSwitcher from "./components/core/ThemeSwitcher"
-import Sidebar from "./components/core/Sidebar"
-import { useEffect, useState } from "react"
-import ErrorNotification from "./components/errors/ErrorNotification"
-
-const TABS = [
-    {
-        // statistiche
-        title: "Overview",
-        icon: <MdBarChart />,
-        content: <OverviewPage />
-    },
-    {
-        // settori, celle, zone, dispositivi
-        title: "Infrastructure",
-        icon: <MdApartment />,
-        content: <InfrastructurePage />
-    },
-    {
-        // dati anagrafici + tipo di persona
-        title: "People",
-        icon: <MdGroup />,
-        content: <PeoplePage />
-    },
-    {
-        // prigionieri, movimenti di celle, visite
-        title: "Inmates",
-        icon: <MdPestControlRodent />,
-        content: <InmatesPage />
-    },
-    {
-        // personale, report
-        title: "Personnel",
-        icon: <MdLocalPolice />,
-        content: <PersonnelPage />
-    },
-    {
-        // consegne, corrieri, veicoli
-        title: "Deliveries",
-        icon: <MdLocalShipping />,
-        content: <DeliveriesPage />
-    },
-    {
-        // attività, routine, 
-        title: "Activities",
-        icon: <MdClass />,
-        content: <ActivitiesPage />
-    }
-]
 
 const THEME = extendTheme({
     "colorSchemes": {
@@ -146,33 +100,20 @@ export default function App() {
                 error={error}
                 onClose={() => setError(null)}
             />
-            <Box sx={{
-                minHeight: "100dvh",
-                width: "100dvw",
-                padding: 0,
-                margin: 0,
-            }}>
-                <Sidebar
-                    tabs={TABS}
-                    expandButtonContent={<MdMenu />}
-                    sx={{
-                        width: "100%",
-                    }}>
-                    <Box sx={{
-                        width: "100%",
-                        padding: "1em"
-                    }}>
-                        <Typography
-                            level="h4">
-                            Theme
-                        </Typography>
-                        <ThemeSwitcher sx={{
-                            width: "100%",
-                            marginTop: "0.5em",
-                        }} />
-                    </Box>
-                </Sidebar>
-            </Box>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<MainLayout />}>
+                        <Route index element={<Navigate to="/overview" replace />} />
+                        <Route path="overview" element={<OverviewPage />} />
+                        <Route path="infrastructure" element={<InfrastructurePage />} />
+                        <Route path="people" element={<PeoplePage />} />
+                        <Route path="inmates" element={<InmatesPage />} />
+                        <Route path="personnel" element={<PersonnelPage />} />
+                        <Route path="deliveries" element={<DeliveriesPage />} />
+                        <Route path="activities" element={<ActivitiesPage />} />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
         </CssVarsProvider >
     )
 }
