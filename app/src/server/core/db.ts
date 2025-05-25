@@ -1,6 +1,7 @@
 import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2/promise"
 import env from "../../common/env"
 import { Pool } from "mysql2/promise"
+import utils from "../../common/utils"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
     return options
@@ -10,11 +11,50 @@ const forcedOptions = defineForcedOptions({
     rowsAsArray: false,
     namedPlaceholders: true,
     multipleStatements: false,
+    typeCast: (field, next) => {
+        switch (field.type) {
+            case "DATE":
+            case "TIMESTAMP":
+            case "TIMESTAMP2":
+            case "DATETIME2":
+            case "DATETIME":
+            case "TIME":
+            case "TIME2":
+                return field.string()
+            case "BIT":
+                return field.string() === "1"
+            case "NULL":
+            case "DECIMAL":
+            case "TINY":
+            case "SHORT":
+            case "LONG":
+            case "FLOAT":
+            case "DOUBLE":
+            case "LONGLONG":
+            case "INT24":
+            case "YEAR":
+            case "NEWDATE":
+            case "VARCHAR":
+            case "VECTOR":
+            case "JSON":
+            case "NEWDECIMAL":
+            case "ENUM":
+            case "SET":
+            case "TINY_BLOB":
+            case "MEDIUM_BLOB":
+            case "LONG_BLOB":
+            case "BLOB":
+            case "VAR_STRING":
+            case "STRING":
+            case "GEOMETRY":
+                return next() // default casting for other types
+        }
+    },
 })
 
 export type DBConfig = Omit<PoolOptions, keyof typeof forcedOptions>
 
-export type ColumnValue = string | number | Date | null
+export type ColumnValue = string | number | boolean | null
 export type TableStructure = { [key: string]: ColumnValue }
 export type QueryEntry<T extends TableStructure> = {
     [K in keyof T]: T[K]
@@ -45,16 +85,20 @@ export class DBManager {
         }
     }
 
-    async executeQuery<T extends QueryEntry<TableStructure>[] | ResultSetHeader>(
+    async executeQuery<T extends QueryEntry<TableStructure> | ResultSetHeader>(
         query: string,
-        values: { [k: string]: ColumnValue } = {},
-    ): Promise<T> {
+        values: Partial<{ [k: string]: ColumnValue }> = {},
+    ): Promise<T[]> {
         const connection = await this.pool.getConnection()
         try {
-            const [result] = await connection.query(query, values)
-            return result as T
+            const [result] = await connection.query(query, utils.removeUndefinedKeys(values))
+            return result as T[]
         } finally {
             connection.release()
         }
     }
+}
+
+export function createQuery(...lines: string[]): string {
+    return lines.join("\n")
 }

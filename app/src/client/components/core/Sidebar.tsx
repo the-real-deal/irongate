@@ -21,18 +21,16 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
         <Tabs
             onChange={() => setOpen(false)}
             orientation="vertical"
-            sx={{
-                height: "100%",
-                ...sx
-            }}>
+            sx={sx}>
             <TabList
                 variant="solid"
                 color="primary"
                 disableUnderline
                 sx={{
-                    overflow: 'auto',
-                    scrollSnapType: 'x mandatory',
-                    '&::-webkit-scrollbar': { display: 'none' }
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    height: "100dvh",
                 }}>
                 <IconContext.Provider value={{
                     size: "var(--joy-fontSize-lg)"
@@ -123,11 +121,16 @@ export default function Sidebar({ tabs, expandButtonContent, sx, children }: Pro
                     {children}
                 </Stack>
             </Drawer>
-            {
-                tabs.map(({ content }, i) => (
-                    <TabPanel value={i}>{content}</TabPanel>
-                ))
-            }
+            <Box sx={{
+                height: "100%",
+                paddingLeft: "3em"
+            }}>
+                {
+                    tabs.map(({ content }, i) => (
+                        <TabPanel value={i}>{content}</TabPanel>
+                    ))
+                }
+            </Box>
         </Tabs >
     )
 }

@@ -1,11 +1,24 @@
 import { Box, Typography } from "@mui/joy"
 import TableView from "../../components/core/TableView"
-import { PeopleEntry } from "../../../server/db/people"
-import { MdFemale, MdMale } from "react-icons/md"
+import { PeopleEntry } from "../../../server/tables/people"
+import { useEffect, useState } from "react"
+import server from "../../api/server"
 
 export default function PeoplePage() {
+    const [people, setPeople] = useState<PeopleEntry[] | null>(null)
+
+    useEffect(() => {
+        (async () => {
+            const res = await server.fetchJSON<PeopleEntry[]>("/people")
+            setPeople(res)
+        })()
+        return () => {
+            setPeople(null)
+        }
+    }, [])
+
     return (
-        <Box>
+        <Box height={"100%"}>
             <Typography level="h1">People</Typography>
             <TableView<PeopleEntry>
                 structure={{
@@ -14,12 +27,11 @@ export default function PeoplePage() {
                     },
                     Name: {},
                     Surname: {},
-                    GenderID: {
-                        title: "Gender",
-                        map: (field) => field === 0 ? <MdMale /> : <MdFemale />
+                    Gender: {
+                        title: "Gender"
                     }
                 }}
-                data={[]}
+                data={people ?? []}
             />
         </Box>
     )

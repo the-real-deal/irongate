@@ -1,6 +1,6 @@
 import { Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../utils"
-import { ColumnValue, QueryEntry, TableStructure } from "../../../server/db/db"
+import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { ReactNode } from "react"
 
 export interface Props<T extends QueryEntry<TableStructure>> extends BaseProps {
@@ -11,10 +11,6 @@ export interface Props<T extends QueryEntry<TableStructure>> extends BaseProps {
         }
     }
     data: T[]
-}
-
-function defaultMap(value: ColumnValue): ReactNode {
-    return value instanceof Date ? value.toLocaleString() : String(value)
 }
 
 export default function TableView<T extends QueryEntry<TableStructure>>({
@@ -29,11 +25,15 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
             hoverRow
             variant="outlined"
             sx={{
-                "& tr > *:last-child": {
-                    position: "sticky",
-                    right: 0,
-                    bgcolor: "var(--TableCell-headBackground)",
+                "& thead": {
+                    background: "background.neutral"
                 },
+                height: "100%",
+                // "& tr > *:last-child": {
+                //     position: "sticky",
+                //     right: 0,
+                //     bgcolor: "var(--TableCell-headBackground)",
+                // },
                 ...sx
             }}>
             <thead>
@@ -72,7 +72,7 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                                             <td key={key.toString()}>
                                                 {
                                                     map === undefined ?
-                                                        defaultMap(value) :
+                                                        value :
                                                         map(value)
                                                 }
                                             </td>

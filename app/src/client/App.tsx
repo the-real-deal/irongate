@@ -122,14 +122,20 @@ export default function App() {
     const [error, setError] = useState<Error | null>(null)
 
     useEffect(() => {
-        function handleError({ error }: ErrorEvent) {
-            setError(error)
+        function handleError(e: ErrorEvent | PromiseRejectionEvent) {
+            if ("error" in e) {
+                setError(e.error)
+            } else if ("reason" in e) {
+                setError(e.reason)
+            } else {
+                setError(new Error("Unknown error"))
+            }
         }
-
         window.addEventListener("error", handleError)
-
+        window.addEventListener("unhandledrejection", handleError)
         return () => {
             window.removeEventListener("error", handleError)
+            window.removeEventListener("unhandledrejection", handleError)
         }
     }, [])
 
@@ -141,14 +147,17 @@ export default function App() {
                 onClose={() => setError(null)}
             />
             <Box sx={{
-                height: '100dvh',
-                width: '100dvw',
+                minHeight: "100dvh",
+                width: "100dvw",
                 padding: 0,
-                margin: 0
+                margin: 0,
             }}>
                 <Sidebar
                     tabs={TABS}
-                    expandButtonContent={<MdMenu />}>
+                    expandButtonContent={<MdMenu />}
+                    sx={{
+                        width: "100%",
+                    }}>
                     <Box sx={{
                         width: "100%",
                         padding: "1em"
