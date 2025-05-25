@@ -22,8 +22,8 @@ services:
       context: ${APP_ROOT}
       args:
         - WORKDIR=${DOCKER_WORKDIR?DOCKER_WORKDIR must exist}/app
-        - USER=${DOCKER_USER:?DOCKER_USER  must be non-empty}
-        - SERVER_PORT=${APP_PORT:?APP_PORT  must be non-empty}
+        - USER=${DOCKER_USER:?DOCKER_USER must be non-empty}
+        - APP_PORT=${APP_PORT:?APP_PORT must be non-empty}
     ports:
       - ${APP_PORT}:${APP_PORT}
     networks:

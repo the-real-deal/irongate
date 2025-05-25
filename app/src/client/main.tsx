@@ -1,16 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import { DBManager } from './api/core/db'
-import GlobalContextProvider from './context/GlobalContext'
-
-const db = new DBManager()
-await db.testConnection()
+import GlobalContextProvider from './context/GlobalContextProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GlobalContextProvider
-      db={db}>
+    <GlobalContextProvider context={{
+      x: "hello, world"
+    }}>
       <App />
     </GlobalContextProvider>
   </StrictMode>,

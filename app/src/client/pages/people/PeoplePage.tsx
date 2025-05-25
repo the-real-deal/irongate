@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/joy"
 import TableView from "../../components/core/TableView"
-import { PeopleEntry } from "../../api/tables/people"
+import { PeopleEntry } from "../../../server/db/people"
 import { MdFemale, MdMale } from "react-icons/md"
 
 export default function PeoplePage() {

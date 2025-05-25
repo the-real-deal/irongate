@@ -1,6 +1,6 @@
 import { Table, Typography } from "@mui/joy"
-import { BaseProps } from "../../api/ui/components"
-import { ColumnValue, QueryEntry, TableStructure } from "../../api/core/db"
+import { BaseProps } from "../../utils"
+import { ColumnValue, QueryEntry, TableStructure } from "../../../server/db/db"
 import { ReactNode } from "react"
 
 export interface Props<T extends QueryEntry<TableStructure>> extends BaseProps {

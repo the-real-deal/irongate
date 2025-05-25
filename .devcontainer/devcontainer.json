@@ -22,7 +22,8 @@
 				"mtxr.sqltools-driver-mysql",
 				"ms-azuretools.vscode-containers",
 				"ms-vsliveshare.vsliveshare",
-				"vitest.explorer"
+				"vitest.explorer",
+				"dbaeumer.vscode-eslint"
 			]
 		}
 	},

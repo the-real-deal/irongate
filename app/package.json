@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "nodemon -w src/server -x tsx src/server/main.ts",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -14,16 +14,20 @@
     "@emotion/styled": "^11.14.0",
     "@mui/joy": "^5.0.0-beta.52",
     "chroma-js": "^3.1.2",
+    "express": "^5.1.0",
     "mysql2": "^3.14.1",
     "named-placeholders": "^1.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "tsx": "^4.19.4",
+    "vite-express": "^0.21.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/chroma-js": "^3.1.1",
-    "@types/node": "^22.15.12",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.21",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
@@ -31,6 +35,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "nodemon": "^3.1.10",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.5"

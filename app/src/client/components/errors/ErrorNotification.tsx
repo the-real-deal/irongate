@@ -3,7 +3,7 @@ import { SyntheticEvent } from "react"
 
 export interface Props {
     error: Error | null
-    onClose: (event: SyntheticEvent<any> | Event | null, reason: SnackbarCloseReason) => void
+    onClose: (event: SyntheticEvent | Event | null, reason: SnackbarCloseReason) => void
 }
 
 export default function ErrorNotification({ error, onClose }: Props) {

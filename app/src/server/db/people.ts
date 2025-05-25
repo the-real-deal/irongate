@@ -1,4 +1,4 @@
-import { QueryEntry } from "../core/db"
+import { QueryEntry } from "./db"
 
 export type PeopleEntry = QueryEntry<{
     DocumentID: string
