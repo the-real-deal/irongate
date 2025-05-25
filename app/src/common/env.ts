@@ -12,15 +12,17 @@ function get<K extends EnvValueType>(key: string, type: K): EnvTypeMap[K] | unde
     }
 
     switch (type) {
-        case "string":
+        case "string": {
             return value as EnvTypeMap[K]
-        case "number":
+        }
+        case "number": {
             const parsed = Number(value)
             if (isNaN(parsed)) {
                 throw new Error(`env variable ${key}=${value} is not a valid number`)
             }
             return parsed as EnvTypeMap[K]
-        case "boolean":
+        }
+        case "boolean": {
             if (value.toLowerCase() === "true" || value === "1") {
                 return true as EnvTypeMap[K]
             } else if (value.toLowerCase() === "false" || value === "0") {
@@ -28,6 +30,7 @@ function get<K extends EnvValueType>(key: string, type: K): EnvTypeMap[K] | unde
             } else {
                 throw new Error(`env variable ${key}=${value} is not a valid boolean`)
             }
+        }
     }
 }
 

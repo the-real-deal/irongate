@@ -2,7 +2,7 @@ FROM node:23-bookworm
 
 ARG WORKDIR
 ARG USER
-ARG SERVER_PORT
+ARG APP_PORT
 
 RUN userdel -r node
 
@@ -13,7 +13,7 @@ RUN useradd -Ums /bin/bash ${USER}
 
 USER ${USER}
 
-ENV SERVER_PORT=${SERVER_PORT}
+ENV APP_PORT=${APP_PORT}
 
 WORKDIR ${WORKDIR}
 
@@ -21,6 +21,6 @@ COPY . .
 
 RUN npm clean-install --verbose
 
-EXPOSE ${SERVER_PORT}
+EXPOSE ${APP_PORT}
 
 CMD [ "npm", "run", "dev" ]

@@ -1,5 +1,5 @@
 import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2/promise"
-import env from "./env"
+import env from "../../common/env"
 import { Pool } from "mysql2/promise"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
@@ -47,7 +47,7 @@ export class DBManager {
 
     async executeQuery<T extends QueryEntry<TableStructure>[] | ResultSetHeader>(
         query: string,
-        values: { [k: string]: any } = {},
+        values: { [k: string]: ColumnValue } = {},
     ): Promise<T> {
         const connection = await this.pool.getConnection()
         try {

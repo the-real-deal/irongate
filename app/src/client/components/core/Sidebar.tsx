@@ -1,7 +1,7 @@
 import { Box, Drawer, IconButton, Stack, Tab, TabList, TabPanel, Tabs, Tooltip, Typography } from "@mui/joy"
 import { PropsWithChildren, ReactNode, useState } from "react"
 import { IconContext } from "react-icons"
-import { BaseProps } from "../../api/ui/components"
+import { BaseProps } from "../../utils"
 
 export interface TabStructure {
     title: string
