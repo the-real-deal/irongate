@@ -1,8 +1,8 @@
 import { Box, Typography } from "@mui/joy"
-import TableView from "../../components/core/TableView"
-import { PeopleEntry } from "../../../server/tables/people"
+import TableView from "../components/core/TableView"
+import { PeopleEntry } from "../../server/tables/people"
 import { useEffect, useState } from "react"
-import server from "../../api/server"
+import server from "../api/server"
 
 export default function PeoplePage() {
     const [people, setPeople] = useState<PeopleEntry[] | null>(null)
