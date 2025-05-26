@@ -7,7 +7,7 @@ export function logRequest(): RequestHandler {
     return (req, _res, next) => {
         console.log(`[Request] ${req.method} ${req.originalUrl}`)
         console.log('Headers:', req.headers)
-        if (req.body) console.log('Body:', req.body)
+        console.log('Body:', req.body)
         next()
     }
 }
