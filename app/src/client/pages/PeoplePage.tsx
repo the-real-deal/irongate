@@ -18,7 +18,11 @@ export default function PeoplePage() {
     }, [])
 
     return (
-        <Box>
+        <Box sx={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column"
+        }}>
             <Typography level="h1" paddingBottom={"0.5em"}>People</Typography>
             <TableView<PeopleEntry>
                 structure={{

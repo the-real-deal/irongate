@@ -75,7 +75,7 @@ export default function MainLayout() {
 
     return (
         <Box sx={{
-            minHeight: "100dvh",
+            height: "100dvh",
             width: "100dvw",
             display: "flex",
             padding: 0,
@@ -103,7 +103,7 @@ export default function MainLayout() {
             </Sidebar>
             <Sheet sx={{
                 width: "100%",
-                minHeight: "100%",
+                height: "100%",
                 padding: "1em",
             }}>
                 <Outlet />
