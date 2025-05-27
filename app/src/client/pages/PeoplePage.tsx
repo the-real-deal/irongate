@@ -3,7 +3,7 @@ import { PeopleEntry } from "../../server/tables/people"
 import { useCallback, useEffect, useState } from "react"
 import server from "../api/server"
 import { useSearchParams } from "react-router"
-import { TableStructureDisplay } from "../api/display"
+import { TableStructureDisplay } from "../api/tableDisplay"
 import DetailView from "../components/core/DetailView"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog } from "@mui/joy"
 

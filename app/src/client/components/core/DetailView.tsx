@@ -1,7 +1,7 @@
 import { Sheet, Table, Typography } from "@mui/joy"
 import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { BaseProps } from "../../api/utils"
-import { tableDisplayObject, TableStructureDisplay } from "../../api/display"
+import { tableDisplayObject, TableStructureDisplay } from "../../api/tableDisplay"
 
 export interface DetailViewProps<T extends QueryEntry<TableStructure>> extends BaseProps {
     display: TableStructureDisplay<T>

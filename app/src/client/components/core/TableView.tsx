@@ -4,7 +4,7 @@ import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { useEffect, useState } from "react"
 import { MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "./SearchBar"
-import { tableDisplayNodes, tableDisplayTitles, TableStructureDisplay } from "../../api/display"
+import { tableDisplayNodes, tableDisplayTitles, TableStructureDisplay } from "../../api/tableDisplay"
 
 export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
     display: T
