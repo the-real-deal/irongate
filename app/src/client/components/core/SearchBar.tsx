@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { BaseProps } from "../../utils"
+import { BaseProps } from "../../api/utils"
 import { Input } from "@mui/joy"
 
 export interface SearchBarProps extends BaseProps {
@@ -7,7 +7,7 @@ export interface SearchBarProps extends BaseProps {
     delay?: number
 }
 
-export default function SearchBar({ onChange, delay = 300, sx }: SearchBarProps) {
+export default function SearchBar({ onChange, delay = 200, sx }: SearchBarProps) {
     const [value, setValue] = useState("")
 
     useEffect(() => {

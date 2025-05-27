@@ -85,14 +85,14 @@ export class DBManager {
         }
     }
 
-    async executeQuery<T extends QueryEntry<TableStructure> | ResultSetHeader>(
+    async executeQuery<T extends QueryEntry<TableStructure>[] | ResultSetHeader>(
         query: string,
         values: Partial<{ [k: string]: ColumnValue }> = {},
-    ): Promise<T[]> {
+    ): Promise<T> {
         const connection = await this.pool.getConnection()
         try {
             const [result] = await connection.query(query, utils.removeUndefinedKeys(values))
-            return result as T[]
+            return result as T
         } finally {
             connection.release()
         }

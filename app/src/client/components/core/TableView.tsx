@@ -1,43 +1,37 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
-import { BaseProps } from "../../utils"
+import { BaseProps } from "../../api/utils"
 import { QueryEntry, TableStructure } from "../../../server/core/db"
-import { ReactNode, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "./SearchBar"
+import { tableDisplayNodes, tableDisplayTitles, TableStructureDisplay } from "../../api/display"
 
-export interface TableViewProps<T extends QueryEntry<TableStructure>> extends BaseProps {
-    title: string,
-    structure: {
-        [K in keyof T]?: {
-            title?: string
-            map?: (value: T[K]) => ReactNode
-        }
-    }
-    data: T[]
+export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
+    display: T
+    data: U[]
     search?: boolean
-    onExpand?: (entry: T) => void
-    onDelete?: (entry: T) => void
+    onExpand?: (entry: U) => void
+    onDelete?: (entry: U) => void
 }
 
-export default function TableView<T extends QueryEntry<TableStructure>>({
-    title,
-    structure,
+export default function TableView<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>({
+    display,
     data,
     search = true,
     onDelete,
     onExpand,
     sx,
-}: TableViewProps<T>) {
+}: TableViewProps<U, T>) {
     const lastColumn = onDelete != undefined || onExpand != undefined
 
-    const [rows, setRows] = useState<T[]>([])
+    const [rows, setRows] = useState<U[]>([])
 
     useEffect(() => {
         setRows(data)
         return () => {
             setRows([])
         }
-    }, [data])
+    }, [data, display])
 
     function searchNormalize(str: string): string {
         return str.toLowerCase().replace(/\s+/g, " ").trim()
@@ -56,16 +50,18 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
             height: "100%",
             display: "flex",
             flexDirection: "column",
-            gap: "0.5em"
+            gap: "1em",
+            ...sx
         }}>
             <Box sx={{
                 width: "100%",
+                maxHeight: "100%",
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center"
             }}>
-                <Typography level="h1">{title}</Typography>
+                <Typography level="h1">{display.title}</Typography>
                 {
                     search ?
                         <SearchBar onChange={async (query) => {
@@ -74,25 +70,25 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                         null
                 }
             </Box>
-            <Sheet variant="outlined" sx={{
-                maxHeight: "100%",
-                overflow: "scroll"
-            }}>
+            <Sheet
+                variant="plain"
+                sx={{
+                    overflow: "scroll"
+                }}>
                 <Table
                     stickyFooter
                     stickyHeader
                     hoverRow
-                    variant="plain"
+                    variant="outlined"
+                    borderAxis="both"
                     sx={{
                         tableLayout: "auto",
-                        overflowX: "scroll",
-                        ...sx
+                        overflow: "scroll",
                     }}>
                     <thead>
                         <tr>
                             {
-                                (Object.keys(structure) as [keyof T]).map(key => {
-                                    const title = structure[key]?.title ?? key.toString()
+                                tableDisplayTitles<U, T>(display).map(title => {
                                     return (
                                         <th>{title}</th>
                                     )
@@ -101,6 +97,8 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                             {
                                 lastColumn ?
                                     <th style={{
+                                        position: "sticky",
+                                        right: 0,
                                         width: "0.1%",
                                         whiteSpace: "nowrap",
                                     }}></th> :
@@ -112,9 +110,7 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                         {
                             rows.length == 0 ?
                                 <tr>
-                                    <th
-                                        colSpan={Object.keys(structure).length}
-                                        scope="row">
+                                    <th colSpan={Object.keys(display.keys).length}>
                                         <Box sx={{
                                             display: "flex",
                                             justifyContent: "center",
@@ -131,16 +127,10 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                                 rows.map(row => (
                                     <tr>
                                         {
-                                            (Object.keys(structure) as [keyof T]).map(key => {
-                                                const value = row[key]
-                                                const map = structure[key]?.map
+                                            tableDisplayNodes(row, display).map(node => {
                                                 return (
                                                     <td>
-                                                        {
-                                                            map === undefined ?
-                                                                value :
-                                                                map(value)
-                                                        }
+                                                        {node}
                                                     </td>
                                                 )
                                             })
@@ -152,6 +142,7 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                                                     right: 0,
                                                     width: "0.1%",
                                                     whiteSpace: "nowrap",
+                                                    backgroundColor: "var(--TableCell-headBackground)",
                                                 }}>
                                                     <Box sx={{
                                                         display: "flex",
@@ -187,6 +178,6 @@ export default function TableView<T extends QueryEntry<TableStructure>>({
                     </tbody>
                 </Table>
             </Sheet>
-        </Box>
+        </Box >
     )
 }

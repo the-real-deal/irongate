@@ -1,5 +1,5 @@
 import { Select, useColorScheme, Option } from "@mui/joy"
-import { BaseProps } from "../../utils"
+import { BaseProps } from "../../api/utils"
 
 export default function ThemeSwitcher({ sx }: BaseProps) {
     const { mode, setMode } = useColorScheme()
