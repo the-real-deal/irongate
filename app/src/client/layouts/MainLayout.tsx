@@ -50,27 +50,27 @@ const TABS: TabStructure[] = [
     }
 ]
 
-const fallbackRoute = "/"
-
 export default function MainLayout() {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const [currentRoute, setCurrentRoute] = useState<string>(fallbackRoute)
+    const [currentRoute, setCurrentRoute] = useState<string | null>(null)
 
     useEffect(() => {
         const route = TABS.map(t => t.route).find((path) =>
             matchPath({ path, end: false }, location.pathname)
         )
-        setCurrentRoute(route === undefined ? fallbackRoute : route)
+        setCurrentRoute(route ?? null)
         return () => {
-            setCurrentRoute(fallbackRoute)
+            setCurrentRoute(null)
         }
     }, [location.pathname])
 
-    function handleChange(_: SyntheticEvent | null, newRoute: string) {
+    function handleChange(_: SyntheticEvent | null, newRoute: string | null) {
         setCurrentRoute(newRoute)
-        navigate(newRoute)
+        if (newRoute !== null) {
+            navigate(newRoute)
+        }
     }
 
     return (
@@ -84,7 +84,6 @@ export default function MainLayout() {
             <Sidebar
                 tabs={TABS}
                 currentRoute={currentRoute}
-                fallbackRoute={fallbackRoute}
                 expandButtonContent={<MdMenu />}
                 onChange={handleChange}>
                 <Box sx={{

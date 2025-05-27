@@ -11,13 +11,12 @@ export interface TabStructure {
 
 export interface Props extends BaseProps {
     tabs: TabStructure[]
-    currentRoute: string
-    fallbackRoute: string
+    currentRoute: string | null
     expandButtonContent: ReactNode
-    onChange: (e: SyntheticEvent | null, value: string) => void
+    onChange: (e: SyntheticEvent | null, value: string | null) => void
 }
 
-export default function Sidebar({ tabs, currentRoute, fallbackRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<Props>) {
+export default function Sidebar({ tabs, currentRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<Props>) {
     const [drawerOpen, setDrawerOpen] = useState(false)
 
     return (
@@ -25,7 +24,7 @@ export default function Sidebar({ tabs, currentRoute, fallbackRoute, expandButto
             value={currentRoute}
             onChange={(e, value) => {
                 setDrawerOpen(false)
-                onChange(e, value?.toString() ?? fallbackRoute)
+                onChange(e, value?.toString() ?? null)
             }}
             orientation="vertical"
             sx={{
