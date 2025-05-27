@@ -6,8 +6,8 @@ import { JSONType } from "../common/json"
 export function logRequest(): RequestHandler {
     return (req, _res, next) => {
         console.log(`[Request] ${req.method} ${req.originalUrl}`)
-        console.log('Headers:', req.headers)
-        console.log('Body:', req.body)
+        console.log("Headers:", req.headers)
+        console.log("Body:", req.body)
         next()
     }
 }

@@ -1,4 +1,3 @@
-import { Box, Typography } from "@mui/joy"
 import TableView from "../components/core/TableView"
 import { PeopleEntry } from "../../server/tables/people"
 import { useEffect, useState } from "react"
@@ -18,25 +17,21 @@ export default function PeoplePage() {
     }, [])
 
     return (
-        <Box sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column"
-        }}>
-            <Typography level="h1" paddingBottom={"0.5em"}>People</Typography>
-            <TableView<PeopleEntry>
-                structure={{
-                    DocumentID: {
-                        title: "Document ID"
-                    },
-                    Name: {},
-                    Surname: {},
-                    Gender: {
-                        title: "Gender"
-                    }
-                }}
-                data={people ?? []}
-            />
-        </Box>
+        <TableView
+            title="People"
+            structure={{
+                DocumentID: {
+                    title: "Document ID"
+                },
+                Name: {},
+                Surname: {},
+                Gender: {
+                    title: "Gender"
+                }
+            }}
+            data={people ?? []}
+            onExpand={(e) => alert(`EXPAND: ${JSON.stringify(e, undefined, 2)}`)}
+            onDelete={(e) => alert(`DELETE: ${JSON.stringify(e, undefined, 2)}`)}
+        />
     )
 }

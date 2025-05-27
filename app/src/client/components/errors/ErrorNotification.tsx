@@ -1,12 +1,12 @@
 import { Snackbar, SnackbarCloseReason } from "@mui/joy"
 import { SyntheticEvent } from "react"
 
-export interface Props {
+export interface ErrorNotificationProps {
     error: Error | null
     onClose: (event: SyntheticEvent | Event | null, reason: SnackbarCloseReason) => void
 }
 
-export default function ErrorNotification({ error, onClose }: Props) {
+export default function ErrorNotification({ error, onClose }: ErrorNotificationProps) {
     return (
         <Snackbar
             open={error !== null}

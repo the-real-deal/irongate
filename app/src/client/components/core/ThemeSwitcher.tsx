@@ -5,12 +5,7 @@ export default function ThemeSwitcher({ sx }: BaseProps) {
     const { mode, setMode } = useColorScheme()
     return (
         <Select
-            sx={{
-                "&:hover, &:hover:not(.Mui-selected)": {
-                    // backgroundColor: "neutral.500"
-                },
-                ...sx
-            }}
+            sx={sx}
             variant="outlined"
             color="primary"
             value={mode}
@@ -18,31 +13,13 @@ export default function ThemeSwitcher({ sx }: BaseProps) {
                 setMode(newMode)
             }}
         >
-            <Option
-                sx={{
-                    "&:hover, &:hover:not(.Mui-selected)": {
-                        // backgroundColor: "neutral.500"
-                    }
-                }}
-                value="system">
+            <Option value="system">
                 System
             </Option>
-            <Option
-                sx={{
-                    "&:hover, &:hover:not(.Mui-selected)": {
-                        // backgroundColor: "neutral.500"
-                    }
-                }}
-                value="light">
+            <Option value="light">
                 Light
             </Option>
-            <Option
-                sx={{
-                    "&:hover, &:hover:not(.Mui-selected)": {
-                        // backgroundColor: "neutral.500"
-                    }
-                }}
-                value="dark">
+            <Option value="dark">
                 Dark
             </Option>
         </Select >

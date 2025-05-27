@@ -9,14 +9,14 @@ export interface TabStructure {
     icon: ReactNode
 }
 
-export interface Props extends BaseProps {
+export interface SideBarProps extends BaseProps {
     tabs: TabStructure[]
     currentRoute: string | null
     expandButtonContent: ReactNode
     onChange: (e: SyntheticEvent | null, value: string | null) => void
 }
 
-export default function Sidebar({ tabs, currentRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<Props>) {
+export default function Sidebar({ tabs, currentRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<SideBarProps>) {
     const [drawerOpen, setDrawerOpen] = useState(false)
 
     return (

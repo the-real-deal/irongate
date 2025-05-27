@@ -75,16 +75,17 @@ const THEME = extendTheme({
 export default function App() {
     const [error, setError] = useState<Error | null>(null)
 
-    useEffect(() => {
-        function handleError(e: ErrorEvent | PromiseRejectionEvent) {
-            if ("error" in e) {
-                setError(e.error)
-            } else if ("reason" in e) {
-                setError(e.reason)
-            } else {
-                setError(new Error("Unknown error"))
-            }
+    function handleError(e: ErrorEvent | PromiseRejectionEvent) {
+        if ("error" in e) {
+            setError(e.error)
+        } else if ("reason" in e) {
+            setError(e.reason)
+        } else {
+            setError(new Error("Unknown error"))
         }
+    }
+
+    useEffect(() => {
         window.addEventListener("error", handleError)
         window.addEventListener("unhandledrejection", handleError)
         return () => {
