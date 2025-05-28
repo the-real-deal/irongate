@@ -158,7 +158,6 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                                                                 </Button> :
                                                                 null
                                                         }
-
                                                         {
                                                             onDelete !== undefined ?
                                                                 <Button

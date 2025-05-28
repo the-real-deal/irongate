@@ -1,16 +1,21 @@
-import { Sheet, Table, Typography } from "@mui/joy"
+import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { BaseProps } from "../../api/utils"
 import { tableDisplayObject, TableStructureDisplay } from "../../api/tableDisplay"
+import { MdDelete } from "react-icons/md"
 
 export interface DetailViewProps<T extends QueryEntry<TableStructure>> extends BaseProps {
     display: TableStructureDisplay<T>
     data: T
+    onEdit?: (old: T, edits: Partial<T>) => void
+    onDelete?: (data: T) => void
 }
 
 export default function DetailView<T extends QueryEntry<TableStructure>>({
     display,
     data,
+    onEdit,
+    onDelete,
     sx,
 }: DetailViewProps<T>) {
     return (
@@ -20,7 +25,25 @@ export default function DetailView<T extends QueryEntry<TableStructure>>({
             gap: "1em",
             ...sx
         }}>
-            <Typography level="h1">{display.title}</Typography>
+            <Box sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}>
+                <Typography level="h1">{display.title}</Typography>
+                <Box>
+                    {
+                        onDelete !== undefined ?
+                            <Button
+                                color="danger"
+                                onClick={() => onDelete(data)}>
+                                <MdDelete />
+                            </Button> :
+                            null
+                    }
+                </Box>
+            </Box>
             <Sheet variant="outlined">
                 <Table
                     variant="soft"

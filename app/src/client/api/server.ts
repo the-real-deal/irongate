@@ -1,10 +1,11 @@
 import { HTTPError } from "../../common/http"
 import { JSONObject, JSONType } from "../../common/json"
+import utils from "../../common/utils"
 
 export interface FetchData {
     method?: string
     params?: {
-        [key: string]: string | number | boolean
+        [key: string]: string | number | boolean | undefined
     }
     body?: JSONObject
     headers?: {
@@ -17,7 +18,7 @@ async function fetchAPI(endPoint: string, data: FetchData = {}): Promise<Respons
     if (data.params !== undefined) {
         url += "?"
 
-        for (const [key, val] of Object.entries(data.params)) {
+        for (const [key, val] of Object.entries(utils.removeUndefinedKeys(data.params))) {
             url += `${key}=${val}&`
         }
 

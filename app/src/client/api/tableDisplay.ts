@@ -7,6 +7,7 @@ export type TableStructureDisplay<T extends QueryEntry<TableStructure>> = {
         [K in keyof T]?: {
             title?: string
             map?: (value: T[K]) => ReactNode
+            editNode?: (edits: Partial<T>) => ReactNode
         }
     }
 }

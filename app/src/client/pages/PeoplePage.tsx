@@ -13,10 +13,12 @@ export default function PeoplePage() {
     const [searchParams, setSearchParams] = useSearchParams()
 
     const fetchData = useCallback(async () => {
-        const detailID = searchParams.get("id")
-        const baseUri = "/people"
+        const id = searchParams.get("id") ?? undefined
         setData(await server.fetchJSON<PeopleEntry[] | PeopleEntry>(
-            baseUri + (detailID === null ? "" : `?id=${detailID}`)
+            "/people",
+            {
+                params: { id }
+            }
         ))
     }, [searchParams])
 
@@ -50,57 +52,67 @@ export default function PeoplePage() {
     }
 
     return (
-        Array.isArray(data) ?
-            <Box height={"100%"}>
-                <TableView
-                    display={display}
-                    data={data ?? []}
-                    onExpand={({ DocumentID }) => setSearchParams({ id: DocumentID })}
-                    onDelete={(e) => setDeleteCandidate(e)}
-                />
-                <Modal
-                    open={deleteCandidate !== null}
-                    onClose={() => setDeleteCandidate(null)}>
-                    <ModalDialog variant="outlined" role="alertdialog">
-                        <DialogTitle>
-                            Confirmation
-                        </DialogTitle>
-                        <Divider />
-                        <DialogContent>
-                            Are you sure you want to delete {deleteCandidate?.Name} {deleteCandidate?.Surname} ({deleteCandidate?.DocumentID})?
-                        </DialogContent>
-                        <DialogActions>
-                            <Button
-                                variant="solid"
-                                color="danger"
-                                onClick={async () => {
-                                    if (deleteCandidate == null) {
-                                        return
+        <Box sx={{
+            height: "100%"
+        }}>
+            {
+                Array.isArray(data) ?
+                    <TableView
+                        display={display}
+                        data={data ?? []}
+                        onExpand={({ DocumentID }) => setSearchParams({ id: DocumentID })}
+                        onDelete={setDeleteCandidate}
+                    /> :
+                    <DetailView
+                        data={data}
+                        display={display}
+                        onDelete={setDeleteCandidate}
+                    />
+            }
+            <Modal
+                open={deleteCandidate !== null}
+                onClose={() => setDeleteCandidate(null)}>
+                <ModalDialog variant="outlined" role="alertdialog">
+                    <DialogTitle>
+                        Confirmation
+                    </DialogTitle>
+                    <Divider />
+                    <DialogContent>
+                        Are you sure you want to delete {deleteCandidate?.Name} {deleteCandidate?.Surname} ({deleteCandidate?.DocumentID})?
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            variant="solid"
+                            color="danger"
+                            onClick={async () => {
+                                if (deleteCandidate == null) {
+                                    return
+                                }
+                                await server.fetchAPI(
+                                    "/people",
+                                    {
+                                        method: "DELETE",
+                                        params: { id: deleteCandidate.DocumentID }
                                     }
-                                    await server.fetchAPI(
-                                        `/people?id=${deleteCandidate.DocumentID}`,
-                                        {
-                                            method: "DELETE",
-                                        }
-                                    )
+                                )
+                                setDeleteCandidate(null)
+                                if (searchParams.get("id") !== null) {
+                                    setSearchParams({})
+                                } else {
                                     await fetchData()
-                                    setDeleteCandidate(null)
-                                }}>
-                                Confirm
-                            </Button>
-                            <Button
-                                variant="plain"
-                                color="neutral"
-                                onClick={() => setDeleteCandidate(null)}>
-                                Cancel
-                            </Button>
-                        </DialogActions>
-                    </ModalDialog>
-                </Modal>
-            </Box> :
-            <DetailView
-                data={data}
-                display={display}
-            />
+                                }
+                            }}>
+                            Confirm
+                        </Button>
+                        <Button
+                            variant="plain"
+                            color="neutral"
+                            onClick={() => setDeleteCandidate(null)}>
+                            Cancel
+                        </Button>
+                    </DialogActions>
+                </ModalDialog>
+            </Modal>
+        </Box>
     )
 }
