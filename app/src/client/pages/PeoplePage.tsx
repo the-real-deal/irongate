@@ -6,6 +6,8 @@ import { TableStructureDisplay } from "../api/tableDisplay"
 import DetailView from "../components/tables/DetailView"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
+import JoyDatePicker from "../components/JoyDatePicker"
+import utils from "../../common/utils"
 
 export default function PeoplePage() {
     const [data, setData] = useState<PeopleEntry[] | PeopleEntry | null>(null)
@@ -71,7 +73,17 @@ export default function PeoplePage() {
                 )
             },
             Birthday: {
-                defaultNode: (_, value) => new Date(value).toLocaleDateString()
+                defaultNode: (_, value) => new Date(value).toLocaleDateString(),
+                editNode: (key, value, edits) => (
+                    <JoyDatePicker
+                        defaultValue={new Date(value)}
+                        placeholder={key}
+                        onChange={val => {
+                            edits[key] = utils.dateMySQLFormat(val)
+                        }}
+                    />
+                )
+
             },
             BirthPlace: {
                 editNode: (key, value, edits) => (
