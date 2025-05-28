@@ -41,7 +41,7 @@ export default function PeoplePage() {
                 title: "Gender"
             },
             Birthday: {
-                map: (value) => new Date(value).toLocaleDateString()
+                defaultNode: (value) => new Date(value).toLocaleDateString()
             },
             BirthPlace: {}
         }
@@ -67,6 +67,7 @@ export default function PeoplePage() {
                         data={data}
                         display={display}
                         onDelete={setDeleteCandidate}
+                        onEdit={(old, edits) => null}
                     />
             }
             <Modal

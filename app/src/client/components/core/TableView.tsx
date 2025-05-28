@@ -4,7 +4,7 @@ import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { useEffect, useState } from "react"
 import { MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "./SearchBar"
-import { tableDisplayNodes, tableDisplayTitles, TableStructureDisplay } from "../../api/tableDisplay"
+import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
 
 export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
     display: T
@@ -22,6 +22,7 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
     onExpand,
     sx,
 }: TableViewProps<U, T>) {
+    const keyDisplays = getKeyDisplays<U, T>(display)
     const lastColumn = onDelete != undefined || onExpand != undefined
 
     const [rows, setRows] = useState<U[]>([])
@@ -88,9 +89,11 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                     <thead>
                         <tr>
                             {
-                                tableDisplayTitles<U, T>(display).map(title => {
+                                (Object.keys(keyDisplays)).map(key => {
                                     return (
-                                        <th>{title}</th>
+                                        <th>
+                                            {keyDisplays[key].title}
+                                        </th>
                                     )
                                 })
                             }
@@ -127,10 +130,10 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                                 rows.map(row => (
                                     <tr>
                                         {
-                                            tableDisplayNodes(row, display).map(node => {
+                                            (Object.keys(keyDisplays)).map(key => {
                                                 return (
                                                     <td>
-                                                        {node}
+                                                        {keyDisplays[key].defaultNode(row[key as keyof U])}
                                                     </td>
                                                 )
                                             })

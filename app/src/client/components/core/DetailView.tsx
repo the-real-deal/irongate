@@ -1,23 +1,34 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { BaseProps } from "../../api/utils"
-import { tableDisplayObject, TableStructureDisplay } from "../../api/tableDisplay"
-import { MdDelete } from "react-icons/md"
+import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
+import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
+import { useState } from "react"
 
-export interface DetailViewProps<T extends QueryEntry<TableStructure>> extends BaseProps {
-    display: TableStructureDisplay<T>
-    data: T
-    onEdit?: (old: T, edits: Partial<T>) => void
-    onDelete?: (data: T) => void
+export interface DetailViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
+    display: T
+    data: U
+    onEdit?: (old: U, edits: Partial<U>) => void
+    onDelete?: (data: U) => void
 }
 
-export default function DetailView<T extends QueryEntry<TableStructure>>({
+export default function DetailView<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>({
     display,
     data,
     onEdit,
     onDelete,
     sx,
-}: DetailViewProps<T>) {
+}: DetailViewProps<U, T>) {
+    const keyDisplays = getKeyDisplays<U, T>(display)
+
+    const [editing, setEditing] = useState(false)
+    const [edits, setEdits] = useState({})
+
+    function resetEditing() {
+        setEditing(false)
+        setEdits({})
+    }
+
     return (
         <Sheet sx={{
             display: "flex",
@@ -32,13 +43,39 @@ export default function DetailView<T extends QueryEntry<TableStructure>>({
                 alignItems: "center",
             }}>
                 <Typography level="h1">{display.title}</Typography>
-                <Box>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: ".5em",
+                }}>
+                    {
+                        onEdit !== undefined ?
+                            <Button
+                                color="primary"
+                                onClick={() => {
+                                    if (editing) {
+                                        onEdit(data, edits)
+                                        resetEditing()
+                                    } else {
+                                        setEditing(true)
+                                    }
+                                }}>
+                                {editing ? <MdCheck /> : <MdEdit />}
+                            </Button> :
+                            null
+                    }
                     {
                         onDelete !== undefined ?
                             <Button
                                 color="danger"
-                                onClick={() => onDelete(data)}>
-                                <MdDelete />
+                                onClick={() => {
+                                    if (editing) {
+                                        resetEditing()
+                                    } else {
+                                        onDelete(data)
+                                    }
+                                }}>
+                                {editing ? <MdClear /> : <MdDelete />}
                             </Button> :
                             null
                     }
@@ -54,17 +91,17 @@ export default function DetailView<T extends QueryEntry<TableStructure>>({
                     }}>
                     <tbody>
                         {
-                            Object.entries(tableDisplayObject(data, display)).map(([title, node]) => (
-                                <tr>
+                            (Object.keys(keyDisplays)).map(key => {
+                                return <tr>
                                     <th style={{
                                         width: "0.1%",
                                         whiteSpace: "nowrap",
                                     }}>
-                                        {title}
+                                        {keyDisplays[key].title}
                                     </th>
-                                    <td>{node}</td>
+                                    <td>{keyDisplays[key].defaultNode(data[key as keyof U])}</td>
                                 </tr>
-                            ))
+                            })
                         }
                     </tbody>
                 </Table>

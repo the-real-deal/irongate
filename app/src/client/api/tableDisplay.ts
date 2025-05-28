@@ -1,45 +1,30 @@
 import { QueryEntry, TableStructure } from "../../server/core/db"
 import { ReactNode } from "react"
 
+export interface KeyDisplay<T extends QueryEntry<TableStructure>, K extends keyof T> {
+    title?: string
+    defaultNode?: (value: T[K]) => ReactNode
+    editNode?: (value: T[K], edits: Partial<T>) => ReactNode
+}
+
 export type TableStructureDisplay<T extends QueryEntry<TableStructure>> = {
-    title: string,
-    keys: {
-        [K in keyof T]?: {
-            title?: string
-            map?: (value: T[K]) => ReactNode
-            editNode?: (edits: Partial<T>) => ReactNode
-        }
+    readonly title: string,
+    readonly keys: {
+        readonly [K in keyof T]?: KeyDisplay<T, K>
     }
 }
 
-export function tableDisplayTitles<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>(display: T): string[] {
-    return (Object.keys(display.keys)).map(
-        key => display.keys[key]?.title ?? key.toString()
-    )
-}
-
-export function tableDisplayNodes<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>(
-    data: U,
+export function getKeyDisplays<
+    U extends QueryEntry<TableStructure>,
+    T extends TableStructureDisplay<U>,
+>(
     display: T,
-): ReactNode[] {
-    return (Object.keys(display.keys) as [keyof U]).map(key => {
-        const value = data[key]
-        const map = display.keys[key]?.map
-        return (
-            map === undefined ?
-                value :
-                map(value)
-        )
-    })
-}
-
-export function tableDisplayObject<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>(
-    data: U,
-    display: T,
-): Record<string, ReactNode> {
-    const keys = tableDisplayTitles<U, T>(display)
-    const values = tableDisplayNodes(data, display)
-    return Object.fromEntries(
-        keys.map((key, i) => [key, values[i]])
-    )
+) {
+    return Object.fromEntries((Object.keys(display.keys) as [keyof U]).map(key => {
+        const keyDisplay = display.keys[key] ?? {}
+        const title = keyDisplay.title ?? key.toString()
+        const defaultNode = keyDisplay.defaultNode ?? ((value) => value)
+        const editNode = keyDisplay.editNode ?? defaultNode
+        return [key, { title, defaultNode, editNode }]
+    }))
 }
