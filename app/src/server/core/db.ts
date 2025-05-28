@@ -2,6 +2,7 @@ import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2
 import env from "../../common/env"
 import { Pool } from "mysql2/promise"
 import utils from "../../common/utils"
+import { ColumnValue, QueryEntry, TableStructure } from "../../common/db"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
     return options
@@ -53,12 +54,6 @@ const forcedOptions = defineForcedOptions({
 })
 
 export type DBConfig = Omit<PoolOptions, keyof typeof forcedOptions>
-
-export type ColumnValue = string | number | boolean | null
-export type TableStructure = { [key: string]: ColumnValue }
-export type QueryEntry<T extends TableStructure> = {
-    [K in keyof T]: T[K]
-}
 
 export class DBManager {
     private pool: Pool

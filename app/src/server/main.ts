@@ -3,11 +3,11 @@ import env from "../common/env"
 import peopleRouter from "./api/people"
 import ViteExpress from "vite-express"
 import { HTTPError, HttpStatusCode } from "../common/http"
-import { jsonErrors, logRequest, primitiveRequest } from "./middlewares"
+import { jsonErrors, logs, primitiveRequest } from "./middlewares"
 
 const app = express()
 const router = Router()
-router.use(logRequest())
+router.use(logs())
 router.use(primitiveRequest())
 
 router.use("/people", peopleRouter)

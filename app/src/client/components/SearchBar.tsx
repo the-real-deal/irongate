@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { BaseProps } from "../../api/utils"
+import { BaseProps } from "../api/utils"
 import { Input } from "@mui/joy"
 
 export interface SearchBarProps extends BaseProps {

@@ -3,7 +3,7 @@ import { BaseProps } from "../../api/utils"
 import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { useEffect, useState } from "react"
 import { MdDelete, MdVisibility } from "react-icons/md"
-import SearchBar from "./SearchBar"
+import SearchBar from "../SearchBar"
 import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
 
 export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
@@ -72,7 +72,7 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                 }
             </Box>
             <Sheet
-                variant="plain"
+                variant="outlined"
                 sx={{
                     overflow: "scroll"
                 }}>
@@ -80,7 +80,7 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                     stickyFooter
                     stickyHeader
                     hoverRow
-                    variant="outlined"
+                    variant="plain"
                     borderAxis="both"
                     sx={{
                         tableLayout: "auto",
@@ -133,7 +133,10 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                                             (Object.keys(keyDisplays)).map(key => {
                                                 return (
                                                     <td>
-                                                        {keyDisplays[key].defaultNode(row[key as keyof U])}
+                                                        {
+                                                            keyDisplays[key]
+                                                                .defaultNode(key as keyof U, row[key as keyof U])
+                                                        }
                                                     </td>
                                                 )
                                             })

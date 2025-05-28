@@ -1,15 +1,7 @@
 import { ResultSetHeader } from "mysql2"
 import { db } from "../context"
-import { createQuery, QueryEntry } from "../core/db"
-
-export type PeopleEntry = QueryEntry<{
-    DocumentID: string
-    Name: string
-    Surname: string
-    Birthday: string
-    BirthPlace: string
-    Gender: string
-}>
+import { createQuery } from "../core/db"
+import { PeopleEntry } from "../../common/tables/people"
 
 async function get(id?: string): Promise<PeopleEntry[] | PeopleEntry> {
     const query = createQuery(

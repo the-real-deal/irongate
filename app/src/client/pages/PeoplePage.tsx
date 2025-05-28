@@ -1,11 +1,11 @@
-import TableView from "../components/core/TableView"
-import { PeopleEntry } from "../../server/tables/people"
+import TableView from "../components/tables/TableView"
 import { useCallback, useEffect, useState } from "react"
 import server from "../api/server"
 import { useSearchParams } from "react-router"
 import { TableStructureDisplay } from "../api/tableDisplay"
-import DetailView from "../components/core/DetailView"
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog } from "@mui/joy"
+import DetailView from "../components/tables/DetailView"
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
+import { PeopleEntry } from "../../common/tables/people"
 
 export default function PeoplePage() {
     const [data, setData] = useState<PeopleEntry[] | PeopleEntry | null>(null)
@@ -14,12 +14,13 @@ export default function PeoplePage() {
 
     const fetchData = useCallback(async () => {
         const id = searchParams.get("id") ?? undefined
-        setData(await server.fetchJSON<PeopleEntry[] | PeopleEntry>(
+        const data = await server.fetchJSON<PeopleEntry[] | PeopleEntry>(
             "/people",
             {
                 params: { id }
             }
-        ))
+        )
+        setData(data)
     }, [searchParams])
 
     useEffect(() => {
@@ -35,15 +36,54 @@ export default function PeoplePage() {
             DocumentID: {
                 title: "Document ID"
             },
-            Name: {},
-            Surname: {},
+            Name: {
+                editNode: (key, value, edits) => (
+                    <Input
+                        key={key}
+                        defaultValue={value}
+                        onChange={e => {
+                            edits[key] = e.target.value
+                        }}
+                    />
+                )
+            },
+            Surname: {
+                editNode: (key, value, edits) => (
+                    <Input
+                        key={key}
+                        defaultValue={value}
+                        onChange={e => {
+                            edits[key] = e.target.value
+                        }}
+                    />
+                )
+            },
             Gender: {
-                title: "Gender"
+                title: "Gender",
+                editNode: (key, value, edits) => (
+                    <Input
+                        key={key}
+                        defaultValue={value}
+                        onChange={e => {
+                            edits[key] = e.target.value
+                        }}
+                    />
+                )
             },
             Birthday: {
-                defaultNode: (value) => new Date(value).toLocaleDateString()
+                defaultNode: (_, value) => new Date(value).toLocaleDateString()
             },
-            BirthPlace: {}
+            BirthPlace: {
+                editNode: (key, value, edits) => (
+                    <Input
+                        key={key}
+                        defaultValue={value}
+                        onChange={e => {
+                            edits[key] = e.target.value
+                        }}
+                    />
+                )
+            }
         }
     }
 

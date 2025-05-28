@@ -99,7 +99,13 @@ export default function DetailView<U extends QueryEntry<TableStructure>, T exten
                                     }}>
                                         {keyDisplays[key].title}
                                     </th>
-                                    <td>{keyDisplays[key].defaultNode(data[key as keyof U])}</td>
+                                    <td>
+                                        {
+                                            editing ?
+                                                keyDisplays[key].editNode(key as keyof U, data[key as keyof U], edits) :
+                                                keyDisplays[key].defaultNode(key as keyof U, data[key as keyof U])
+                                        }
+                                    </td>
                                 </tr>
                             })
                         }

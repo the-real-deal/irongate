@@ -3,8 +3,8 @@ import { ReactNode } from "react"
 
 export interface KeyDisplay<T extends QueryEntry<TableStructure>, K extends keyof T> {
     title?: string
-    defaultNode?: (value: T[K]) => ReactNode
-    editNode?: (value: T[K], edits: Partial<T>) => ReactNode
+    defaultNode?: (key: K, value: T[K]) => ReactNode
+    editNode?: (key: K, value: T[K], edits: Partial<T>) => ReactNode
 }
 
 export type TableStructureDisplay<T extends QueryEntry<TableStructure>> = {
@@ -23,8 +23,8 @@ export function getKeyDisplays<
     return Object.fromEntries((Object.keys(display.keys) as [keyof U]).map(key => {
         const keyDisplay = display.keys[key] ?? {}
         const title = keyDisplay.title ?? key.toString()
-        const defaultNode = keyDisplay.defaultNode ?? ((value) => value)
-        const editNode = keyDisplay.editNode ?? defaultNode
+        const defaultNode = keyDisplay.defaultNode ?? ((_, value) => value)
+        const editNode = keyDisplay.editNode ?? ((key, value, _) => defaultNode(key, value))
         return [key, { title, defaultNode, editNode }]
     }))
 }

@@ -1,8 +1,8 @@
 import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from 'react-icons/md'
 import { Outlet, useLocation, useNavigate, matchPath } from 'react-router'
-import Sidebar, { TabStructure } from '../components/core/Sidebar'
+import Sidebar, { TabStructure } from '../components/layout/Sidebar'
 import { Box, Typography, Sheet } from '@mui/joy'
-import ThemeSwitcher from '../components/core/ThemeSwitcher'
+import ThemeSwitcher from '../components/ThemeSwitcher'
 import { SyntheticEvent, useEffect, useState } from 'react'
 
 const TABS: TabStructure[] = [
