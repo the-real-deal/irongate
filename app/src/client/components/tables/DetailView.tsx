@@ -1,9 +1,9 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
-import { QueryEntry, TableStructure } from "../../../server/core/db"
 import { BaseProps } from "../../api/utils"
 import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
+import { QueryEntry, TableStructure } from "../../../common/db"
 
 export interface DetailViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
     display: T

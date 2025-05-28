@@ -1,5 +1,5 @@
-import { QueryEntry, TableStructure } from "../../server/core/db"
 import { ReactNode } from "react"
+import { QueryEntry, TableStructure } from "../../common/db"
 
 export interface KeyDisplay<T extends QueryEntry<TableStructure>, K extends keyof T> {
     title?: string
