@@ -1,6 +1,6 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../api/utils"
-import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
+import { TableStructureDisplay } from "../../api/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
 import { QueryEntry, TableStructure } from "../../../common/db"
@@ -19,8 +19,6 @@ export default function DetailView<U extends QueryEntry<TableStructure>, T exten
     onDelete,
     sx,
 }: DetailViewProps<U, T>) {
-    const keyDisplays = getKeyDisplays<U, T>(display)
-
     const [editing, setEditing] = useState(false)
     const [edits, setEdits] = useState({})
 
@@ -91,19 +89,19 @@ export default function DetailView<U extends QueryEntry<TableStructure>, T exten
                     }}>
                     <tbody>
                         {
-                            (Object.keys(keyDisplays)).map(key => {
+                            (Object.keys(display.keys) as [keyof U]).map(key => {
                                 return <tr>
                                     <th style={{
                                         width: "0.1%",
                                         whiteSpace: "nowrap",
                                     }}>
-                                        {keyDisplays[key].title}
+                                        {display.keys[key].title}
                                     </th>
                                     <td>
                                         {
                                             editing ?
-                                                keyDisplays[key].editNode(key as keyof U, data[key as keyof U], edits) :
-                                                keyDisplays[key].defaultNode(key as keyof U, data[key as keyof U])
+                                                display.keys[key].inputNode(key, data[key], edits) :
+                                                display.keys[key].defaultNode(key, data[key])
                                         }
                                     </td>
                                 </tr>

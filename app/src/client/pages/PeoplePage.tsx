@@ -2,7 +2,7 @@ import TableView from "../components/tables/TableView"
 import { useCallback, useEffect, useState } from "react"
 import server from "../api/server"
 import { useSearchParams } from "react-router"
-import { TableStructureDisplay } from "../api/tableDisplay"
+import { createDisplay } from "../api/tableDisplay"
 import DetailView from "../components/tables/DetailView"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
@@ -32,72 +32,69 @@ export default function PeoplePage() {
         }
     }, [fetchData])
 
-    const display: TableStructureDisplay<PeopleEntry> = {
-        title: "People",
-        keys: {
-            DocumentID: {
-                title: "Document ID"
-            },
-            Name: {
-                editNode: (key, value, edits) => (
-                    <Input
-                        key={key}
-                        defaultValue={value}
-                        onChange={e => {
-                            edits[key] = e.target.value
-                        }}
-                    />
-                )
-            },
-            Surname: {
-                editNode: (key, value, edits) => (
-                    <Input
-                        key={key}
-                        defaultValue={value}
-                        onChange={e => {
-                            edits[key] = e.target.value
-                        }}
-                    />
-                )
-            },
-            Gender: {
-                title: "Gender",
-                editNode: (key, value, edits) => (
-                    <Input
-                        key={key}
-                        defaultValue={value}
-                        onChange={e => {
-                            edits[key] = e.target.value
-                        }}
-                    />
-                )
-            },
-            Birthday: {
-                editNode: (key, value, edits) => (
-                    <JoyDatePicker
-                        defaultValue={dates.parse(value, MYSQL_DATE_FORMAT)}
-                        timeSelect={false}
-                        placeholder={key}
-                        onChange={val => {
-                            edits[key] = dates.format(val, MYSQL_DATE_FORMAT)
-                        }}
-                    />
-                )
+    const display = createDisplay<PeopleEntry>("People", {
+        DocumentID: {
+            title: "Document ID"
+        },
+        Name: {
+            inputNode: (key, value, edits) => (
+                <Input
+                    key={key}
+                    defaultValue={value}
+                    onChange={e => {
+                        edits[key] = e.target.value
+                    }}
+                />
+            )
+        },
+        Surname: {
+            inputNode: (key, value, edits) => (
+                <Input
+                    key={key}
+                    defaultValue={value}
+                    onChange={e => {
+                        edits[key] = e.target.value
+                    }}
+                />
+            )
+        },
+        Gender: {
+            title: "Gender",
+            inputNode: (key, value, edits) => (
+                <Input
+                    key={key}
+                    defaultValue={value}
+                    onChange={e => {
+                        edits[key] = e.target.value
+                    }}
+                />
+            )
+        },
+        Birthday: {
+            inputNode: (key, value, edits) => (
+                <JoyDatePicker
+                    defaultValue={dates.parse(value, MYSQL_DATE_FORMAT)}
+                    timeSelect={false}
+                    placeholder={key}
+                    onChange={val => {
+                        edits[key] = dates.format(val, MYSQL_DATE_FORMAT)
+                    }}
+                />
+            )
 
-            },
-            BirthPlace: {
-                editNode: (key, value, edits) => (
-                    <Input
-                        key={key}
-                        defaultValue={value}
-                        onChange={e => {
-                            edits[key] = e.target.value
-                        }}
-                    />
-                )
-            }
+        },
+        BirthPlace: {
+            inputNode: (key, value, edits) => (
+                <Input
+                    key={key}
+                    defaultValue={value}
+                    onChange={e => {
+                        edits[key] = e.target.value
+                    }}
+                />
+            )
         }
-    }
+    })
 
     if (data === null) {
         return null
@@ -114,6 +111,7 @@ export default function PeoplePage() {
                         data={data ?? []}
                         onExpand={({ DocumentID }) => setSearchParams({ id: DocumentID })}
                         onDelete={setDeleteCandidate}
+                        onCreate={() => null}
                     /> :
                     <DetailView
                         data={data}

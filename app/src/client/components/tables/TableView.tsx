@@ -3,7 +3,7 @@ import { BaseProps } from "../../api/utils"
 import { useEffect, useState } from "react"
 import { MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
-import { getKeyDisplays, TableStructureDisplay } from "../../api/tableDisplay"
+import { TableStructureDisplay } from "../../api/tableDisplay"
 import { QueryEntry, TableStructure } from "../../../common/db"
 
 export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
@@ -12,6 +12,7 @@ export interface TableViewProps<U extends QueryEntry<TableStructure>, T extends 
     search?: boolean
     onExpand?: (entry: U) => void
     onDelete?: (entry: U) => void
+    onCreate?: () => void
 }
 
 export default function TableView<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>({
@@ -20,9 +21,9 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
     search = true,
     onDelete,
     onExpand,
+    onCreate,
     sx,
 }: TableViewProps<U, T>) {
-    const keyDisplays = getKeyDisplays<U, T>(display)
     const lastColumn = onDelete != undefined || onExpand != undefined
 
     const [rows, setRows] = useState<U[]>([])
@@ -63,13 +64,26 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                 alignItems: "center"
             }}>
                 <Typography level="h1">{display.title}</Typography>
-                {
-                    search ?
-                        <SearchBar onChange={async (query) => {
-                            setRows(filterRows(query))
-                        }} /> :
-                        null
-                }
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "end",
+                    alignItems: "center",
+                    gap: "1em"
+                }}>
+                    {
+                        onCreate !== undefined ?
+                            <Button component="a">NEW</Button> :
+                            null
+                    }
+                    {
+                        search ?
+                            <SearchBar onChange={async (query) => {
+                                setRows(filterRows(query))
+                            }} /> :
+                            null
+                    }
+                </Box>
             </Box>
             <Sheet
                 variant="outlined"
@@ -89,10 +103,10 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                     <thead>
                         <tr>
                             {
-                                (Object.keys(keyDisplays)).map(key => {
+                                (Object.keys(display.keys) as [keyof U]).map(key => {
                                     return (
                                         <th>
-                                            {keyDisplays[key].title}
+                                            {display.keys[key].title}
                                         </th>
                                     )
                                 })
@@ -130,12 +144,12 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                                 rows.map(row => (
                                     <tr>
                                         {
-                                            (Object.keys(keyDisplays)).map(key => {
+                                            (Object.keys(display.keys) as [keyof U]).map(key => {
                                                 return (
                                                     <td>
                                                         {
-                                                            keyDisplays[key]
-                                                                .defaultNode(key as keyof U, row[key as keyof U])
+                                                            display.keys[key]
+                                                                .defaultNode(key, row[key])
                                                         }
                                                     </td>
                                                 )
