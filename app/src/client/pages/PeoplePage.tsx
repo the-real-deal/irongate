@@ -7,7 +7,7 @@ import DetailView from "../components/tables/DetailView"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
 import JoyDatePicker from "../components/JoyDatePicker"
-import utils from "../../common/utils"
+import dates, { MYSQL_DATE_FORMAT } from "../../common/dates"
 
 export default function PeoplePage() {
     const [data, setData] = useState<PeopleEntry[] | PeopleEntry | null>(null)
@@ -16,12 +16,12 @@ export default function PeoplePage() {
 
     const fetchData = useCallback(async () => {
         const id = searchParams.get("id") ?? undefined
-        const data = await server.fetchJSON<PeopleEntry[] | PeopleEntry>(
+        const data = await server.fetchJSON(
             "/people",
             {
                 params: { id }
             }
-        )
+        ) as PeopleEntry[] | PeopleEntry
         setData(data)
     }, [searchParams])
 
@@ -73,13 +73,13 @@ export default function PeoplePage() {
                 )
             },
             Birthday: {
-                defaultNode: (_, value) => new Date(value).toLocaleDateString(),
                 editNode: (key, value, edits) => (
                     <JoyDatePicker
-                        defaultValue={new Date(value)}
+                        defaultValue={dates.parse(value, MYSQL_DATE_FORMAT)}
+                        timeSelect={false}
                         placeholder={key}
                         onChange={val => {
-                            edits[key] = utils.dateMySQLFormat(val)
+                            edits[key] = dates.format(val, MYSQL_DATE_FORMAT)
                         }}
                     />
                 )
@@ -119,7 +119,17 @@ export default function PeoplePage() {
                         data={data}
                         display={display}
                         onDelete={setDeleteCandidate}
-                        onEdit={(old, edits) => null}
+                        onEdit={async (old, edits) => {
+                            await server.fetchAPI(
+                                "/people",
+                                {
+                                    method: "PUT",
+                                    params: { id: old.DocumentID },
+                                    body: edits
+                                }
+                            )
+                            await fetchData()
+                        }}
                     />
             }
             <Modal

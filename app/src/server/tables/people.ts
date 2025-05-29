@@ -28,4 +28,19 @@ async function remove(id: string): Promise<boolean> {
     return res.affectedRows > 0
 }
 
-export default { get, remove }
+async function update(id: string, edits: Partial<PeopleEntry>): Promise<boolean> {
+    if (Object.keys(edits).length == 0) {
+        return true
+    }
+    const query = createQuery(
+        "UPDATE `People` SET",
+        (Object.keys(edits) as [keyof typeof edits]).map(
+            key => `\`${key}\` = :${key}`
+        ).join(", "),
+        "WHERE `DocumentID` = :id"
+    )
+    const res = await db.executeQuery<ResultSetHeader>(query, { id, ...edits })
+    return res.affectedRows > 0
+}
+
+export default { get, remove, update }

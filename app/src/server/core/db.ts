@@ -86,8 +86,13 @@ export class DBManager {
     ): Promise<T> {
         const connection = await this.pool.getConnection()
         try {
+            await connection.beginTransaction()
             const [result] = await connection.query(query, utils.removeUndefinedKeys(values))
+            await connection.commit()
             return result as T
+        } catch (err) {
+            await connection.rollback()
+            throw err
         } finally {
             connection.release()
         }
