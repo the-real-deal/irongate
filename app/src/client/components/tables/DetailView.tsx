@@ -28,88 +28,114 @@ export default function DetailView<U extends QueryEntry<TableStructure>, T exten
     }
 
     return (
-        <Sheet sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1em",
-            ...sx
-        }}>
-            <Box sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
+        <form
+            onSubmit={(e) => {
+                e.preventDefault()
+                if (onEdit === undefined) {
+                    return
+                }
+                onEdit(data, edits)
+                resetEditing()
+            }}
+            onReset={(e) => {
+                e.preventDefault()
+                resetEditing()
             }}>
-                <Typography level="h1">{display.title}</Typography>
+            <Sheet sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1em",
+                ...sx
+            }}>
                 <Box sx={{
                     display: "flex",
                     flexDirection: "row",
-                    gap: ".5em",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                 }}>
-                    {
-                        onEdit !== undefined ?
-                            <Button
-                                color="primary"
-                                onClick={() => {
-                                    if (editing) {
-                                        onEdit(data, edits)
-                                        resetEditing()
-                                    } else {
-                                        setEditing(true)
-                                    }
-                                }}>
-                                {editing ? <MdCheck /> : <MdEdit />}
-                            </Button> :
-                            null
-                    }
-                    {
-                        onDelete !== undefined ?
-                            <Button
-                                color="danger"
-                                onClick={() => {
-                                    if (editing) {
-                                        resetEditing()
-                                    } else {
-                                        onDelete(data)
-                                    }
-                                }}>
-                                {editing ? <MdClear /> : <MdDelete />}
-                            </Button> :
-                            null
-                    }
-                </Box>
-            </Box>
-            <Sheet variant="outlined">
-                <Table
-                    variant="soft"
-                    borderAxis="yBetween"
-                    sx={{
-                        tableLayout: "auto",
-                        overflow: "scroll",
+                    <Typography level="h1">{display.title}</Typography>
+                    <Box sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "end",
+                        alignItems: "center",
+                        gap: ".5em",
                     }}>
-                    <tbody>
                         {
-                            (Object.keys(display.keys) as [keyof U]).map(key => {
-                                return <tr>
-                                    <th style={{
-                                        width: "0.1%",
-                                        whiteSpace: "nowrap",
-                                    }}>
-                                        {display.keys[key].title}
-                                    </th>
-                                    <td>
-                                        {
-                                            editing ?
-                                                display.keys[key].inputNode(key, data[key], edits) :
-                                                display.keys[key].defaultNode(key, data[key])
-                                        }
-                                    </td>
-                                </tr>
-                            })
+                            onEdit !== undefined ?
+                                (
+                                    editing ?
+                                        <Box sx={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            justifyContent: "end",
+                                            alignItems: "center",
+                                            gap: ".5em",
+                                        }}>
+                                            <Button
+                                                color="primary"
+                                                type="submit">
+                                                <MdCheck />
+                                            </Button>
+                                            <Button
+                                                color="danger"
+                                                type="reset">
+                                                <MdClear />
+                                            </Button>
+                                        </Box>
+                                        :
+                                        <Button
+                                            color="primary"
+                                            onClick={() => setEditing(true)}>
+                                            <MdEdit />
+                                        </Button>
+
+                                ) :
+                                null
                         }
-                    </tbody>
-                </Table>
+                        {
+                            onDelete !== undefined && !editing ?
+                                <Button
+                                    color="danger"
+                                    onClick={() => onDelete(data)}>
+                                    <MdDelete />
+                                </Button> :
+                                null
+                        }
+                    </Box>
+                </Box>
+                <Sheet variant="outlined">
+                    <Table
+                        variant="soft"
+                        borderAxis="yBetween"
+                        sx={{
+                            tableLayout: "auto",
+                            overflow: "scroll",
+                        }}>
+                        <tbody>
+                            {
+                                (Object.keys(display.keys) as [keyof U]).map(key => {
+                                    return <tr>
+                                        <th style={{
+                                            width: "0.1%",
+                                            whiteSpace: "nowrap",
+                                        }}>
+                                            {display.keys[key].title}
+                                        </th>
+                                        <td>
+                                            {
+                                                editing ?
+                                                    display.keys[key].inputNode(key, data[key], edits) :
+                                                    display.keys[key].defaultNode(key, data[key])
+                                            }
+                                        </td>
+                                    </tr>
+                                })
+                            }
+                        </tbody>
+                    </Table>
+                </Sheet>
             </Sheet>
-        </Sheet>
+        </form>
     )
 }
