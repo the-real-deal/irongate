@@ -2,21 +2,26 @@ import { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import Input from '@mui/joy/Input'
-import { BaseProps } from '../api/utils'
+import { BaseProps } from '../core/utils'
 import { Box } from '@mui/joy'
-import { MYSQL_DATE_FORMAT, MYSQL_TIME_FORMAT } from '../../common/dates'
 
 export interface JoyDatePickerProps extends BaseProps {
-    timeSelect: boolean
+    includeTime: boolean
     defaultValue?: Date
     placeholder?: string
+    required?: boolean
+    dateFormat: string
+    timeFormat: string
     onChange: (value: Date) => void
 }
 
 export default function JoyDatePicker({
     defaultValue,
     placeholder,
-    timeSelect,
+    includeTime,
+    required = false,
+    dateFormat,
+    timeFormat,
     onChange,
     sx,
 }: JoyDatePickerProps) {
@@ -30,18 +35,20 @@ export default function JoyDatePicker({
             ...sx
         }}>
             <DatePicker
-                showTimeSelect={timeSelect}
+                showTimeSelect={includeTime}
                 selected={value}
-                dateFormat={MYSQL_DATE_FORMAT}
-                timeFormat={MYSQL_TIME_FORMAT}
+                placeholderText={placeholder}
+                required={required}
+                dateFormat={dateFormat}
+                timeFormat={timeFormat}
                 onChange={date => {
                     if (date === null) {
-                        throw new Error("Invalid date")
+                        return
                     }
                     setValue(date)
                     onChange(date)
                 }}
-                customInput={<Input placeholder={placeholder} />}
+                customInput={<Input />}
             />
         </Box>
     )

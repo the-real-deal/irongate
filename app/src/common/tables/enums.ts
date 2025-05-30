@@ -12,14 +12,14 @@ export const SECURITY_LEVELS = [
 ] as const
 export type SecurityLevel = typeof SECURITY_LEVELS[number]
 
-export const PERSONNEL_LEVELS = [
+export const PERSONNEL_TYPES = [
     "Director",
     "Guard",
     "Technician",
     "Janitor",
     "Librarian",
 ] as const
-export type PersonnelLevel = typeof PERSONNEL_LEVELS[number]
+export type PersonnelType = typeof PERSONNEL_TYPES[number]
 
 export const DEVICE_TYPES = [
     "Camera",

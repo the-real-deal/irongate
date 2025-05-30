@@ -1,9 +1,9 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
-import { BaseProps } from "../../api/utils"
+import { BaseProps } from "../../core/utils"
 import { useEffect, useState } from "react"
-import { MdDelete, MdVisibility } from "react-icons/md"
+import { MdAdd, MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
-import { TableStructureDisplay } from "../../api/tableDisplay"
+import { TableStructureDisplay } from "../../core/tableDisplay"
 import { QueryEntry, TableStructure } from "../../../common/db"
 
 export interface DBTableProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
@@ -73,7 +73,10 @@ export default function DBTable<U extends QueryEntry<TableStructure>, T extends 
                 }}>
                     {
                         onCreate !== undefined ?
-                            <Button component="a">NEW</Button> :
+                            <Button
+                                onClick={onCreate}>
+                                <MdAdd />
+                            </Button> :
                             null
                     }
                     {
@@ -94,8 +97,8 @@ export default function DBTable<U extends QueryEntry<TableStructure>, T extends 
                     stickyFooter
                     stickyHeader
                     hoverRow
-                    variant="plain"
-                    borderAxis="both"
+                    variant="soft"
+                    borderAxis="bothBetween"
                     sx={{
                         tableLayout: "auto",
                         overflow: "scroll",
@@ -103,7 +106,7 @@ export default function DBTable<U extends QueryEntry<TableStructure>, T extends 
                     <thead>
                         <tr>
                             {
-                                (Object.keys(display.keys) as [keyof U]).map(key => {
+                                (Object.keys(display.keys) as (keyof U)[]).map(key => {
                                     return (
                                         <th>
                                             {display.keys[key].title}
@@ -125,75 +128,63 @@ export default function DBTable<U extends QueryEntry<TableStructure>, T extends 
                     </thead>
                     <tbody>
                         {
-                            rows.length == 0 ?
-                                <tr>
-                                    <th colSpan={Object.keys(display.keys).length}>
-                                        <Box sx={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            width: "100%",
-                                            height: "100%",
-                                        }}>
-                                            <Typography level="title-lg">
-                                                No data found
-                                            </Typography>
-                                        </Box>
-                                    </th>
-                                </tr> :
-                                rows.map(row => {
-                                    return (
-                                        <tr>
-                                            {
-                                                (Object.keys(display.keys) as [keyof U]).map(key => {
-                                                    return (
-                                                        <td>
-                                                            {
-                                                                display.keys[key].defaultNode(key, row[key])
-                                                            }
-                                                        </td>
-                                                    )
-                                                })
-                                            }
-                                            {
-                                                lastColumn ?
-                                                    <td style={{
-                                                        position: "sticky",
-                                                        right: 0,
-                                                        width: "0.1%",
-                                                        whiteSpace: "nowrap",
-                                                        backgroundColor: "var(--TableCell-headBackground)",
+                            rows.map(row => {
+                                return (
+                                    <tr>
+                                        {
+                                            (Object.keys(display.keys) as (keyof U)[]).map(key => {
+                                                return (
+                                                    <td>
+                                                        {
+                                                            display.keys[key].defaultNode(
+                                                                key,
+                                                                display.keys[key].title,
+                                                                row[key]
+                                                            )
+                                                        }
+                                                    </td>
+                                                )
+                                            })
+                                        }
+                                        {
+                                            lastColumn ?
+                                                <td style={{
+                                                    position: "sticky",
+                                                    right: 0,
+                                                    width: "0.1%",
+                                                    whiteSpace: "nowrap",
+                                                    backgroundColor: "var(--TableCell-headBackground)",
+                                                }}>
+                                                    <Box sx={{
+                                                        display: "flex",
+                                                        flexDirection: "row",
+                                                        justifyContent: "end",
+                                                        gap: "0.5em",
                                                     }}>
-                                                        <Box sx={{
-                                                            display: "flex",
-                                                            flexDirection: "row",
-                                                            justifyContent: "end",
-                                                            gap: "0.5em",
-                                                        }}>
-                                                            {
-                                                                onExpand !== undefined ?
-                                                                    <Button
-                                                                        onClick={() => onExpand(row)}>
-                                                                        <MdVisibility />
-                                                                    </Button> :
-                                                                    null
-                                                            }
-                                                            {
-                                                                onDelete !== undefined ?
-                                                                    <Button
-                                                                        color="danger"
-                                                                        onClick={() => onDelete(row)}>
-                                                                        <MdDelete />
-                                                                    </Button> :
-                                                                    null
-                                                            }
-                                                        </Box>
-                                                    </td> :
-                                                    null
-                                            }
-                                        </tr>
-                                    )
-                                })
+                                                        {
+                                                            onExpand !== undefined ?
+                                                                <Button
+                                                                    onClick={() => onExpand(row)}>
+                                                                    <MdVisibility />
+                                                                </Button> :
+                                                                null
+                                                        }
+                                                        {
+                                                            onDelete !== undefined ?
+                                                                <Button
+                                                                    color="danger"
+                                                                    onClick={() => onDelete(row)}>
+                                                                    <MdDelete />
+                                                                </Button> :
+                                                                null
+                                                        }
+                                                    </Box>
+                                                </td> :
+                                                null
+                                        }
+                                    </tr>
+                                )
+                            })
                         }
                     </tbody>
                 </Table>

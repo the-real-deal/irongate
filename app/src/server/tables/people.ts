@@ -27,7 +27,7 @@ async function update(id: string, edits: Partial<PeopleEntry>): Promise<boolean>
     }
     const query = createQuery(
         "UPDATE `People` SET",
-        (Object.keys(edits) as [keyof typeof edits]).map(
+        (Object.keys(edits) as (keyof typeof edits)[]).map(
             key => `\`${key}\` = :${key}`
         ).join(", "),
         "WHERE `DocumentID` = :id"

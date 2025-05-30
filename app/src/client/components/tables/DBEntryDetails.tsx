@@ -1,6 +1,6 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
-import { BaseProps } from "../../api/utils"
-import { TableStructureDisplay } from "../../api/tableDisplay"
+import { BaseProps } from "../../core/utils"
+import { TableStructureDisplay } from "../../core/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
 import { QueryEntry, TableStructure } from "../../../common/db"
@@ -114,9 +114,18 @@ export default function DBEntryDetails<U extends QueryEntry<TableStructure>, T e
                         }}>
                         <tbody>
                             {
-                                (Object.keys(display.keys) as [keyof U]).map(key => {
-                                    const inputNode = display.keys[key].inputNode(key, data[key], edits)
-                                    const defaultNode = display.keys[key].defaultNode(key, data[key])
+                                (Object.keys(display.keys) as (keyof U)[]).map(key => {
+                                    const inputNode = display.keys[key].inputNode(
+                                        key,
+                                        display.keys[key].title,
+                                        data[key],
+                                        edits
+                                    )
+                                    const defaultNode = display.keys[key].defaultNode(
+                                        key,
+                                        display.keys[key].title,
+                                        data[key]
+                                    )
                                     return (
                                         <tr>
                                             <th style={{
