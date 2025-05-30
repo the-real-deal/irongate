@@ -4,7 +4,7 @@ import server from "../core/server"
 import { useSearchParams } from "react-router"
 import { createDisplay, dateInputNode, selectInputNode, stringInputNode } from "../core/tableDisplay"
 import DBEntryDetails from "../components/tables/DBEntryDetails"
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
 import { GENDERS } from "../../common/tables/enums"
 import DBEntryCreation from "../components/tables/DBEntryCreation"
@@ -36,32 +36,25 @@ export default function PeoplePage() {
 
     const display = createDisplay<PeopleEntry>("People", {
         DocumentID: {
-            title: "Document ID"
+            title: "Document ID",
+            inputNode: stringInputNode(),
         },
         Name: {
-            inputNode: stringInputNode()
+            inputNode: stringInputNode(),
         },
         Surname: {
-            inputNode: stringInputNode()
+            inputNode: stringInputNode(),
         },
         GenderID: {
             title: "Gender",
-            inputNode: selectInputNode(GENDERS)
+            inputNode: selectInputNode(GENDERS),
         },
         Birthday: {
-            inputNode: dateInputNode(false)
+            inputNode: dateInputNode(false),
 
         },
         BirthPlace: {
-            inputNode: (key, title, value, edits) => (
-                <Input
-                    placeholder={title}
-                    defaultValue={value}
-                    onChange={e => {
-                        edits[key] = e.target.value
-                    }}
-                />
-            )
+            inputNode: stringInputNode(),
         }
     })
 

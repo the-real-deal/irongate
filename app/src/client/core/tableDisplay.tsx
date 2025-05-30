@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import { QueryEntry, TableStructure } from "../../common/db"
-import { Input, Select, Option } from "@mui/joy"
+import { Input, Select, Option, Textarea } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../common/dates"
 import JoyDatePicker from "../components/JoyDatePicker"
 
@@ -36,7 +36,9 @@ export function createDisplay<T extends QueryEntry<TableStructure>>(
     return { title, keys: filledKeys }
 }
 
-export function stringInputNode<T extends QueryEntry<TableStructure>>() {
+export function stringInputNode<T extends QueryEntry<TableStructure>>(
+    required: boolean = true,
+) {
     return <K extends keyof T>(
         key: K,
         title: string,
@@ -46,7 +48,27 @@ export function stringInputNode<T extends QueryEntry<TableStructure>>() {
         <Input
             placeholder={title}
             defaultValue={value}
-            required
+            required={required}
+            onChange={e => {
+                edits[key] = e.target.value as T[K]
+            }}
+        />
+    )
+}
+
+export function textInputNode<T extends QueryEntry<TableStructure>>(
+    required: boolean = true,
+) {
+    return <K extends keyof T>(
+        key: K,
+        title: string,
+        value: T[K] extends string | undefined ? string | undefined : never,
+        edits: Partial<T>
+    ) => (
+        <Textarea
+            placeholder={title}
+            defaultValue={value}
+            required={required}
             onChange={e => {
                 edits[key] = e.target.value as T[K]
             }}
@@ -56,6 +78,7 @@ export function stringInputNode<T extends QueryEntry<TableStructure>>() {
 
 export function selectInputNode<T extends QueryEntry<TableStructure>, V extends string>(
     values: readonly V[],
+    required: boolean = true,
 ) {
     return <K extends keyof T>(
         key: K,
@@ -67,7 +90,7 @@ export function selectInputNode<T extends QueryEntry<TableStructure>, V extends 
             multiple={false}
             placeholder={title}
             defaultValue={value}
-            required
+            required={required}
             onChange={(_, selected) => {
                 if (selected === null) {
                     return
@@ -85,6 +108,7 @@ export function selectInputNode<T extends QueryEntry<TableStructure>, V extends 
 
 export function dateInputNode<T extends QueryEntry<TableStructure>>(
     includeTime: boolean = true,
+    required: boolean = true,
 ) {
     const dateFormat = includeTime ? MYSQL_DATETIME_FORMAT : MYSQL_DATE_FORMAT
     const timeFormat = MYSQL_TIME_FORMAT
@@ -95,6 +119,7 @@ export function dateInputNode<T extends QueryEntry<TableStructure>>(
         edits: Partial<T>
     ) => (
         <JoyDatePicker
+            required={required}
             placeholder={`${title} (${dateFormat})`}
             defaultValue={value === undefined ? value : dates.parse(value, dateFormat)}
             includeTime={includeTime}
