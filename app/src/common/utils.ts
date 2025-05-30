@@ -13,6 +13,9 @@ function isPlainObject<T>(value: unknown): value is Record<string, T> {
     )
 }
 
+function debugAlert<T>(value: T): T {
+    alert(typeof value === "object" || Array.isArray(value) ? JSON.stringify(value, undefined, 2) : String(value))
+    return value
+}
 
-
-export default { removeUndefinedKeys, isPlainObject }
+export default { removeUndefinedKeys, isPlainObject, debugAlert }

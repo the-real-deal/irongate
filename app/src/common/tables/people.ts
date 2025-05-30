@@ -1,4 +1,5 @@
 import { QueryEntry } from "../db"
+import { Gender } from "./enums"
 
 export type PeopleEntry = QueryEntry<{
     DocumentID: string
@@ -6,5 +7,5 @@ export type PeopleEntry = QueryEntry<{
     Surname: string
     Birthday: string
     BirthPlace: string
-    Gender: string
+    GenderID: Gender
 }>

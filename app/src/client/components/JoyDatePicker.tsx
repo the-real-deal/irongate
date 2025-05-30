@@ -7,8 +7,8 @@ import { Box } from '@mui/joy'
 import { MYSQL_DATE_FORMAT, MYSQL_TIME_FORMAT } from '../../common/dates'
 
 export interface JoyDatePickerProps extends BaseProps {
-    defaultValue: Date
     timeSelect: boolean
+    defaultValue?: Date
     placeholder?: string
     onChange: (value: Date) => void
 }

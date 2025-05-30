@@ -5,15 +5,8 @@ import { PeopleEntry } from "../../common/tables/people"
 
 async function get(id?: string): Promise<PeopleEntry[] | PeopleEntry> {
     const query = createQuery(
-        "SELECT",
-        "   p.`DocumentID`,",
-        "   p.`Name`,",
-        "   p.`Surname`,",
-        "   p.`Birthday`,",
-        "   p.`BirthPlace`,",
-        "   g.`Name` as `Gender`",
-        "FROM `People` p",
-        "   JOIN `Genders` g ON p.`GenderID` = g.`ID`",
+        "SELECT *",
+        "FROM `People`",
         id === undefined ? "" : "WHERE `DocumentID` = :id"
     )
     const res = await db.executeQuery<PeopleEntry[]>(query, { id })

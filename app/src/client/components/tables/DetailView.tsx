@@ -115,27 +115,31 @@ export default function DetailView<U extends QueryEntry<TableStructure>, T exten
                         <tbody>
                             {
                                 (Object.keys(display.keys) as [keyof U]).map(key => {
-                                    return <tr>
-                                        <th style={{
-                                            width: "0.1%",
-                                            whiteSpace: "nowrap",
-                                        }}>
-                                            {display.keys[key].title}
-                                        </th>
-                                        <td>
-                                            {
-                                                editing ?
-                                                    display.keys[key].inputNode(key, data[key], edits) :
-                                                    display.keys[key].defaultNode(key, data[key])
-                                            }
-                                        </td>
-                                    </tr>
+                                    const inputNode = display.keys[key].inputNode(key, data[key], edits)
+                                    const defaultNode = display.keys[key].defaultNode(key, data[key])
+                                    return (
+                                        <tr>
+                                            <th style={{
+                                                width: "0.1%",
+                                                whiteSpace: "nowrap",
+                                            }}>
+                                                {display.keys[key].title}
+                                            </th>
+                                            <td>
+                                                {
+                                                    editing ?
+                                                        inputNode ?? defaultNode :
+                                                        defaultNode
+                                                }
+                                            </td>
+                                        </tr>
+                                    )
                                 })
                             }
                         </tbody>
                     </Table>
                 </Sheet>
             </Sheet>
-        </form>
+        </form >
     )
 }

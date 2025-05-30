@@ -141,58 +141,59 @@ export default function TableView<U extends QueryEntry<TableStructure>, T extend
                                         </Box>
                                     </th>
                                 </tr> :
-                                rows.map(row => (
-                                    <tr>
-                                        {
-                                            (Object.keys(display.keys) as [keyof U]).map(key => {
-                                                return (
-                                                    <td>
-                                                        {
-                                                            display.keys[key]
-                                                                .defaultNode(key, row[key])
-                                                        }
-                                                    </td>
-                                                )
-                                            })
-                                        }
-                                        {
-                                            lastColumn ?
-                                                <td style={{
-                                                    position: "sticky",
-                                                    right: 0,
-                                                    width: "0.1%",
-                                                    whiteSpace: "nowrap",
-                                                    backgroundColor: "var(--TableCell-headBackground)",
-                                                }}>
-                                                    <Box sx={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        justifyContent: "end",
-                                                        gap: "0.5em",
+                                rows.map(row => {
+                                    return (
+                                        <tr>
+                                            {
+                                                (Object.keys(display.keys) as [keyof U]).map(key => {
+                                                    return (
+                                                        <td>
+                                                            {
+                                                                display.keys[key].defaultNode(key, row[key])
+                                                            }
+                                                        </td>
+                                                    )
+                                                })
+                                            }
+                                            {
+                                                lastColumn ?
+                                                    <td style={{
+                                                        position: "sticky",
+                                                        right: 0,
+                                                        width: "0.1%",
+                                                        whiteSpace: "nowrap",
+                                                        backgroundColor: "var(--TableCell-headBackground)",
                                                     }}>
-                                                        {
-                                                            onExpand !== undefined ?
-                                                                <Button
-                                                                    onClick={() => onExpand(row)}>
-                                                                    <MdVisibility />
-                                                                </Button> :
-                                                                null
-                                                        }
-                                                        {
-                                                            onDelete !== undefined ?
-                                                                <Button
-                                                                    color="danger"
-                                                                    onClick={() => onDelete(row)}>
-                                                                    <MdDelete />
-                                                                </Button> :
-                                                                null
-                                                        }
-                                                    </Box>
-                                                </td> :
-                                                null
-                                        }
-                                    </tr>
-                                ))
+                                                        <Box sx={{
+                                                            display: "flex",
+                                                            flexDirection: "row",
+                                                            justifyContent: "end",
+                                                            gap: "0.5em",
+                                                        }}>
+                                                            {
+                                                                onExpand !== undefined ?
+                                                                    <Button
+                                                                        onClick={() => onExpand(row)}>
+                                                                        <MdVisibility />
+                                                                    </Button> :
+                                                                    null
+                                                            }
+                                                            {
+                                                                onDelete !== undefined ?
+                                                                    <Button
+                                                                        color="danger"
+                                                                        onClick={() => onDelete(row)}>
+                                                                        <MdDelete />
+                                                                    </Button> :
+                                                                    null
+                                                            }
+                                                        </Box>
+                                                    </td> :
+                                                    null
+                                            }
+                                        </tr>
+                                    )
+                                })
                         }
                     </tbody>
                 </Table>

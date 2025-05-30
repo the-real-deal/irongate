@@ -4,10 +4,11 @@ import server from "../api/server"
 import { useSearchParams } from "react-router"
 import { createDisplay } from "../api/tableDisplay"
 import DetailView from "../components/tables/DetailView"
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog } from "@mui/joy"
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog, Option, Select } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
 import JoyDatePicker from "../components/JoyDatePicker"
 import dates, { MYSQL_DATE_FORMAT } from "../../common/dates"
+import { GENDERS } from "../../common/tables/enums"
 
 export default function PeoplePage() {
     const [data, setData] = useState<PeopleEntry[] | PeopleEntry | null>(null)
@@ -50,7 +51,6 @@ export default function PeoplePage() {
         Surname: {
             inputNode: (key, value, edits) => (
                 <Input
-                    key={key}
                     defaultValue={value}
                     onChange={e => {
                         edits[key] = e.target.value
@@ -58,22 +58,31 @@ export default function PeoplePage() {
                 />
             )
         },
-        Gender: {
+        GenderID: {
             title: "Gender",
-            inputNode: (key, value, edits) => (
-                <Input
-                    key={key}
-                    defaultValue={value}
-                    onChange={e => {
-                        edits[key] = e.target.value
-                    }}
-                />
-            )
+            inputNode: (key, value, edits) => {
+                return (
+                    <Select
+                        defaultValue={value}
+                        onChange={(_, selected) => {
+                            if (selected === null) {
+                                return
+                            }
+                            edits[key] = selected
+                        }}>
+                        {
+                            GENDERS.map(g => (
+                                <Option value={g}>{g}</Option>
+                            ))
+                        }
+                    </Select>
+                )
+            }
         },
         Birthday: {
             inputNode: (key, value, edits) => (
                 <JoyDatePicker
-                    defaultValue={dates.parse(value, MYSQL_DATE_FORMAT)}
+                    defaultValue={value === undefined ? value : dates.parse(value, MYSQL_DATE_FORMAT)}
                     timeSelect={false}
                     placeholder={key}
                     onChange={val => {

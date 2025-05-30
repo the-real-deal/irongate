@@ -4,7 +4,7 @@ import { QueryEntry, TableStructure } from "../../common/db"
 export interface KeyDisplay<T extends QueryEntry<TableStructure>, K extends keyof T> {
     title: string
     defaultNode: (key: K, value: T[K]) => ReactNode
-    inputNode: (key: K, value: T[K], edits: Partial<T>) => ReactNode
+    inputNode: (key: K, value: T[K] | undefined, edits: Partial<T>) => ReactNode
 }
 
 export type TableStructureDisplay<T extends QueryEntry<TableStructure>> = {
@@ -25,7 +25,7 @@ export function createDisplay<T extends QueryEntry<TableStructure>>(
             const keyDisplay = keys[key] ?? {}
             const title = keyDisplay.title ?? key.toString()
             const defaultNode = keyDisplay.defaultNode ?? ((_, value) => value)
-            const inputNode = keyDisplay.inputNode ?? ((key, value, _) => defaultNode(key, value))
+            const inputNode = keyDisplay.inputNode ?? (() => null)
             return [key, { title, defaultNode, inputNode }]
         })
     ) as unknown as { [K in keyof T]: KeyDisplay<T, K> }
