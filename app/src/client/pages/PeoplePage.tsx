@@ -1,9 +1,9 @@
-import TableView from "../components/tables/TableView"
+import DBTable from "../components/tables/DBTable"
 import { useCallback, useEffect, useState } from "react"
 import server from "../api/server"
 import { useSearchParams } from "react-router"
 import { createDisplay } from "../api/tableDisplay"
-import DetailView from "../components/tables/DetailView"
+import DBEntryDetails from "../components/tables/DBEntryDetails"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Input, Modal, ModalDialog, Option, Select } from "@mui/joy"
 import { PeopleEntry } from "../../common/tables/people"
 import JoyDatePicker from "../components/JoyDatePicker"
@@ -115,14 +115,14 @@ export default function PeoplePage() {
         }}>
             {
                 Array.isArray(data) ?
-                    <TableView
+                    <DBTable
                         display={display}
                         data={data ?? []}
                         onExpand={({ DocumentID }) => setSearchParams({ id: DocumentID })}
                         onDelete={setDeleteCandidate}
                         onCreate={() => null}
                     /> :
-                    <DetailView
+                    <DBEntryDetails
                         data={data}
                         display={display}
                         onDelete={setDeleteCandidate}
