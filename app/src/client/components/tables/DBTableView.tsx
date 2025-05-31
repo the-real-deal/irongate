@@ -6,7 +6,7 @@ import SearchBar from "../SearchBar"
 import { TableStructureDisplay } from "../../core/tableDisplay"
 import { DBTable, TableRecord } from "../../../common/db"
 
-export interface DBTableProps<U extends DBTable<TableRecord>, T extends TableStructureDisplay<U>> extends BaseProps {
+export interface DBTableViewProps<U extends DBTable<TableRecord>, T extends TableStructureDisplay<U>> extends BaseProps {
     display: T
     data: U[]
     search?: boolean
@@ -15,7 +15,7 @@ export interface DBTableProps<U extends DBTable<TableRecord>, T extends TableStr
     onCreate?: () => void
 }
 
-export default function DBTable<U extends DBTable<TableRecord>, T extends TableStructureDisplay<U>>({
+export default function DBTableView<U extends DBTable<TableRecord>, T extends TableStructureDisplay<U>>({
     display,
     data,
     search = true,
@@ -23,7 +23,7 @@ export default function DBTable<U extends DBTable<TableRecord>, T extends TableS
     onExpand,
     onCreate,
     sx,
-}: DBTableProps<U, T>) {
+}: DBTableViewProps<U, T>) {
     const lastColumn = onDelete != undefined || onExpand != undefined
 
     const [rows, setRows] = useState<U[]>([])

@@ -1,7 +1,6 @@
 import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2/promise"
 import env from "../../common/env"
 import { Pool } from "mysql2/promise"
-import utils from "../../common/utils"
 import { ColumnValue, DBTable, TableRecord } from "../../common/db"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
@@ -10,7 +9,7 @@ function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
 
 const forcedOptions = defineForcedOptions({
     rowsAsArray: false,
-    namedPlaceholders: true,
+    namedPlaceholders: false,
     multipleStatements: false,
     typeCast: (field, next) => {
         switch (field.type) {
@@ -82,12 +81,12 @@ export class DBManager {
 
     async executeQuery<T extends DBTable<TableRecord>[] | ResultSetHeader>(
         query: string,
-        values: Partial<{ [k: string]: ColumnValue }> = {},
+        values: ColumnValue[] = [],
     ): Promise<T> {
         const connection = await this.pool.getConnection()
         try {
             await connection.beginTransaction()
-            const [result] = await connection.query(query, utils.removeUndefinedKeys(values))
+            const [result] = await connection.query(query, values)
             await connection.commit()
             return result as T
         } catch (err) {
@@ -99,6 +98,8 @@ export class DBManager {
     }
 }
 
-export function createQuery(...lines: string[]): string {
-    return lines.join("\n")
+export function createQuery(...lines: (string | string[])[]): string {
+    return lines
+        .map(l => Array.isArray(l) ? l.join(", ") : l)
+        .join("\n")
 }

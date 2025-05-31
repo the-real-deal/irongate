@@ -42,4 +42,13 @@ peopleRouter.put("/", async (req: PrimitiveRequest, res) => {
     }
 })
 
+peopleRouter.post("/", async (req: PrimitiveRequest, res) => {
+    if (req.body === undefined || !utils.isPlainObject(req.body)) {
+        res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)
+        return
+    }
+    await people.create(req.body)
+    res.status(HttpStatusCode.OK).send()
+})
+
 export default peopleRouter

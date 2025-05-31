@@ -1,4 +1,4 @@
-import DBTable from "../components/tables/DBTable"
+import DBTableView from "../components/tables/DBTableView"
 import { useCallback, useEffect, useState } from "react"
 import server from "../core/server"
 import { useSearchParams } from "react-router"
@@ -8,7 +8,6 @@ import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal,
 import { PeopleTable } from "../../common/tables/people"
 import { GENDERS } from "../../common/tables/enums"
 import DBEntryCreation from "../components/tables/DBEntryCreation"
-import utils from "../../common/utils"
 
 export default function PeoplePage() {
     const [data, setData] = useState<PeopleTable[] | PeopleTable | null>(null)
@@ -68,7 +67,7 @@ export default function PeoplePage() {
         }}>
             {
                 Array.isArray(data) ?
-                    <DBTable
+                    <DBTableView
                         display={display}
                         data={data ?? []}
                         onExpand={({ DocumentID }) => setSearchParams({ id: DocumentID })}
@@ -148,9 +147,16 @@ export default function PeoplePage() {
                         open={showCreationModal}
                         InputsContainer={DialogContent}
                         ButtonsContainer={DialogActions}
-                        onConfirm={(data) => {
-                            utils.debugAlert(data)
+                        onConfirm={async (data) => {
+                            await server.fetchAPI(
+                                "/people",
+                                {
+                                    method: "POST",
+                                    body: data
+                                }
+                            )
                             setShowCreationModal(false)
+                            await fetchData()
                         }}
                         onClose={() => setShowCreationModal(false)}
                     />
