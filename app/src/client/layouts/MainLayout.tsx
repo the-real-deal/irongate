@@ -1,53 +1,100 @@
-import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdMenu, MdPestControlRodent } from 'react-icons/md'
+import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdPestControlRodent } from 'react-icons/md'
 import { Outlet, useLocation, useNavigate, matchPath } from 'react-router'
 import Sidebar, { TabStructure } from '../components/layout/Sidebar'
-import { Box, Typography, Sheet } from '@mui/joy'
-import ThemeSwitcher from '../components/ThemeSwitcher'
+import { Box, Sheet } from '@mui/joy'
 import { SyntheticEvent, useEffect, useState } from 'react'
 
 const TABS: TabStructure[] = [
     {
         // statistiche
         title: "Overview",
-        route: "/overview",
         icon: <MdBarChart />,
+        routes: "/overview",
     },
     {
         // settori, celle, zone, dispositivi
         title: "Infrastructure",
-        route: "/infrastructure",
         icon: <MdApartment />,
+        routes: [
+            {
+                title: "Sectors",
+                route: "/sectors",
+            },
+            {
+                title: "Cells",
+                route: "/cells",
+            },
+            {
+                title: "Zones",
+                route: "/zones",
+            },
+            {
+                title: "Devices",
+                route: "/devices",
+            },
+        ],
     },
     {
         // dati anagrafici + tipo di persona
         title: "People",
-        route: "/people",
         icon: <MdGroup />,
+        routes: "/people",
     },
     {
         // prigionieri, movimenti di celle, visite
         title: "Inmates",
-        route: "/inmates",
         icon: <MdPestControlRodent />,
+        routes: "/inmates",
     },
     {
         // personale, report
         title: "Personnel",
-        route: "/personnel",
         icon: <MdLocalPolice />,
+        routes: [
+            {
+                title: "Personnel",
+                route: "/personnel"
+            },
+            {
+                title: "Reports",
+                route: "/reports"
+            },
+        ],
     },
     {
         // consegne, corrieri, veicoli
         title: "Deliveries",
-        route: "/deliveries",
         icon: <MdLocalShipping />,
+        routes: [
+            {
+                title: "Deliveries",
+                route: "/deliveries"
+            },
+            {
+                title: "Couriers",
+                route: "/couriers"
+            },
+            {
+                title: "Vehicles",
+                route: "/vehicles"
+            },
+        ],
     },
     {
         // attività, routine, 
         title: "Activities",
-        route: "/activities",
         icon: <MdClass />,
-    }
+        routes: [
+            {
+                title: "Activities",
+                route: "/activities"
+            },
+            {
+                title: "Routines",
+                route: "/routines"
+            },
+        ],
+    },
 ]
 
 export default function MainLayout() {
@@ -57,9 +104,9 @@ export default function MainLayout() {
     const [currentRoute, setCurrentRoute] = useState<string | null>(null)
 
     useEffect(() => {
-        const route = TABS.map(t => t.route).find((path) =>
-            matchPath({ path, end: false }, location.pathname)
-        )
+        const route = TABS
+            .flatMap(t => Array.isArray(t.routes) ? t.routes.map(r => r.route) : [t.routes])
+            .find(path => matchPath({ path, end: false }, location.pathname))
         setCurrentRoute(route ?? null)
         return () => {
             setCurrentRoute(null)
@@ -84,22 +131,7 @@ export default function MainLayout() {
             <Sidebar
                 tabs={TABS}
                 currentRoute={currentRoute}
-                expandButtonContent={<MdMenu />}
-                onChange={handleChange}>
-                <Box sx={{
-                    width: "100%",
-                    padding: "1em"
-                }}>
-                    <Typography
-                        level="h4">
-                        Theme
-                    </Typography>
-                    <ThemeSwitcher sx={{
-                        width: "100%",
-                        marginTop: "0.5em",
-                    }} />
-                </Box>
-            </Sidebar>
+                onChange={handleChange} />
             <Sheet sx={{
                 width: "100%",
                 height: "100%",

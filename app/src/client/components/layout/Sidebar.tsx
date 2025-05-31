@@ -1,45 +1,45 @@
-import { Box, Drawer, IconButton, Stack, Tab, TabList, Tabs, Tooltip, Typography } from "@mui/joy"
-import { PropsWithChildren, ReactNode, SyntheticEvent, useState } from "react"
+import { Box, Divider, Drawer, IconButton, Sheet, Stack, Tab, TabList, Tabs, Tooltip, Typography } from "@mui/joy"
+import { ReactNode, SyntheticEvent, useState } from "react"
 import { IconContext } from "react-icons"
 import { BaseProps } from "../../core/utils"
+import { MdMenu } from "react-icons/md"
+import ThemeSwitcher from "../ThemeSwitcher"
 
-export interface TabStructure {
+export type TabStructure = {
     title: string
-    route: string
     icon: ReactNode
+    routes: string | {
+        title: string
+        route: string
+    }[]
 }
+
 
 export interface SideBarProps extends BaseProps {
     tabs: TabStructure[]
     currentRoute: string | null
-    expandButtonContent: ReactNode
     onChange: (e: SyntheticEvent | null, value: string | null) => void
 }
 
-export default function Sidebar({ tabs, currentRoute, expandButtonContent, onChange, sx, children }: PropsWithChildren<SideBarProps>) {
+export default function Sidebar({
+    tabs,
+    currentRoute,
+    onChange,
+    sx
+}: SideBarProps) {
     const [drawerOpen, setDrawerOpen] = useState(false)
 
     return (
-        <Tabs
-            value={currentRoute}
-            onChange={(e, value) => {
-                setDrawerOpen(false)
-                onChange(e, value?.toString() ?? null)
-            }}
-            orientation="vertical"
-            sx={{
-                width: "fit-content",
-                ...sx
-            }}>
-            <TabList
+        <Box>
+            <Sheet
                 variant="solid"
                 color="primary"
-                disableUnderline
                 sx={{
                     position: "sticky",
                     top: 0,
                     height: "100dvh",
-                    zIndex: 100
+                    zIndex: 100,
+                    ...sx
                 }}>
                 <IconContext.Provider value={{
                     size: "var(--joy-fontSize-lg)"
@@ -54,79 +54,120 @@ export default function Sidebar({ tabs, currentRoute, expandButtonContent, onCha
                                     width: "100%",
                                     borderRadius: 0
                                 }}>
-                                {expandButtonContent}
+                                <MdMenu />
                             </IconButton>
                         </Tooltip>
-                        {
-                            tabs.map(({ title, icon, route }) => (
-                                <Tooltip title={title} placement="right" arrow>
-                                    <Tab
-                                        value={route}
-                                        variant="solid"
-                                        color="primary"
-                                        sx={{
-                                            width: "100%",
-                                            flex: 'none',
-                                            scrollSnapAlign: 'start'
-                                        }}>
-                                        {icon}
-                                    </Tab>
-                                </Tooltip>
-                            ))
-                        }
                     </Box>
                 </IconContext.Provider>
-            </TabList>
+            </Sheet>
             <Drawer
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
                 size="sm"
             >
-                <Stack sx={{
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    height: "100%",
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100dvh",
                     width: "100%",
                 }}>
-                    <Box sx={{ width: "100%" }}>
-                        <Typography
-                            level="h4"
-                            paddingInline={"1em"}
-                            paddingBlock={"0.5em"}>
-                            Pages
-                        </Typography>
-                        <TabList
-                            disableUnderline
-                            sx={{
-                                height: "100%",
-                                width: "100%",
-                                overflow: 'auto',
-                                scrollSnapType: 'x mandatory',
-                                '&::-webkit-scrollbar': { display: 'none' },
-                                fontWeight: "bold",
-                            }}>
-                            {
-                                tabs.map(({ title, icon, route }) => (
-                                    <Tab
-                                        value={route}
-                                        variant="plain"
-                                        color="primary"
-                                        indicatorInset
-                                        sx={{
-                                            width: "100%",
-                                            flex: 'none',
-                                            scrollSnapAlign: 'start',
-                                            paddingInline: "1em",
-                                        }}>
-                                        <Typography level="title-lg" startDecorator={icon}>{title}</Typography>
-                                    </Tab>
-                                ))
-                            }
-                        </TabList>
+                    <Box sx={{
+                        paddingInline: "1em",
+                        paddingBlock: "0.5em",
+                        flex: "0 0 auto",
+                    }}>
+                        <Typography level="h4">Pages</Typography>
                     </Box>
-                    {children}
-                </Stack>
+                    <Box sx={{
+                        flex: "1 1 auto",
+                        overflowY: "auto",
+                        '&::-webkit-scrollbar': { display: "none" },
+                    }}>
+                        <Tabs
+                            value={currentRoute}
+                            onChange={(e, value) => {
+                                setDrawerOpen(false)
+                                onChange(e, value?.toString() ?? null)
+                            }}
+                            orientation="vertical"
+                            sx={{
+                                width: "100%",
+                            }}
+                        >
+                            <TabList disableUnderline sx={{ width: "100%" }}>
+                                {
+                                    tabs.map(({ title, icon, routes }) => (
+                                        Array.isArray(routes) ?
+                                            <Box sx={{ width: "100%" }}>
+                                                <Typography
+                                                    level="title-lg"
+                                                    startDecorator={icon}
+                                                    sx={{
+                                                        paddingBlock: "0.5em",
+                                                        paddingInline: "1em",
+                                                    }}>
+                                                    {title}
+                                                </Typography>
+                                                <Box sx={{ position: "relative" }}>
+                                                    <Divider
+                                                        orientation="vertical"
+                                                        sx={{
+                                                            position: "absolute",
+                                                            left: 0,
+                                                            top: 0,
+                                                            zIndex: 500,
+                                                            marginInlineStart: "1.5em",
+                                                            width: ".2em",
+                                                            height: "100%",
+                                                            pointerEvents: "none",
+                                                            backgroundColor: "neutral.500"
+                                                        }} />
+                                                    <Stack sx={{ width: "100%" }}>
+                                                        {
+                                                            routes.map(({ title, route: subroute }) => (
+                                                                <Tab
+                                                                    value={subroute}
+                                                                    variant="plain"
+                                                                    color="primary"
+                                                                    indicatorInset
+                                                                    sx={{
+                                                                        width: "100%",
+                                                                        paddingBlock: "0.5em",
+                                                                        paddingInline: "3em",
+                                                                    }}>
+                                                                    <Typography level="title-lg">{title}</Typography>
+                                                                </Tab>
+                                                            ))
+                                                        }
+                                                    </Stack>
+                                                </Box>
+                                            </Box> :
+                                            <Tab
+                                                value={routes}
+                                                variant="plain"
+                                                color="primary"
+                                                indicatorInset
+                                                sx={{
+                                                    width: "100%",
+                                                    paddingBlock: "0.5em",
+                                                    paddingInline: "1em",
+                                                }}>
+                                                <Typography level="title-lg" startDecorator={icon}>{title}</Typography>
+                                            </Tab>
+                                    ))
+                                }
+                            </TabList>
+                        </Tabs>
+                    </Box>
+                    <Box sx={{
+                        flex: "0 0 auto",
+                        padding: "1em",
+                    }}>
+                        <Typography level="h4">Theme</Typography>
+                        <ThemeSwitcher sx={{ width: "100%", marginTop: "0.5em" }} />
+                    </Box>
+                </Box>
             </Drawer>
-        </Tabs >
+        </Box >
     )
 }

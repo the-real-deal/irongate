@@ -97,7 +97,7 @@ export default function DBTableView<U extends DBTable<TableRecord>, T extends Ta
                     stickyFooter
                     stickyHeader
                     hoverRow
-                    variant="soft"
+                    variant="plain"
                     borderAxis="bothBetween"
                     sx={{
                         tableLayout: "auto",
