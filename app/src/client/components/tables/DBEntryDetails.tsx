@@ -3,16 +3,16 @@ import { BaseProps } from "../../core/utils"
 import { TableStructureDisplay } from "../../core/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
-import { QueryEntry, TableStructure } from "../../../common/db"
+import { DBTable } from "../../../common/db"
 
-export interface DBEntryDetailsProps<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>> extends BaseProps {
+export interface DBEntryDetailsProps<U extends DBTable<DBTable>, T extends TableStructureDisplay<U>> extends BaseProps {
     display: T
     data: U
     onEdit?: (old: U, edits: Partial<U>) => void
     onDelete?: (data: U) => void
 }
 
-export default function DBEntryDetails<U extends QueryEntry<TableStructure>, T extends TableStructureDisplay<U>>({
+export default function DBEntryDetails<U extends DBTable<DBTable>, T extends TableStructureDisplay<U>>({
     display,
     data,
     onEdit,

@@ -1,23 +1,23 @@
 import { ReactNode } from "react"
-import { QueryEntry, TableStructure } from "../../common/db"
+import { DBTable, TableRecord } from "../../common/db"
 import { Input, Select, Option, Textarea } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../common/dates"
 import JoyDatePicker from "../components/JoyDatePicker"
 
-export interface KeyDisplay<T extends QueryEntry<TableStructure>, K extends keyof T> {
+export interface KeyDisplay<T extends DBTable<TableRecord>, K extends keyof T> {
     title: string
     defaultNode: (key: K, title: string, value: T[K]) => ReactNode
     inputNode: (key: K, title: string, value: T[K] | undefined, edits: Partial<T>) => ReactNode
 }
 
-export type TableStructureDisplay<T extends QueryEntry<TableStructure>> = {
+export type TableStructureDisplay<T extends DBTable<TableRecord>> = {
     title: string,
     keys: {
         [K in keyof T]: KeyDisplay<T, K>
     }
 }
 
-export function createDisplay<T extends QueryEntry<TableStructure>>(
+export function createDisplay<T extends DBTable<TableRecord>>(
     title: string,
     keys: {
         [K in keyof T]: Partial<KeyDisplay<T, K>>
@@ -36,7 +36,7 @@ export function createDisplay<T extends QueryEntry<TableStructure>>(
     return { title, keys: filledKeys }
 }
 
-export function stringInputNode<T extends QueryEntry<TableStructure>>(
+export function stringInputNode<T extends DBTable<TableRecord>>(
     required: boolean = true,
 ) {
     return <K extends keyof T>(
@@ -56,7 +56,7 @@ export function stringInputNode<T extends QueryEntry<TableStructure>>(
     )
 }
 
-export function textInputNode<T extends QueryEntry<TableStructure>>(
+export function textInputNode<T extends DBTable<TableRecord>>(
     required: boolean = true,
 ) {
     return <K extends keyof T>(
@@ -76,7 +76,7 @@ export function textInputNode<T extends QueryEntry<TableStructure>>(
     )
 }
 
-export function selectInputNode<T extends QueryEntry<TableStructure>, V extends string>(
+export function selectInputNode<T extends DBTable<TableRecord>, V extends string>(
     values: readonly V[],
     required: boolean = true,
 ) {
@@ -106,7 +106,7 @@ export function selectInputNode<T extends QueryEntry<TableStructure>, V extends 
     )
 }
 
-export function dateInputNode<T extends QueryEntry<TableStructure>>(
+export function dateInputNode<T extends DBTable<TableRecord>>(
     includeTime: boolean = true,
     required: boolean = true,
 ) {

@@ -5,14 +5,14 @@ import { useSearchParams } from "react-router"
 import { createDisplay, dateInputNode, selectInputNode, stringInputNode } from "../core/tableDisplay"
 import DBEntryDetails from "../components/tables/DBEntryDetails"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog } from "@mui/joy"
-import { PeopleEntry } from "../../common/tables/people"
+import { PeopleTable } from "../../common/tables/people"
 import { GENDERS } from "../../common/tables/enums"
 import DBEntryCreation from "../components/tables/DBEntryCreation"
 import utils from "../../common/utils"
 
 export default function PeoplePage() {
-    const [data, setData] = useState<PeopleEntry[] | PeopleEntry | null>(null)
-    const [deleteCandidate, setDeleteCandidate] = useState<PeopleEntry | null>(null)
+    const [data, setData] = useState<PeopleTable[] | PeopleTable | null>(null)
+    const [deleteCandidate, setDeleteCandidate] = useState<PeopleTable | null>(null)
     const [showCreationModal, setShowCreationModal] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
 
@@ -23,7 +23,7 @@ export default function PeoplePage() {
             {
                 params: { id }
             }
-        ) as PeopleEntry[] | PeopleEntry
+        ) as PeopleTable[] | PeopleTable
         setData(data)
     }, [searchParams])
 
@@ -34,7 +34,7 @@ export default function PeoplePage() {
         }
     }, [fetchData])
 
-    const display = createDisplay<PeopleEntry>("People", {
+    const display = createDisplay<PeopleTable>("People", {
         DocumentID: {
             title: "Document ID",
             inputNode: stringInputNode(),

@@ -1,10 +1,10 @@
 import { Box, Button, Table } from "@mui/joy"
-import { QueryEntry, TableStructure } from "../../../common/db"
+import { TableRecord, DBTable } from "../../../common/db"
 import { TableStructureDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { ComponentType, ReactNode, useEffect, useState } from "react"
 
-export interface DBEntryCreationProps<T extends QueryEntry<TableStructure>> extends BaseProps {
+export interface DBEntryCreationProps<T extends DBTable<TableRecord>> extends BaseProps {
     display: TableStructureDisplay<T>
     open: boolean
     onConfirm: (data: Partial<T>) => void
@@ -13,7 +13,7 @@ export interface DBEntryCreationProps<T extends QueryEntry<TableStructure>> exte
     ButtonsContainer?: ComponentType<{ children: ReactNode }>
 }
 
-export default function DBEntryCreation<T extends QueryEntry<TableStructure>>({
+export default function DBEntryCreation<T extends DBTable<TableRecord>>({
     display,
     open,
     InputsContainer = Box,
