@@ -3,6 +3,7 @@ import { DBTable, TableRecord } from "../../common/db"
 import { Input, Select, Option, Textarea } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../common/dates"
 import JoyDatePicker from "../components/JoyDatePicker"
+import { BaseProps } from "./utils"
 
 export interface KeyDisplay<T extends DBTable<TableRecord>, K extends keyof T> {
     title: string
@@ -36,9 +37,12 @@ export function createDisplay<T extends DBTable<TableRecord>>(
     return { title, keys: filledKeys }
 }
 
-export function stringInputNode<T extends DBTable<TableRecord>>(
-    required: boolean = true,
-) {
+export function stringInputNode<T extends DBTable<TableRecord>>({
+    required = true,
+    sx,
+}: {
+    required?: boolean,
+} & BaseProps = {}) {
     return <K extends keyof T>(
         key: K,
         title: string,
@@ -49,6 +53,7 @@ export function stringInputNode<T extends DBTable<TableRecord>>(
             placeholder={title}
             defaultValue={value}
             required={required}
+            sx={sx}
             onChange={e => {
                 edits[key] = e.target.value as T[K]
             }}
@@ -56,9 +61,12 @@ export function stringInputNode<T extends DBTable<TableRecord>>(
     )
 }
 
-export function textInputNode<T extends DBTable<TableRecord>>(
-    required: boolean = true,
-) {
+export function textInputNode<T extends DBTable<TableRecord>>({
+    required = true,
+    sx,
+}: {
+    required?: boolean,
+} & BaseProps = {}) {
     return <K extends keyof T>(
         key: K,
         title: string,
@@ -69,6 +77,7 @@ export function textInputNode<T extends DBTable<TableRecord>>(
             placeholder={title}
             defaultValue={value}
             required={required}
+            sx={sx}
             onChange={e => {
                 edits[key] = e.target.value as T[K]
             }}
@@ -78,7 +87,12 @@ export function textInputNode<T extends DBTable<TableRecord>>(
 
 export function selectInputNode<T extends DBTable<TableRecord>, V extends string>(
     values: readonly V[],
-    required: boolean = true,
+    {
+        required = true,
+        sx,
+    }: {
+        required?: boolean,
+    } & BaseProps = {},
 ) {
     return <K extends keyof T>(
         key: K,
@@ -91,6 +105,7 @@ export function selectInputNode<T extends DBTable<TableRecord>, V extends string
             placeholder={title}
             defaultValue={value}
             required={required}
+            sx={sx}
             onChange={(_, selected) => {
                 if (selected === null) {
                     return
@@ -106,10 +121,14 @@ export function selectInputNode<T extends DBTable<TableRecord>, V extends string
     )
 }
 
-export function dateInputNode<T extends DBTable<TableRecord>>(
-    includeTime: boolean = true,
-    required: boolean = true,
-) {
+export function dateInputNode<T extends DBTable<TableRecord>>({
+    required = true,
+    includeTime = true,
+    sx,
+}: {
+    required?: boolean,
+    includeTime?: boolean,
+} & BaseProps = {}) {
     const dateFormat = includeTime ? MYSQL_DATETIME_FORMAT : MYSQL_DATE_FORMAT
     const timeFormat = MYSQL_TIME_FORMAT
     return <K extends keyof T>(
@@ -125,6 +144,7 @@ export function dateInputNode<T extends DBTable<TableRecord>>(
             includeTime={includeTime}
             dateFormat={dateFormat}
             timeFormat={timeFormat}
+            sx={sx}
             onChange={val => {
                 edits[key] = dates.format(val, dateFormat) as T[K]
             }}

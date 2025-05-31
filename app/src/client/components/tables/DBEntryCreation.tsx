@@ -85,7 +85,7 @@ export default function DBEntryCreation<T extends DBTable<TableRecord>>({
                         variant="solid"
                         color="primary"
                         type="submit">
-                        Confirm
+                        Create
                     </Button>
                     <Button
                         variant="plain"

@@ -19,7 +19,7 @@ const DISPLAY = createDisplay<PeopleTable>("People", {
         inputNode: selectInputNode(GENDERS),
     },
     Birthday: {
-        inputNode: dateInputNode(false),
+        inputNode: dateInputNode({ includeTime: false }),
 
     },
     BirthPlace: {

@@ -94,9 +94,11 @@ export default function DBTablePage<T extends DBTable<TableRecord>>({
             <Modal
                 open={deleteCandidate !== null}
                 onClose={() => setDeleteCandidate(null)}>
-                <ModalDialog variant="outlined" role="alertdialog">
+                <ModalDialog
+                    variant="outlined"
+                    role="alertdialog">
                     <DialogTitle>
-                        Confirmation deletion
+                        Confirm deletion
                     </DialogTitle>
                     <Divider />
                     <DialogContent>
@@ -163,7 +165,7 @@ export default function DBTablePage<T extends DBTable<TableRecord>>({
                                     await fetchData()
                                 }
                             }}>
-                            Confirm
+                            Delete
                         </Button>
                         <Button
                             variant="plain"
@@ -178,9 +180,14 @@ export default function DBTablePage<T extends DBTable<TableRecord>>({
                 open={showCreationModal}
                 onClose={() => setShowCreationModal(false)}>
                 <ModalDialog
+                    variant="outlined"
                     sx={{
                         minWidth: "50%"
                     }}>
+                    <DialogTitle>
+                        Create new entry
+                    </DialogTitle>
+                    <Divider />
                     <DBEntryCreation
                         display={display}
                         open={showCreationModal}
