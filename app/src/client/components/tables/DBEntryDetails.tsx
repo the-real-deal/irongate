@@ -1,18 +1,18 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../core/utils"
-import { TableStructureDisplay } from "../../core/tableDisplay"
+import { TableDisplay } from "../../core/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
-import { DBTable } from "../../../common/db"
+import { DBTable, TableRecord } from "../../../common/db"
 
-export interface DBEntryDetailsProps<U extends DBTable<DBTable>, T extends TableStructureDisplay<U>> extends BaseProps {
+export interface DBEntryDetailsProps<U extends DBTable<TableRecord>, T extends TableDisplay<U>> extends BaseProps {
     display: T
-    data: U
+    data?: U
     onEdit?: (old: U, edits: Partial<U>) => void
     onDelete?: (data: U) => void
 }
 
-export default function DBEntryDetails<U extends DBTable<DBTable>, T extends TableStructureDisplay<U>>({
+export default function DBEntryDetails<U extends DBTable<TableRecord>, T extends TableDisplay<U>>({
     display,
     data,
     onEdit,
@@ -31,7 +31,7 @@ export default function DBEntryDetails<U extends DBTable<DBTable>, T extends Tab
         <form
             onSubmit={(e) => {
                 e.preventDefault()
-                if (onEdit === undefined) {
+                if (data === undefined || onEdit === undefined) {
                     return
                 }
                 onEdit(data, edits)
@@ -97,7 +97,12 @@ export default function DBEntryDetails<U extends DBTable<DBTable>, T extends Tab
                             onDelete !== undefined && !editing ?
                                 <Button
                                     color="danger"
-                                    onClick={() => onDelete(data)}>
+                                    onClick={() => {
+                                        if (data === undefined) {
+                                            return
+                                        }
+                                        onDelete(data)
+                                    }}>
                                     <MdDelete />
                                 </Button> :
                                 null
@@ -105,48 +110,52 @@ export default function DBEntryDetails<U extends DBTable<DBTable>, T extends Tab
                     </Box>
                 </Box>
                 <Sheet variant="outlined">
-                    <Table
-                        variant="soft"
-                        borderAxis="yBetween"
-                        sx={{
-                            tableLayout: "auto",
-                            overflow: "scroll",
-                        }}>
-                        <tbody>
-                            {
-                                (Object.keys(display.keys) as (keyof U)[]).map(key => {
-                                    const inputNode = display.keys[key].inputNode(
-                                        key,
-                                        display.keys[key].title,
-                                        data[key],
-                                        edits
-                                    )
-                                    const defaultNode = display.keys[key].defaultNode(
-                                        key,
-                                        display.keys[key].title,
-                                        data[key]
-                                    )
-                                    return (
-                                        <tr>
-                                            <th style={{
-                                                width: "0.1%",
-                                                whiteSpace: "nowrap",
-                                            }}>
-                                                {display.keys[key].title}
-                                            </th>
-                                            <td>
-                                                {
-                                                    editing ?
-                                                        inputNode ?? defaultNode :
-                                                        defaultNode
-                                                }
-                                            </td>
-                                        </tr>
-                                    )
-                                })
-                            }
-                        </tbody>
-                    </Table>
+                    {
+                        data !== undefined ?
+                            <Table
+                                variant="soft"
+                                borderAxis="yBetween"
+                                sx={{
+                                    tableLayout: "auto",
+                                    overflow: "scroll",
+                                }}>
+                                <tbody>
+                                    {
+                                        (Object.keys(display.keys) as (keyof U)[]).map(key => {
+                                            const inputNode = display.keys[key].inputNode(
+                                                key,
+                                                display.keys[key].title,
+                                                data[key],
+                                                edits
+                                            )
+                                            const defaultNode = display.keys[key].defaultNode(
+                                                key,
+                                                display.keys[key].title,
+                                                data[key]
+                                            )
+                                            return (
+                                                <tr>
+                                                    <th style={{
+                                                        width: "0.1%",
+                                                        whiteSpace: "nowrap",
+                                                    }}>
+                                                        {display.keys[key].title}
+                                                    </th>
+                                                    <td>
+                                                        {
+                                                            editing ?
+                                                                inputNode ?? defaultNode :
+                                                                defaultNode
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })
+                                    }
+                                </tbody>
+                            </Table> :
+                            null
+                    }
                 </Sheet>
             </Sheet>
         </form >

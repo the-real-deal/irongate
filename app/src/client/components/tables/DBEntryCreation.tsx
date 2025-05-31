@@ -1,11 +1,11 @@
 import { Box, Button, Table } from "@mui/joy"
 import { TableRecord, DBTable } from "../../../common/db"
-import { TableStructureDisplay } from "../../core/tableDisplay"
+import { TableDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { ComponentType, ReactNode, useEffect, useState } from "react"
 
 export interface DBEntryCreationProps<T extends DBTable<TableRecord>> extends BaseProps {
-    display: TableStructureDisplay<T>
+    display: TableDisplay<T>
     open: boolean
     onConfirm: (data: Partial<T>) => void
     onClose: () => void

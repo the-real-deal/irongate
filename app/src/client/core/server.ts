@@ -1,11 +1,11 @@
 import { HTTPError } from "../../common/http"
-import { JSONObject, JSONType } from "../../common/json"
+import { JSONObject, JSONstring, JSONType } from "../../common/json"
 import utils from "../../common/utils"
 
 export interface FetchData {
     method?: string
     params?: {
-        [key: string]: string | number | boolean | undefined
+        [key: string]: string | number | boolean
     }
     body?: JSONObject
     headers?: {
@@ -13,25 +13,37 @@ export interface FetchData {
     }
 }
 
-async function fetchAPI(endPoint: string, data: FetchData = {}): Promise<Response> {
+async function fetchAPI(
+    endPoint: string,
+    {
+        method = "GET",
+        params = {},
+        body = undefined,
+        headers = {},
+    }: FetchData = {}
+): Promise<Response> {
     let url = `/api${endPoint}`
-    if (data.params !== undefined) {
+    const sanitizedParams = utils.removeUndefinedKeys(params)
+    if (Object.keys(sanitizedParams).length !== 0) {
         url += "?"
 
-        for (const [key, val] of Object.entries(utils.removeUndefinedKeys(data.params))) {
+        for (const [key, val] of Object.entries(utils.removeUndefinedKeys(sanitizedParams))) {
             url += `${key}=${val}&`
         }
 
         // remove trailing ? if there are no params or & if there are
         url = url.slice(0, -1)
     }
-    const res = await fetch(url, {
-        method: data.method,
-        headers: {
+    if (body !== undefined) {
+        headers = {
             "Content-Type": "application/json",
-            ...data.headers
-        },
-        body: data.body !== undefined ? JSON.stringify(data.body) : undefined
+            ...headers
+        }
+    }
+    const res = await fetch(url, {
+        method,
+        headers,
+        body: body !== undefined ? JSONstring(body) : undefined
     })
     if (res.ok) {
         return res
@@ -42,7 +54,10 @@ async function fetchAPI(endPoint: string, data: FetchData = {}): Promise<Respons
     }
 }
 
-async function fetchJSON<T extends JSONType>(endPoint: string, data: FetchData = {}): Promise<T> {
+async function fetchJSON<T extends JSONType>(
+    endPoint: string,
+    data: FetchData = {}
+): Promise<T> {
     return await (await fetchAPI(endPoint, data)).json()
 }
 

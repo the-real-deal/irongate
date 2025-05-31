@@ -2,7 +2,7 @@ import { ErrorRequestHandler, json, Request, RequestHandler } from "express"
 import type { ParamsDictionary } from 'express-serve-static-core'
 import { HTTPError, HttpStatusCode } from "../common/http"
 import { JSONType } from "../common/json"
-import { randomUUID } from "node:crypto"
+import { randomUUID } from "crypto"
 
 export function logs(): RequestHandler {
     return (req, res, next) => {
@@ -27,9 +27,7 @@ export type PrimitiveRequest<
     P = ParamsDictionary,
     ResBody = JSONType,
     ReqBody = JSONType | undefined,
-    ReqQuery = {
-        [key: string]: string | undefined
-    }
+    ReqQuery = Record<string, string>,
 > = Request<P, ResBody, ReqBody, ReqQuery>
 
 export function primitiveRequest(): RequestHandler {
@@ -40,10 +38,9 @@ export function primitiveRequest(): RequestHandler {
                 return next(err)
             }
             for (const [key, val] of Object.entries(req.query)) {
-                if (
-                    val !== undefined &&
-                    typeof val !== "string"
-                ) {
+                if (val === undefined) {
+                    delete req.query[key]
+                } else if (typeof val !== "string") {
                     return next(new HTTPError(HttpStatusCode.BAD_REQUEST, `Invalid type for parameter ${key}: ${typeof val}`))
                 }
             }

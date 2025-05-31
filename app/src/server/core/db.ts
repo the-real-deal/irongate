@@ -86,6 +86,7 @@ export class DBManager {
         const connection = await this.pool.getConnection()
         try {
             await connection.beginTransaction()
+            console.log("Running query:", query)
             const [result] = await connection.query(query, values)
             await connection.commit()
             return result as T
@@ -102,4 +103,8 @@ export function createQuery(...lines: (string | string[])[]): string {
     return lines
         .map(l => Array.isArray(l) ? l.join(", ") : l)
         .join("\n")
+}
+
+export function escapeQueryField(name: string): string {
+    return `\`${name}\``
 }

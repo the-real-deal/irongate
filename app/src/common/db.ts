@@ -1,3 +1,5 @@
+import { parseJSONPrimitive } from "./json"
+
 export type ColumnValue = string | number | boolean | null
 
 export type TableRecord = {
@@ -11,7 +13,7 @@ export type DBTable<T extends TableRecord> = {
 export type TableStructure<T extends DBTable<TableRecord>> = {
     [K in keyof T]: {
         isPrimaryKey: boolean
-        generate?: (data: Partial<T>) => T[K] | undefined // undefined to remove it and let it generate inside the DB (ex. auto increment)
+        generate: ((data: Partial<T>) => T[K]) | boolean
     }
 }
 
@@ -19,14 +21,53 @@ export function createTableStructure<T extends DBTable<TableRecord>>(
     structure: {
         [K in keyof T]: {
             isPrimaryKey?: boolean
-            generate?: (data: Partial<T>) => T[K] | undefined
+            generate?: ((data: Partial<T>) => T[K]) | boolean
         }
     }
 ): TableStructure<T> {
     return Object.fromEntries((Object.keys(structure) as (keyof T)[]).map(key => {
         const val = structure[key]
         const isPrimaryKey = val.isPrimaryKey ?? false
-        const generate = val.generate
+        const generate = val.generate ?? false
         return [key, { isPrimaryKey, generate }]
     })) as TableStructure<T>
+}
+
+export function tableStructurePrimaryKey<U extends DBTable<TableRecord>, T extends TableStructure<U>>(structure: T): Partial<T> {
+    return Object.fromEntries(
+        (Object.keys(structure) as (keyof T)[])
+            .filter(key => structure[key].isPrimaryKey)
+            .map(key => [key, structure[key]])
+    ) as Partial<T>
+}
+
+export function recordPrimaryKey<T extends DBTable<TableRecord>>(
+    source: Record<string, string>,
+    structure: TableStructure<T>,
+): Partial<T> {
+    return Object.fromEntries(
+        Object.keys(tableStructurePrimaryKey<T, typeof structure>(structure))
+            .map(key => [key, source[key] === undefined ? source[key] : parseJSONPrimitive(source[key])])
+    ) as Partial<T>
+}
+
+export function entryPrimaryKey<T extends DBTable<TableRecord>>(
+    source: Partial<T>,
+    structure: TableStructure<T>,
+): Partial<T> {
+    return Object.fromEntries(
+        Object.keys(tableStructurePrimaryKey<T, typeof structure>(structure))
+            .map(key => [key, source[key]])
+    ) as Partial<T>
+}
+
+export function entryRecord<T extends DBTable<TableRecord>>(entry: Partial<T>): Record<string, string> {
+    const params: Record<string, string> = {}
+    for (const key of (Object.keys(entry) as (keyof T)[])) {
+        const val = entry[key]
+        if (val !== undefined) {
+            params[String(key)] = String(val)
+        }
+    }
+    return params
 }

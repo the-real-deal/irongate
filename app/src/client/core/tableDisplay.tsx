@@ -10,7 +10,7 @@ export interface KeyDisplay<T extends DBTable<TableRecord>, K extends keyof T> {
     inputNode: (key: K, title: string, value: T[K] | undefined, edits: Partial<T>) => ReactNode
 }
 
-export type TableStructureDisplay<T extends DBTable<TableRecord>> = {
+export type TableDisplay<T extends DBTable<TableRecord>> = {
     title: string,
     keys: {
         [K in keyof T]: KeyDisplay<T, K>
@@ -22,7 +22,7 @@ export function createDisplay<T extends DBTable<TableRecord>>(
     keys: {
         [K in keyof T]: Partial<KeyDisplay<T, K>>
     }
-): TableStructureDisplay<T> {
+): TableDisplay<T> {
     const filledKeys = Object.fromEntries(
         (Object.keys(keys) as (keyof T)[]).map(key => {
             const keyDisplay = keys[key] ?? {}
