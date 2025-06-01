@@ -1,23 +1,23 @@
 import { ReactNode } from "react"
-import { DBTable, TableRecord } from "../../common/db"
+import { TableEntry, entryString, TableRecord } from "../../common/db"
 import { Input, Select, Option, Textarea } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../common/dates"
 import JoyDatePicker from "../components/JoyDatePicker"
 import { BaseProps } from "./utils"
 
-export interface KeyDisplay<T extends DBTable<TableRecord>, K extends keyof T> {
+export interface KeyDisplay<T extends TableEntry<TableRecord>, K extends keyof T> {
     title: string
     inputNode: (key: K, title: string, value: T[K] | undefined, edits: Partial<T>) => ReactNode
 }
 
-export type TableDisplay<T extends DBTable<TableRecord>> = {
+export type TableDisplay<T extends TableEntry<TableRecord>> = {
     title: string,
     keys: {
         [K in keyof T]: KeyDisplay<T, K>
     }
 }
 
-export function createDisplay<T extends DBTable<TableRecord>>(
+export function createDisplay<T extends TableEntry<TableRecord>>(
     title: string,
     keys: {
         [K in keyof T]: Partial<KeyDisplay<T, K>>
@@ -35,7 +35,7 @@ export function createDisplay<T extends DBTable<TableRecord>>(
     return { title, keys: filledKeys }
 }
 
-export function stringInputNode<T extends DBTable<TableRecord>>({
+export function stringInputNode<T extends TableEntry<TableRecord>>({
     required = true,
     sx,
 }: {
@@ -59,7 +59,7 @@ export function stringInputNode<T extends DBTable<TableRecord>>({
     )
 }
 
-export function textInputNode<T extends DBTable<TableRecord>>({
+export function textInputNode<T extends TableEntry<TableRecord>>({
     required = true,
     sx,
 }: {
@@ -83,8 +83,8 @@ export function textInputNode<T extends DBTable<TableRecord>>({
     )
 }
 
-export function selectInputNode<T extends DBTable<TableRecord>, V extends string>(
-    values: readonly V[],
+export function selectInputNode<T extends TableEntry<TableRecord>, V extends (string | Partial<T>)>(
+    values: V[],
     {
         required = true,
         sx,
@@ -112,14 +112,16 @@ export function selectInputNode<T extends DBTable<TableRecord>, V extends string
             }}>
             {
                 values.map(x => (
-                    <Option value={x}>{x}</Option>
+                    <Option value={x}>
+                        {typeof x === "string" ? x : entryString(x as Partial<T>)}
+                    </Option>
                 ))
             }
         </Select>
     )
 }
 
-export function dateInputNode<T extends DBTable<TableRecord>>({
+export function dateInputNode<T extends TableEntry<TableRecord>>({
     required = true,
     includeTime = true,
     sx,

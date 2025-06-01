@@ -4,9 +4,9 @@ import { useEffect, useState } from "react"
 import { MdAdd, MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
 import { TableDisplay } from "../../core/tableDisplay"
-import { DBTable, TableRecord } from "../../../common/db"
+import { TableEntry, TableRecord } from "../../../common/db"
 
-export interface DBTableViewProps<U extends DBTable<TableRecord>, T extends TableDisplay<U>> extends BaseProps {
+export interface DBTableViewProps<U extends TableEntry<TableRecord>, T extends TableDisplay<U>> extends BaseProps {
     display: T
     data: U[]
     search?: boolean
@@ -15,7 +15,7 @@ export interface DBTableViewProps<U extends DBTable<TableRecord>, T extends Tabl
     onCreate?: () => void
 }
 
-export default function DBTableView<U extends DBTable<TableRecord>, T extends TableDisplay<U>>({
+export default function DBTableView<U extends TableEntry<TableRecord>, T extends TableDisplay<U>>({
     display,
     data,
     search = true,

@@ -3,7 +3,7 @@ import { JSONObject, JSONstring, JSONType } from "../../common/json"
 import utils from "../../common/utils"
 
 export interface FetchData {
-    method?: string
+    method: "GET" | "DELETE" | "PUT" | "POST"
     params?: {
         [key: string]: string | number | boolean
     }
@@ -16,11 +16,11 @@ export interface FetchData {
 async function fetchAPI(
     endPoint: string,
     {
-        method = "GET",
+        method,
         params = {},
         body = undefined,
         headers = {},
-    }: FetchData = {}
+    }: FetchData
 ): Promise<Response> {
     let url = `/api${endPoint}`
     const sanitizedParams = utils.removeUndefinedKeys(params)
@@ -56,7 +56,7 @@ async function fetchAPI(
 
 async function fetchJSON<T extends JSONType>(
     endPoint: string,
-    data: FetchData = {}
+    data: FetchData
 ): Promise<T> {
     return await (await fetchAPI(endPoint, data)).json()
 }

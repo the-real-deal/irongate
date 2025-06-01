@@ -1,18 +1,17 @@
-import { createTableStructure, DBTable } from "../db"
-import { Gender } from "./enums"
+import { createTableStructure, TableEntry } from "../db"
 
-export type PeopleTable = DBTable<{
+export type PeopleEntry = TableEntry<{
     DocumentID: string
     Name: string
     Surname: string
     Birthday: string
     BirthPlace: string
-    GenderID: Gender
+    GenderID: string
 }>
 
-export const PEOPLE_STRUCTURE = createTableStructure<PeopleTable>({
+export const PEOPLE_STRUCTURE = createTableStructure<PeopleEntry>({
     DocumentID: {
-        isPrimaryKey: true,
+        primaryKey: true,
     },
     Name: {},
     Surname: {},

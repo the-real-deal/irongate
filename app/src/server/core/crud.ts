@@ -1,18 +1,16 @@
 import { ResultSetHeader } from "mysql2"
 import { db } from "../context"
 import { createQuery, escapeQueryField } from "./db"
-import { ColumnValue, DBTable, TableRecord, TableStructure, tableStructurePrimaryKey } from "../../common/db"
+import { ColumnValue, TableEntry, TableRecord, TableStructure, tableStructurePrimaryKey } from "../../common/db"
 
 export class SanitizeError extends Error { }
 
-export default class CRUDOperations<T extends DBTable<TableRecord>> {
+export default class CRUDOperations<T extends TableEntry<TableRecord>> {
 
     constructor(
         private readonly tableName: string,
         private readonly structure: TableStructure<T>,
-    ) {
-        this.tableName = `\`${tableName}\``
-    }
+    ) { }
 
     private sanitizeData(
         data: Partial<T>,
@@ -58,58 +56,70 @@ export default class CRUDOperations<T extends DBTable<TableRecord>> {
         this.sanitizeData(primaryKey, { keys })
     }
 
-    private primaryKeyQuery(primaryKey: Partial<T>): [string, ColumnValue[]] {
+    private primaryKeyQuery(primaryKey: Partial<T>): {
+        query: string,
+        values: ColumnValue[],
+    } {
         this.sanitizePrimaryKey(primaryKey)
-        return [
-            createQuery(
+        return {
+            query: createQuery(
                 "WHERE",
                 Object.keys(primaryKey)
                     .map(key => `${escapeQueryField(key)} = ?`)
                     .join(" AND ")
             ),
-            Object.values(primaryKey),
-        ]
+            values: Object.values(primaryKey),
+        }
     }
 
-    async get(primaryKey?: Partial<T>): Promise<T[] | (T | null)> {
-        const [primaryKeyQuery, primaryKeyValues] =
-            primaryKey === undefined ? ["", undefined] : this.primaryKeyQuery(primaryKey)
+    async get({
+        primaryKey,
+        keyOnly = false,
+    }: {
+        primaryKey?: Partial<T>
+        keyOnly?: boolean
+    }): Promise<T[] | (T | null)> {
+        const primaryKeyQuery =
+            primaryKey === undefined ? undefined : this.primaryKeyQuery(primaryKey)
         const query = createQuery(
-            "SELECT *",
-            `FROM ${this.tableName}`,
-            primaryKeyQuery
+            "SELECT",
+            keyOnly ?
+                Object.keys(tableStructurePrimaryKey<T, typeof this.structure>(this.structure)) :
+                "*",
+            `FROM ${escapeQueryField(this.tableName)}`,
+            primaryKeyQuery?.query ?? ""
         )
-        const res = await db.executeQuery<T[]>(query, primaryKeyValues)
+        const res = await db.executeQuery<T[]>(query, primaryKeyQuery?.values ?? undefined)
         return primaryKey === undefined ? res : (res[0] ?? null)
     }
 
     async remove(primaryKey: Partial<T>): Promise<boolean> {
-        const [primaryKeyQuery, primaryKeyValues] = this.primaryKeyQuery(primaryKey)
+        const primaryKeyQuery = this.primaryKeyQuery(primaryKey)
         const query = createQuery(
-            `DELETE FROM ${this.tableName}`,
-            primaryKeyQuery
+            `DELETE FROM ${escapeQueryField(this.tableName)}`,
+            primaryKeyQuery.query
         )
-        const res = await db.executeQuery<ResultSetHeader>(query, primaryKeyValues)
+        const res = await db.executeQuery<ResultSetHeader>(query, primaryKeyQuery.values)
         return res.affectedRows > 0
     }
 
     async update(primaryKey: Partial<T>, edits: Partial<T>): Promise<boolean> {
         this.sanitizeData(edits, { allowUndefined: true })
-        const [primaryKeyQuery, primaryKeyValues] = this.primaryKeyQuery(primaryKey)
+        const primaryKeyQuery = this.primaryKeyQuery(primaryKey)
 
         if (Object.keys(edits).length == 0) {
             return true
         }
         const query = createQuery(
-            `UPDATE ${this.tableName} SET`,
+            `UPDATE ${escapeQueryField(this.tableName)} SET`,
             (Object.keys(edits)).map(
                 key => `${escapeQueryField(key)} = ?`
             ),
-            primaryKeyQuery
+            primaryKeyQuery.query
         )
         const res = await db.executeQuery<ResultSetHeader>(query, [
             ...(Object.values(edits)),
-            ...primaryKeyValues
+            ...primaryKeyQuery.values
         ])
         return res.affectedRows > 0
     }
@@ -119,7 +129,7 @@ export default class CRUDOperations<T extends DBTable<TableRecord>> {
 
         const keys = Object.keys(data)
         const query = createQuery(
-            `INSERT INTO ${this.tableName}(`,
+            `INSERT INTO ${escapeQueryField(this.tableName)} (`,
             (keys.map(key => `${escapeQueryField(key)}`)),
             ") VALUES (",
             (keys.map(_ => "?")),

@@ -1,39 +1,20 @@
-export const GENDERS = [
-    "Male",
-    "Female",
-] as const
-export type Gender = typeof GENDERS[number]
+import { createTableStructure, TableEntry } from "../db"
 
-export const SECURITY_LEVELS = [
-    "Low",
-    "Medium",
-    "High",
-    "Maximum",
+export const ENUM_TABLES = [
+    "Genders",
+    "SecurityLevels",
+    "PersonnelTypes",
+    "DeviceTypes",
+    "GoodTypes",
 ] as const
-export type SecurityLevel = typeof SECURITY_LEVELS[number]
 
-export const PERSONNEL_TYPES = [
-    "Director",
-    "Guard",
-    "Technician",
-    "Janitor",
-    "Librarian",
-] as const
-export type PersonnelType = typeof PERSONNEL_TYPES[number]
+export type EnumEntry = TableEntry<{
+    ID: string
+}>
 
-export const DEVICE_TYPES = [
-    "Camera",
-    "Alarm",
-    "Lock",
-    "Computer",
-    "Metal detector",
-] as const
-export type DeviceType = typeof DEVICE_TYPES[number]
+export const ENUM_STRUCTURE = createTableStructure<EnumEntry>({
+    ID: {
+        primaryKey: true,
+    },
+})
 
-export const GOOD_TYPES = [
-    "Food",
-    "Weapons",
-    "Medical supplies",
-    "Utensils",
-] as const
-export type GoodType = typeof GOOD_TYPES[number]

@@ -1,7 +1,7 @@
 import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2/promise"
 import env from "../../common/env"
 import { Pool } from "mysql2/promise"
-import { ColumnValue, DBTable, TableRecord } from "../../common/db"
+import { ColumnValue, TableEntry, TableRecord } from "../../common/db"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
     return options
@@ -79,7 +79,7 @@ export class DBManager {
         }
     }
 
-    async executeQuery<T extends DBTable<TableRecord>[] | ResultSetHeader>(
+    async executeQuery<T extends TableEntry<TableRecord>[] | ResultSetHeader>(
         query: string,
         values: ColumnValue[] = [],
     ): Promise<T> {

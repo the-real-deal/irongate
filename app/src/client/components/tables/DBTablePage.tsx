@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { DBTable, entryPrimaryKey, entryRecord, entryString, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
+import { TableEntry, entryPrimaryKey, entryRecord, entryString, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
 import { TableDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useSearchParams } from "react-router"
@@ -11,7 +11,7 @@ import { JSONObject } from "../../../common/json"
 import DBEntryCreation from "./DBEntryCreation"
 import utils from "../../../common/utils"
 
-export interface DBTablePage<T extends DBTable<TableRecord>> extends BaseProps {
+export interface DBTablePage<T extends TableEntry<TableRecord>> extends BaseProps {
     apiRoute: string,
     display: TableDisplay<T>,
     structure: TableStructure<T>,
@@ -21,7 +21,7 @@ function searchParamsRecord(searchParams: URLSearchParams): Record<string, strin
     return Object.fromEntries(searchParams.entries())
 }
 
-export default function DBTablePage<T extends DBTable<TableRecord>>({
+export default function DBTablePage<T extends TableEntry<TableRecord>>({
     apiRoute: route,
     display,
     structure,
