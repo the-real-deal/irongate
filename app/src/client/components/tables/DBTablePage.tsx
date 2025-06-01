@@ -10,6 +10,7 @@ import DBEntryDetails from "./DBEntryDetails"
 import { JSONObject } from "../../../common/json"
 import DBEntryCreation from "./DBEntryCreation"
 import utils from "../../../common/utils"
+import { HttpMethod } from "../../../common/http"
 
 export interface DBTablePage<T extends TableEntry<TableRecord>> extends BaseProps {
     apiRoute: string,
@@ -35,9 +36,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     const fetchData = useCallback(async () => {
         const primaryKey = recordPrimaryKey(searchParamsRecord(searchParams), structure)
         const data = await server.fetchJSON(
+            HttpMethod.GET,
             route,
             {
-                method: "GET",
                 params: entryRecord(primaryKey)
             }
         ) as T[] | T
@@ -80,9 +81,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                         onEdit={async (old, edits) => {
                             const primaryKey = entryPrimaryKey(old, structure)
                             await server.fetchAPI(
+                                HttpMethod.PUT,
                                 route,
                                 {
-                                    method: "PUT",
                                     params: entryRecord(primaryKey),
                                     body: edits as JSONObject
                                 }
@@ -151,9 +152,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 }
                                 const primaryKey = entryPrimaryKey(deleteCandidate, structure)
                                 await server.fetchAPI(
+                                    HttpMethod.DELETE,
                                     route,
                                     {
-                                        method: "DELETE",
                                         params: entryRecord(primaryKey)
                                     }
                                 )
@@ -194,9 +195,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                         ButtonsContainer={DialogActions}
                         onConfirm={async (data) => {
                             await server.fetchAPI(
+                                HttpMethod.POST,
                                 route,
                                 {
-                                    method: "POST",
                                     body: data as JSONObject
                                 }
                             )

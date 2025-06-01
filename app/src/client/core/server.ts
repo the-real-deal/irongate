@@ -1,9 +1,8 @@
-import { HTTPError } from "../../common/http"
+import { HTTPError, HttpMethod } from "../../common/http"
 import { JSONObject, JSONstring, JSONType } from "../../common/json"
 import utils from "../../common/utils"
 
 export interface FetchData {
-    method: "GET" | "DELETE" | "PUT" | "POST"
     params?: {
         [key: string]: string | number | boolean
     }
@@ -14,13 +13,13 @@ export interface FetchData {
 }
 
 async function fetchAPI(
+    method: HttpMethod,
     endPoint: string,
     {
-        method,
         params = {},
         body = undefined,
         headers = {},
-    }: FetchData
+    }: FetchData = {}
 ): Promise<Response> {
     let url = `/api${endPoint}`
     const sanitizedParams = utils.removeUndefinedKeys(params)
@@ -55,10 +54,11 @@ async function fetchAPI(
 }
 
 async function fetchJSON<T extends JSONType>(
+    method: HttpMethod,
     endPoint: string,
-    data: FetchData
+    data: FetchData = {}
 ): Promise<T> {
-    return await (await fetchAPI(endPoint, data)).json()
+    return await (await fetchAPI(method, endPoint, data)).json()
 }
 
 export default { fetchAPI, fetchJSON }

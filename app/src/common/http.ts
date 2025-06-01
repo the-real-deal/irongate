@@ -1,3 +1,16 @@
+export enum HttpMethod {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+    PATCH = 'PATCH',
+    HEAD = 'HEAD',
+    OPTIONS = 'OPTIONS',
+    CONNECT = 'CONNECT',
+    TRACE = 'TRACE'
+}
+
+
 // https://gist.github.com/scokmen/f813c904ef79022e84ab2409574d1b45
 
 /**

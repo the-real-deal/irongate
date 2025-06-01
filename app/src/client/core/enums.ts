@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { ENUM_TABLES, EnumEntry } from "../../common/tables/enums"
 import server from "./server"
+import { HttpMethod } from "../../common/http"
 
 export function useEnum(table: (typeof ENUM_TABLES)[number]): string[] {
     const [values, setValues] = useState<string[]>([])
@@ -8,13 +9,12 @@ export function useEnum(table: (typeof ENUM_TABLES)[number]): string[] {
     useEffect(() => {
         (async () => {
             const data = await server.fetchJSON(
-                `/enums/${table.toLowerCase()}`,
-                {
-                    method: "GET",
-                }
+                HttpMethod.GET,
+                `/enums/${table.toLowerCase()}`
             ) as EnumEntry[]
             setValues(data.map(x => x.ID).sort())
         })()
+        return () => setValues([])
     }, [table])
 
     return values
