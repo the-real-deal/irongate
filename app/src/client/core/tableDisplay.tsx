@@ -7,7 +7,6 @@ import { BaseProps } from "./utils"
 
 export interface KeyDisplay<T extends DBTable<TableRecord>, K extends keyof T> {
     title: string
-    defaultNode: (key: K, title: string, value: T[K]) => ReactNode
     inputNode: (key: K, title: string, value: T[K] | undefined, edits: Partial<T>) => ReactNode
 }
 
@@ -28,9 +27,8 @@ export function createDisplay<T extends DBTable<TableRecord>>(
         (Object.keys(keys) as (keyof T)[]).map(key => {
             const keyDisplay = keys[key] ?? {}
             const title = keyDisplay.title ?? key.toString()
-            const defaultNode = keyDisplay.defaultNode ?? ((_key, _title, value) => value)
             const inputNode = keyDisplay.inputNode ?? (() => null)
-            return [key, { title, defaultNode, inputNode }]
+            return [key, { title, inputNode }]
         })
     ) as unknown as { [K in keyof T]: KeyDisplay<T, K> }
 

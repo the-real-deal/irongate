@@ -51,6 +51,10 @@ export function recordPrimaryKey<T extends DBTable<TableRecord>>(
     ) as Partial<T>
 }
 
+export function entryString<T extends DBTable<TableRecord>>(entry: Partial<T>) {
+    return (Object.values(entry) as ColumnValue[]).join(", ")
+}
+
 export function entryPrimaryKey<T extends DBTable<TableRecord>>(
     source: Partial<T>,
     structure: TableStructure<T>,

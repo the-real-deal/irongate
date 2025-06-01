@@ -128,11 +128,6 @@ export default function DBEntryDetails<U extends DBTable<TableRecord>, T extends
                                                 data[key],
                                                 edits
                                             )
-                                            const defaultNode = display.keys[key].defaultNode(
-                                                key,
-                                                display.keys[key].title,
-                                                data[key]
-                                            )
                                             return (
                                                 <tr>
                                                     <th style={{
@@ -144,8 +139,8 @@ export default function DBEntryDetails<U extends DBTable<TableRecord>, T extends
                                                     <td>
                                                         {
                                                             editing ?
-                                                                inputNode ?? defaultNode :
-                                                                defaultNode
+                                                                inputNode ?? data[key] :
+                                                                data[key]
                                                         }
                                                     </td>
                                                 </tr>

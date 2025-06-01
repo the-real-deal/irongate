@@ -99,10 +99,13 @@ export default function DBTableView<U extends DBTable<TableRecord>, T extends Ta
                     hoverRow
                     variant="plain"
                     borderAxis="bothBetween"
-                    sx={{
+                    sx={theme => ({
                         tableLayout: "auto",
                         overflow: "scroll",
-                    }}>
+                        "&": {
+                            "--TableCell-headBackground": theme.getCssVar("palette-background-level2")
+                        }
+                    })}>
                     <thead>
                         <tr>
                             {
@@ -134,15 +137,7 @@ export default function DBTableView<U extends DBTable<TableRecord>, T extends Ta
                                         {
                                             (Object.keys(display.keys) as (keyof U)[]).map(key => {
                                                 return (
-                                                    <td>
-                                                        {
-                                                            display.keys[key].defaultNode(
-                                                                key,
-                                                                display.keys[key].title,
-                                                                row[key]
-                                                            )
-                                                        }
-                                                    </td>
+                                                    <td>{row[key]}</td>
                                                 )
                                             })
                                         }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { DBTable, entryPrimaryKey, entryRecord, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
+import { DBTable, entryPrimaryKey, entryRecord, entryString, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
 import { TableDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useSearchParams } from "react-router"
@@ -70,7 +70,12 @@ export default function DBTablePage<T extends DBTable<TableRecord>>({
                     /> :
                     <DBEntryDetails
                         data={data ?? undefined}
-                        display={display}
+                        display={{
+                            ...display,
+                            title: display.title + (
+                                data === null ? "" : `: ${entryString(entryPrimaryKey(data, structure))}`
+                            )
+                        }}
                         onDelete={setDeleteCandidate}
                         onEdit={async (old, edits) => {
                             const primaryKey = entryPrimaryKey(old, structure)
@@ -126,13 +131,7 @@ export default function DBTablePage<T extends DBTable<TableRecord>>({
                                                     <td style={{
                                                         backgroundColor: "var(--TableCell-headBackground)"
                                                     }}>
-                                                        {
-                                                            display.keys[key].defaultNode(
-                                                                key,
-                                                                display.keys[key].title,
-                                                                deleteCandidate[key],
-                                                            )
-                                                        }
+                                                        {deleteCandidate[key]}
                                                     </td>
                                                 </tr>
                                             ))
