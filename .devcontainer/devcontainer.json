@@ -12,8 +12,16 @@
 		"ghcr.io/devcontainers/features/git": {}
 	},
 	"mounts": [
-		"source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.ssh,target=/home/${DOCKER_USER}/.ssh,type=bind,consistency=cached"
+		{
+			"source": "${localWorkspaceFolder}",
+			"target": "/workspaces/${localWorkspaceFolderBasename}",
+			"type": "bind"
+		},
+		{
+			"source": "${localEnv:HOME}/.ssh",
+			"target": "/home/${DOCKER_USER}/.ssh",
+			"type": "bind"
+		}
 	],
 	"customizations": {
 		"vscode": {
