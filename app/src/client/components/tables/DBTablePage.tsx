@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { TableEntry, entryPrimaryKey, entryRecord, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
 import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
-import { useSearchParams } from "react-router"
+import { useNavigate, useSearchParams } from "react-router"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog, Table } from "@mui/joy"
 import DBTableView from "./DBTableView"
 import DBEntryDetails from "./DBEntryDetails"
@@ -16,6 +16,7 @@ export interface DBTablePage<T extends TableEntry<TableRecord>> extends BaseProp
     apiRoute: string
     display: TableDisplay<T>
     structure: TableStructure<T>
+    location?: string
     expand?: boolean
     remove?: boolean
     create?: boolean
@@ -29,6 +30,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     apiRoute,
     display,
     structure,
+    location,
     expand = true,
     remove = true,
     create = true,
@@ -36,7 +38,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
 }: DBTablePage<T>) {
     const [deleteCandidate, setDeleteCandidate] = useState<T | null>(null)
     const [showCreationModal, setShowCreationModal] = useState(false)
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams,] = useSearchParams()
+    const navigate = useNavigate()
+    location ??= window.location.pathname
 
     const getDefaultData = useCallback(() => {
         return searchParams.size === 0 ? [] : null
@@ -45,16 +49,18 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     const [data, setData] = useState<T[] | T | null>(getDefaultData())
 
     const fetchData = useCallback(async () => {
-        const primaryKey = recordPrimaryKey(searchParamsRecord(searchParams), structure)
-        const data = await fetchJSON(
+        const primaryKey = searchParams.size === 0 ?
+            undefined :
+            entryRecord(recordPrimaryKey(searchParamsRecord(searchParams), structure))
+        const data = await fetchJSON<T[]>(
             HttpMethod.GET,
             apiRoute,
             {
-                params: entryRecord(primaryKey)
+                params: primaryKey
             }
-        ) as T[] | T
-        setData(data)
-    }, [searchParams, apiRoute, structure])
+        )
+        setData(primaryKey === undefined ? data : data[0] ?? getDefaultData())
+    }, [searchParams, apiRoute, structure, getDefaultData])
 
     useEffect(() => {
         fetchData()
@@ -76,7 +82,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                         data={data ?? []}
                         onExpand={expand ? (entry => {
                             const primaryKey = entryPrimaryKey(entry, structure)
-                            setSearchParams(entryRecord(primaryKey))
+                            navigate(`${location}?${new URLSearchParams(entryRecord(primaryKey))}`)
                         }) : undefined}
                         onDelete={remove ? setDeleteCandidate : undefined}
                         onCreate={create ? (() => setShowCreationModal(true)) : undefined}
@@ -100,7 +106,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                             if (utils.areObjectsEqual(entryRecord(primaryKey), entryRecord(newPrimaryKey))) {
                                 await fetchData()
                             } else {
-                                setSearchParams(entryRecord(newPrimaryKey), { replace: true })
+                                navigate(`${location}?${new URLSearchParams(entryRecord(newPrimaryKey))}`, {
+                                    replace: true
+                                })
                             }
                         }}
                     />
@@ -168,7 +176,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 )
                                 setDeleteCandidate(null)
                                 if (searchParams.size !== 0) {
-                                    setSearchParams(new URLSearchParams(), { replace: true })
+                                    navigate(location, { replace: true })
                                 } else {
                                     await fetchData()
                                 }

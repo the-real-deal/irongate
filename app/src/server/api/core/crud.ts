@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { TableEntry, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
+import { TableEntry, recordPrimaryKey, TableRecord, TableStructure, recordEntry } from "../../../common/db"
 import CRUDOperations, { OrderByDefinition, SanitizeError } from "../../core/crud"
 import { PrimitiveRequest } from "../../middlewares"
 import { HttpStatusCode } from "../../../common/http"
@@ -26,14 +26,10 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
 
     if (methods.get?.enabled ?? true) {
         router.get("/", async (req: PrimitiveRequest, res) => {
-            const primaryKey = Object.keys(req.query).length == 0 ? undefined : recordPrimaryKey(req.query, structure)
+            const filter = Object.keys(req.query).length == 0 ? undefined : recordEntry(req.query, structure)
             try {
-                const result = await crud.get({ primaryKey, orderBy: methods.get?.orderBy })
-                if (result === null) {
-                    res.status(HttpStatusCode.NOT_FOUND).send()
-                } else {
-                    res.send(result)
-                }
+                const result = await crud.get({ filter, orderBy: methods.get?.orderBy })
+                res.send(result)
             } catch (err) {
                 if (err instanceof SanitizeError) {
                     res.status(HttpStatusCode.BAD_REQUEST).send()

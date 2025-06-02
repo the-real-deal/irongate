@@ -36,8 +36,12 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         })
         await Promise.all(keys.map(async <K extends keyof T>(key: K) => {
             const generate = this.structure[key].generate
-            if (generate === false && data[key] === undefined && !allowUndefined) {
-                throw new SanitizeError(`Missing key ${key.toString()}`)
+            if (generate === false && data[key] === undefined) {
+                if (allowUndefined) {
+                    delete data[key]
+                } else {
+                    throw new SanitizeError(`Missing key ${key.toString()}`)
+                }
             } else if (generate !== false) {
                 if (generateData && typeof generate === "function") {
                     delete data[key]
@@ -54,46 +58,49 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         await this.sanitizeData(primaryKey, { keys })
     }
 
-    private async primaryKeyQuery(primaryKey: Partial<T>): Promise<{
+    private filterQuery(filterKey: Partial<T>): {
         query: string,
         values: ColumnValue[],
-    }> {
-        await this.sanitizePrimaryKey(primaryKey)
+    } {
         return {
             query: createQuery(
                 "WHERE",
-                Object.keys(primaryKey)
+                Object.keys(filterKey)
                     .map(key => `${escapeQueryField(key)} = ?`)
                     .join(" AND ")
             ),
-            values: Object.values(primaryKey),
+            values: Object.values(filterKey),
         }
     }
 
     async get({
-        primaryKey,
+        filter,
         orderBy = []
     }: {
-        primaryKey?: Partial<T>,
+        filter?: Partial<T>,
         orderBy?: OrderByDefinition<T>
-    } = {}): Promise<T[] | (T | null)> {
-        const primaryKeyQuery =
-            primaryKey === undefined ? undefined : await this.primaryKeyQuery(primaryKey)
+    } = {}): Promise<T[]> {
+        const filterQuery =
+            filter === undefined ? undefined : await (async () => {
+                this.sanitizeData(filter, { allowUndefined: true })
+                return this.filterQuery(filter)
+            })()
         const query = createQuery(
             "SELECT *",
             `FROM ${escapeQueryField(this.tableName)}`,
-            primaryKeyQuery?.query ?? "",
+            filterQuery?.query ?? "",
             orderBy.length == 0 ? "" : createQuery(
                 "ORDER BY",
                 orderBy.map(o => `${escapeQueryField(o.column.toString())} ${o.direction}`)
             )
         )
-        const res = await db.executeQuery<T[]>(query, primaryKeyQuery?.values ?? undefined)
-        return primaryKey === undefined ? res : (res[0] ?? null)
+        const res = await db.executeQuery<T[]>(query, filterQuery?.values ?? undefined)
+        return res
     }
 
     async remove(primaryKey: Partial<T>): Promise<boolean> {
-        const primaryKeyQuery = await this.primaryKeyQuery(primaryKey)
+        await this.sanitizePrimaryKey(primaryKey)
+        const primaryKeyQuery = await this.filterQuery(primaryKey)
         const query = createQuery(
             `DELETE FROM ${escapeQueryField(this.tableName)}`,
             primaryKeyQuery.query
@@ -103,8 +110,9 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
     }
 
     async update(primaryKey: Partial<T>, edits: Partial<T>): Promise<boolean> {
+        await this.sanitizePrimaryKey(primaryKey)
         await this.sanitizeData(edits, { allowUndefined: true })
-        const primaryKeyQuery = await this.primaryKeyQuery(primaryKey)
+        const primaryKeyQuery = await this.filterQuery(primaryKey)
 
         if (Object.keys(edits).length == 0) {
             return true
