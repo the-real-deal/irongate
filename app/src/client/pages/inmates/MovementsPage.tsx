@@ -1,15 +1,20 @@
-import { MOVEMENTS_STRUCTURE } from "../../../common/structures"
-import DBTablePage from "../../components/tables/DBTablePage"
+import { MOVEMENTS_STRUCTURE, MovementsEntry } from "../../../common/structures"
+import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
 import { useMovementsDisplay } from "../../core/display/displays"
 
-export default function InmatesPage() {
+export type MovementsPageProps = Partial<DBTablePageProps<MovementsEntry>> & {
+
+}
+
+export default function MovementsPage(props: MovementsPageProps) {
     const display = useMovementsDisplay()
 
     return (
         <DBTablePage
-            apiRoute="/movements"
+            route="/movements"
             display={display}
             structure={MOVEMENTS_STRUCTURE}
+            {...props}
         />
     )
 }

@@ -7,7 +7,7 @@ export default function PeoplePage() {
 
     return (
         <DBTablePage
-            apiRoute="/cells"
+            route="/cells"
             display={display}
             structure={CELLS_STRUCTURE}
         />

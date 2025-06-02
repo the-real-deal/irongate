@@ -37,7 +37,6 @@ export default function MainLayout({
             height: "100dvh",
             width: "100dvw",
             display: "flex",
-            padding: 0,
             margin: 0,
         }}>
             <Sidebar
@@ -48,6 +47,7 @@ export default function MainLayout({
                 width: "100%",
                 height: "100%",
                 padding: "1em",
+                paddingInlineStart: "3em",
             }}>
                 <Outlet />
             </Sheet>

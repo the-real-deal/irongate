@@ -9,37 +9,38 @@ import ClearableSelect from "../../components/CleareableSelect"
 
 export interface KeyDisplay<T extends TableEntry<TableRecord>, K extends keyof T> {
     title: string
-    hide: boolean
     inputNode: (key: K, title: string, value: T[K] | undefined, edits: Partial<T>) => ReactElement
 }
 
 export type TableDisplay<T extends TableEntry<TableRecord>> = {
-    title: string,
+    tableTitle: string,
+    detailTitle: string,
     keys: {
         [K in keyof T]: KeyDisplay<T, K>
     }
 }
 
-export function createDisplay<T extends TableEntry<TableRecord>>(
-    title: string,
+export function createDisplay<T extends TableEntry<TableRecord>>({
+    tableTitle,
+    detailTitle,
+    keys,
+}: Omit<TableDisplay<T>, "keys"> & {
     keys: {
         [K in keyof T]: Omit<KeyDisplay<T, K>, "title" | "hide"> & {
             title?: KeyDisplay<T, K>["title"]
-            hide?: KeyDisplay<T, K>["hide"]
         }
     }
-): TableDisplay<T> {
+}): TableDisplay<T> {
     const filledKeys = Object.fromEntries(
         (Object.keys(keys) as (keyof T)[]).map(key => {
             const keyDisplay = keys[key] ?? {}
             const title = keyDisplay.title ?? key.toString()
-            const hide = keyDisplay.hide ?? false
             const inputNode = keyDisplay.inputNode
-            return [key, { title, hide, inputNode }]
+            return [key, { title, inputNode }]
         })
     ) as unknown as { [K in keyof T]: KeyDisplay<T, K> }
 
-    return { title, keys: filledKeys }
+    return { tableTitle, detailTitle, keys: filledKeys }
 }
 
 export function adaptKeyDisplay<
@@ -242,12 +243,4 @@ export function dateInputNode<T extends TableEntry<TableRecord>>({
             }}
         />
     )
-}
-
-export function restrictEntry<T extends TableEntry<TableRecord>>(entry: T, display: TableDisplay<T>): Partial<T> {
-    return Object.fromEntries(
-        (Object.keys(entry) as (keyof T)[])
-            .filter(key => !display.keys[key].hide)
-            .map(key => [key, entry[key]])
-    ) as Partial<T>
 }

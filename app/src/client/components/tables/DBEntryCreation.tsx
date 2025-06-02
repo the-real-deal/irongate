@@ -11,6 +11,7 @@ export interface DBEntryCreationProps<T extends TableEntry<TableRecord>> extends
     structure: TableStructure<T>
     onConfirm: (data: Partial<T>) => void
     onClose: () => void
+    defaultData?: Partial<T>
     InputsContainer?: ComponentType<PropsWithChildren>
     ButtonsContainer?: ComponentType<PropsWithChildren>
 }
@@ -22,10 +23,13 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
     ButtonsContainer = Box,
     onConfirm,
     onClose,
+    defaultData = {}
 }: DBEntryCreationProps<T>) {
-    const keys = (Object.keys(display.keys) as (keyof T)[])
-        .filter(key => structure[key].generate === false)
-    const initialData = Object.fromEntries(keys.map(key => [key, null])) as Partial<T>
+    const initialData = Object.fromEntries(
+        (Object.keys(display.keys) as (keyof T)[])
+            .filter(key => structure[key].generate === false)
+            .map(key => [key, defaultData[key] ?? null])
+    ) as Partial<T>
 
     const [data,] = useState<Partial<T>>(initialData)
 
@@ -55,29 +59,32 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
                         }}>
                         <tbody>
                             {
-                                keys.map(key => (
-                                    <tr>
-                                        <th
-                                            style={{
-                                                width: "0.1%",
-                                                whiteSpace: "nowrap",
+                                (Object.keys(initialData) as (keyof T)[])
+                                    .map(key => (
+                                        <tr>
+                                            <th
+                                                style={{
+                                                    width: "0.1%",
+                                                    whiteSpace: "nowrap",
+                                                }}>
+                                                {display.keys[key].title}
+                                            </th>
+                                            <td style={{
+                                                backgroundColor: "var(--TableCell-headBackground)"
                                             }}>
-                                            {display.keys[key].title}
-                                        </th>
-                                        <td style={{
-                                            backgroundColor: "var(--TableCell-headBackground)"
-                                        }}>
-                                            {
-                                                display.keys[key].inputNode(
-                                                    key,
-                                                    display.keys[key].title,
-                                                    undefined,
-                                                    data
-                                                )
-                                            }
-                                        </td>
-                                    </tr>
-                                ))
+                                                {
+                                                    initialData[key] === null ?
+                                                        display.keys[key].inputNode(
+                                                            key,
+                                                            display.keys[key].title,
+                                                            undefined,
+                                                            data
+                                                        ) :
+                                                        initialData[key]
+                                                }
+                                            </td>
+                                        </tr>
+                                    ))
                             }
                         </tbody>
                     </Table>

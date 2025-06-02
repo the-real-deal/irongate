@@ -3,13 +3,14 @@ import { BaseProps } from "../../core/utils"
 import { useCallback, useEffect, useState } from "react"
 import { MdAdd, MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
-import { restrictEntry, TableDisplay } from "../../core/display/tableDisplay"
+import { TableDisplay } from "../../core/display/tableDisplay"
 import { TableEntry, TableRecord } from "../../../common/db"
 
 export interface DBTableViewProps<T extends TableEntry<TableRecord>> extends BaseProps {
     display: TableDisplay<T>
     data: T[]
     search?: boolean
+    hiddenKeys?: (keyof T)[]
     onExpand?: (entry: T) => void
     onDelete?: (entry: T) => void
     onCreate?: () => void
@@ -19,6 +20,7 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
     display,
     data,
     search = true,
+    hiddenKeys,
     onDelete,
     onExpand,
     onCreate,
@@ -32,15 +34,26 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
         return str.toLowerCase().replace(/\s+/g, " ").trim()
     }
 
+    const filterVisibleKeys = useCallback((key: keyof T) => {
+        return hiddenKeys === undefined || !hiddenKeys.includes(key)
+    }, [hiddenKeys])
+
     const toRows = useCallback((data: T[], query: string): [Partial<T>, T][] => {
         const q = searchNormalize(query).split(" ")
         return data
-            .map(dataRow => [restrictEntry(dataRow, display), dataRow] as [Partial<T>, T])
+            .map(dataRow => [
+                Object.fromEntries(
+                    (Object.keys(dataRow) as (keyof T)[])
+                        .filter(filterVisibleKeys)
+                        .map(key => [key, dataRow[key]])
+                ),
+                dataRow
+            ] as [Partial<T>, T])
             .filter(([row, _]) => {
                 const haystack = searchNormalize(Object.values(row).join(" "))
                 return q.every(term => haystack.includes(term))
             })
-    }, [display])
+    }, [filterVisibleKeys])
 
     useEffect(() => {
         setRows(toRows(data, ""))
@@ -52,6 +65,7 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
     return (
         <Box sx={{
             height: "100%",
+            maxHeight: "100%",
             display: "flex",
             flexDirection: "column",
             gap: "1em",
@@ -65,7 +79,7 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
                 justifyContent: "space-between",
                 alignItems: "center"
             }}>
-                <Typography level="h1">{display.title}: {rows.length} entries</Typography>
+                <Typography level="h1">{display.tableTitle}: {rows.length}</Typography>
                 <Box sx={{
                     display: "flex",
                     flexDirection: "row",
@@ -93,7 +107,8 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
             <Sheet
                 variant="outlined"
                 sx={{
-                    overflow: "scroll"
+                    maxHeight: "100%",
+                    overflow: "scroll",
                 }}>
                 <Table
                     stickyFooter
@@ -103,7 +118,7 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
                     borderAxis="bothBetween"
                     sx={theme => ({
                         tableLayout: "auto",
-                        overflow: "scroll",
+                        height: "100%",
                         "&": {
                             "--TableCell-headBackground": theme.getCssVar("palette-background-level2")
                         }
@@ -112,7 +127,7 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
                         <tr>
                             {
                                 (Object.keys(display.keys) as (keyof T)[])
-                                    .filter(key => !display.keys[key].hide)
+                                    .filter(filterVisibleKeys)
                                     .map((key, _, arr) => {
                                         return (
                                             <th style={{
@@ -190,6 +205,6 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
                     </tbody>
                 </Table>
             </Sheet>
-        </Box >
+        </Box>
     )
 }

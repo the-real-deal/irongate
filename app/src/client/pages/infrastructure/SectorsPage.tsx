@@ -7,7 +7,7 @@ export default function SectorsPage() {
 
     return (
         <DBTablePage
-            apiRoute="/sectors"
+            route="/sectors"
             display={display}
             structure={SECTORS_STRUCTURE}
         />

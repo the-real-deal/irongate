@@ -26,7 +26,7 @@ export default function Sidebar({
                 variant="solid"
                 color="primary"
                 sx={{
-                    position: "sticky",
+                    position: "fixed",
                     top: 0,
                     height: "100dvh",
                     zIndex: 100,
