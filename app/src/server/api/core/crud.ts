@@ -9,10 +9,6 @@ interface MethodOptions {
     enabled?: boolean
 }
 
-const defaultMethodOptions: MethodOptions = {
-    enabled: true
-} as const
-
 export function createCRUDRouter<T extends TableEntry<TableRecord>>(
     tableName: string,
     structure: TableStructure<T>,
@@ -23,17 +19,12 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         delete?: MethodOptions
         put?: MethodOptions
         post?: MethodOptions
-    } = {
-            get: defaultMethodOptions,
-            delete: defaultMethodOptions,
-            put: defaultMethodOptions,
-            post: defaultMethodOptions,
-        }
+    } = {}
 ) {
     const crud = new CRUDOperations(tableName, structure)
     const router = Router()
 
-    if (methods.get?.enabled) {
+    if (methods.get?.enabled ?? true) {
         router.get("/", async (req: PrimitiveRequest, res) => {
             const primaryKey = Object.keys(req.query).length == 0 ? undefined : recordPrimaryKey(req.query, structure)
             try {
@@ -53,7 +44,7 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.delete?.enabled) {
+    if (methods.delete?.enabled ?? true) {
         router.delete("/", async (req: PrimitiveRequest, res) => {
             const primaryKey = recordPrimaryKey(req.query, structure)
             const ok = await crud.remove(primaryKey)
@@ -65,7 +56,7 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.put?.enabled) {
+    if (methods.put?.enabled ?? true) {
         router.put("/", async (req: PrimitiveRequest, res) => {
             if (Object.keys(req.query).length == 0) {
                 res.status(HttpStatusCode.BAD_REQUEST).send("Missing query parameters")
@@ -85,7 +76,7 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.post?.enabled) {
+    if (methods.post?.enabled ?? true) {
         router.post("/", async (req: PrimitiveRequest, res) => {
             if (req.body === undefined || !utils.isPlainObject(req.body)) {
                 res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)

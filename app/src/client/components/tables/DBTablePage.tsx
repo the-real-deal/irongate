@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { TableEntry, entryPrimaryKey, entryRecord, entryString, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
+import { TableEntry, entryPrimaryKey, entryRecord, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
 import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useSearchParams } from "react-router"
@@ -34,10 +34,15 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     create = true,
     sx,
 }: DBTablePage<T>) {
-    const [data, setData] = useState<T[] | T | null>(null)
     const [deleteCandidate, setDeleteCandidate] = useState<T | null>(null)
     const [showCreationModal, setShowCreationModal] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
+
+    const getDefaultData = useCallback(() => {
+        return searchParams.size === 0 ? [] : null
+    }, [searchParams])
+
+    const [data, setData] = useState<T[] | T | null>(getDefaultData())
 
     const fetchData = useCallback(async () => {
         const primaryKey = recordPrimaryKey(searchParamsRecord(searchParams), structure)
@@ -54,13 +59,14 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     useEffect(() => {
         fetchData()
         return () => {
-            setData(null)
+            setData(getDefaultData())
         }
-    }, [fetchData])
+    }, [fetchData, getDefaultData])
 
     return (
         <Box sx={{
             height: "100%",
+            width: "100%",
             ...sx,
         }}>
             {
@@ -77,12 +83,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                     /> :
                     <DBEntryDetails
                         data={data ?? undefined}
-                        display={{
-                            ...display,
-                            title: display.title + (
-                                data === null ? "" : `: ${entryString(entryPrimaryKey(data, structure))}`
-                            )
-                        }}
+                        display={display}
                         structure={structure}
                         onDelete={setDeleteCandidate}
                         onEdit={async (old, edits) => {

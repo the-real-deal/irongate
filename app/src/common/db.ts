@@ -51,10 +51,6 @@ export function recordPrimaryKey<T extends TableEntry<TableRecord>>(
     ) as Partial<T>
 }
 
-export function entryString<T extends TableEntry<TableRecord>>(entry: Partial<T>) {
-    return (Object.values(entry) as ColumnValue[]).join(", ")
-}
-
 export function entryPrimaryKey<T extends TableEntry<TableRecord>>(
     source: Partial<T>,
     structure: TableStructure<T>,
