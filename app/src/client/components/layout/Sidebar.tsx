@@ -1,19 +1,10 @@
 import { Box, Divider, Drawer, IconButton, Sheet, Stack, Tab, TabList, Tabs, Tooltip, Typography } from "@mui/joy"
-import { ReactNode, SyntheticEvent, useState } from "react"
+import { SyntheticEvent, useState } from "react"
 import { IconContext } from "react-icons"
 import { BaseProps } from "../../core/utils"
 import { MdMenu } from "react-icons/md"
 import ThemeSwitcher from "../ThemeSwitcher"
-
-export type TabStructure = {
-    title: string
-    icon: ReactNode
-    routes: string | {
-        title: string
-        route: string
-    }[]
-}
-
+import { TabStructure } from "../../core/routing"
 
 export interface SideBarProps extends BaseProps {
     tabs: TabStructure[]
@@ -85,9 +76,9 @@ export default function Sidebar({
                     }}>
                         <Tabs
                             value={currentRoute}
-                            onChange={(e, value) => {
+                            onChange={async (e, value) => {
                                 setDrawerOpen(false)
-                                onChange(e, value?.toString() ?? null)
+                                await onChange(e, value?.toString() ?? null)
                             }}
                             orientation="vertical"
                             sx={{
@@ -124,9 +115,9 @@ export default function Sidebar({
                                                         }} />
                                                     <Stack sx={{ width: "100%" }}>
                                                         {
-                                                            routes.map(({ title, route: subroute }) => (
+                                                            routes.map(({ title, route }) => (
                                                                 <Tab
-                                                                    value={subroute}
+                                                                    value={route.path}
                                                                     variant="plain"
                                                                     color="primary"
                                                                     indicatorInset
@@ -143,7 +134,7 @@ export default function Sidebar({
                                                 </Box>
                                             </Box> :
                                             <Tab
-                                                value={routes}
+                                                value={routes.path}
                                                 variant="plain"
                                                 color="primary"
                                                 indicatorInset

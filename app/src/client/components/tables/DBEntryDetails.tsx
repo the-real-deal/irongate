@@ -1,24 +1,26 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../core/utils"
-import { TableDisplay } from "../../core/tableDisplay"
+import { restrictEntry, TableDisplay } from "../../core/display/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { useState } from "react"
-import { TableEntry, TableRecord } from "../../../common/db"
+import { TableEntry, TableRecord, TableStructure } from "../../../common/db"
 
-export interface DBEntryDetailsProps<U extends TableEntry<TableRecord>, T extends TableDisplay<U>> extends BaseProps {
-    display: T
-    data?: U
-    onEdit?: (old: U, edits: Partial<U>) => void
-    onDelete?: (data: U) => void
+export interface DBEntryDetailsProps<T extends TableEntry<TableRecord>> extends BaseProps {
+    display: TableDisplay<T>
+    structure: TableStructure<T>
+    data?: T
+    onEdit?: (old: T, edits: Partial<T>) => void
+    onDelete?: (data: T) => void
 }
 
-export default function DBEntryDetails<U extends TableEntry<TableRecord>, T extends TableDisplay<U>>({
+export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
     display,
+    structure,
     data,
     onEdit,
     onDelete,
     sx,
-}: DBEntryDetailsProps<U, T>) {
+}: DBEntryDetailsProps<T>) {
     const [editing, setEditing] = useState(false)
     const [edits, setEdits] = useState({})
 
@@ -29,12 +31,12 @@ export default function DBEntryDetails<U extends TableEntry<TableRecord>, T exte
 
     return (
         <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
                 e.preventDefault()
                 if (data === undefined || onEdit === undefined) {
                     return
                 }
-                onEdit(data, edits)
+                await onEdit(data, edits)
                 resetEditing()
             }}
             onReset={(e) => {
@@ -97,11 +99,11 @@ export default function DBEntryDetails<U extends TableEntry<TableRecord>, T exte
                             onDelete !== undefined && !editing ?
                                 <Button
                                     color="danger"
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (data === undefined) {
                                             return
                                         }
-                                        onDelete(data)
+                                        await onDelete(data)
                                     }}>
                                     <MdDelete />
                                 </Button> :
@@ -121,13 +123,7 @@ export default function DBEntryDetails<U extends TableEntry<TableRecord>, T exte
                                 }}>
                                 <tbody>
                                     {
-                                        (Object.keys(display.keys) as (keyof U)[]).map(key => {
-                                            const inputNode = display.keys[key].inputNode(
-                                                key,
-                                                display.keys[key].title,
-                                                data[key],
-                                                edits
-                                            )
+                                        (Object.keys(restrictEntry(data, display)) as (keyof T)[]).map(key => {
                                             return (
                                                 <tr>
                                                     <th style={{
@@ -138,9 +134,14 @@ export default function DBEntryDetails<U extends TableEntry<TableRecord>, T exte
                                                     </th>
                                                     <td>
                                                         {
-                                                            editing ?
-                                                                inputNode ?? data[key] :
-                                                                data[key]
+                                                            !editing || structure[key].generate !== false ?
+                                                                data[key] :
+                                                                display.keys[key].inputNode(
+                                                                    key,
+                                                                    display.keys[key].title,
+                                                                    data[key],
+                                                                    edits
+                                                                )
                                                         }
                                                     </td>
                                                 </tr>

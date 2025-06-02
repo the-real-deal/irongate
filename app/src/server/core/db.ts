@@ -87,6 +87,7 @@ export class DBManager {
         try {
             await connection.beginTransaction()
             console.log("Running query:", query)
+            console.log("Values:", values)
             const [result] = await connection.query(query, values)
             await connection.commit()
             return result as T

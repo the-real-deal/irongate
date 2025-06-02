@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react"
 import { TableEntry, entryPrimaryKey, entryRecord, entryString, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
-import { TableDisplay } from "../../core/tableDisplay"
+import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useSearchParams } from "react-router"
-import server from "../../core/server"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog, Table } from "@mui/joy"
 import DBTableView from "./DBTableView"
 import DBEntryDetails from "./DBEntryDetails"
@@ -11,11 +10,15 @@ import { JSONObject } from "../../../common/json"
 import DBEntryCreation from "./DBEntryCreation"
 import utils from "../../../common/utils"
 import { HttpMethod } from "../../../common/http"
+import { fetchAPI, fetchJSON } from "../../core/server"
 
 export interface DBTablePage<T extends TableEntry<TableRecord>> extends BaseProps {
-    apiRoute: string,
-    display: TableDisplay<T>,
-    structure: TableStructure<T>,
+    apiRoute: string
+    display: TableDisplay<T>
+    structure: TableStructure<T>
+    expand?: boolean
+    remove?: boolean
+    create?: boolean
 }
 
 function searchParamsRecord(searchParams: URLSearchParams): Record<string, string> {
@@ -23,9 +26,12 @@ function searchParamsRecord(searchParams: URLSearchParams): Record<string, strin
 }
 
 export default function DBTablePage<T extends TableEntry<TableRecord>>({
-    apiRoute: route,
+    apiRoute,
     display,
     structure,
+    expand = true,
+    remove = true,
+    create = true,
     sx,
 }: DBTablePage<T>) {
     const [data, setData] = useState<T[] | T | null>(null)
@@ -35,15 +41,15 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
 
     const fetchData = useCallback(async () => {
         const primaryKey = recordPrimaryKey(searchParamsRecord(searchParams), structure)
-        const data = await server.fetchJSON(
+        const data = await fetchJSON(
             HttpMethod.GET,
-            route,
+            apiRoute,
             {
                 params: entryRecord(primaryKey)
             }
         ) as T[] | T
         setData(data)
-    }, [searchParams, route, structure])
+    }, [searchParams, apiRoute, structure])
 
     useEffect(() => {
         fetchData()
@@ -62,12 +68,12 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                     <DBTableView
                         display={display}
                         data={data ?? []}
-                        onExpand={entry => {
+                        onExpand={expand ? (entry => {
                             const primaryKey = entryPrimaryKey(entry, structure)
                             setSearchParams(entryRecord(primaryKey))
-                        }}
-                        onDelete={setDeleteCandidate}
-                        onCreate={() => setShowCreationModal(true)}
+                        }) : undefined}
+                        onDelete={remove ? setDeleteCandidate : undefined}
+                        onCreate={create ? (() => setShowCreationModal(true)) : undefined}
                     /> :
                     <DBEntryDetails
                         data={data ?? undefined}
@@ -77,12 +83,13 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 data === null ? "" : `: ${entryString(entryPrimaryKey(data, structure))}`
                             )
                         }}
+                        structure={structure}
                         onDelete={setDeleteCandidate}
                         onEdit={async (old, edits) => {
                             const primaryKey = entryPrimaryKey(old, structure)
-                            await server.fetchAPI(
+                            await fetchAPI(
                                 HttpMethod.PUT,
-                                route,
+                                apiRoute,
                                 {
                                     params: entryRecord(primaryKey),
                                     body: edits as JSONObject
@@ -151,16 +158,16 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                     return
                                 }
                                 const primaryKey = entryPrimaryKey(deleteCandidate, structure)
-                                await server.fetchAPI(
+                                await fetchAPI(
                                     HttpMethod.DELETE,
-                                    route,
+                                    apiRoute,
                                     {
                                         params: entryRecord(primaryKey)
                                     }
                                 )
                                 setDeleteCandidate(null)
                                 if (searchParams.size !== 0) {
-                                    setSearchParams({})
+                                    setSearchParams(new URLSearchParams(), { replace: true })
                                 } else {
                                     await fetchData()
                                 }
@@ -182,30 +189,33 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                 <ModalDialog
                     variant="outlined"
                     sx={{
-                        minWidth: "50%"
+                        minWidth: "40%"
                     }}>
                     <DialogTitle>
                         Create new entry
                     </DialogTitle>
                     <Divider />
-                    <DBEntryCreation
-                        display={display}
-                        open={showCreationModal}
-                        InputsContainer={DialogContent}
-                        ButtonsContainer={DialogActions}
-                        onConfirm={async (data) => {
-                            await server.fetchAPI(
-                                HttpMethod.POST,
-                                route,
-                                {
-                                    body: data as JSONObject
-                                }
-                            )
-                            setShowCreationModal(false)
-                            await fetchData()
-                        }}
-                        onClose={() => setShowCreationModal(false)}
-                    />
+                    {
+                        showCreationModal ?
+                            <DBEntryCreation
+                                display={display}
+                                structure={structure}
+                                InputsContainer={DialogContent}
+                                ButtonsContainer={DialogActions}
+                                onConfirm={async (data) => {
+                                    await fetchAPI(
+                                        HttpMethod.POST,
+                                        apiRoute,
+                                        {
+                                            body: data as JSONObject
+                                        }
+                                    )
+                                    setShowCreationModal(false)
+                                    await fetchData()
+                                }}
+                                onClose={() => setShowCreationModal(false)}
+                            /> : null
+                    }
                 </ModalDialog>
             </Modal>
         </Box>

@@ -1,45 +1,50 @@
 import { Box, Button, Table } from "@mui/joy"
-import { TableRecord, TableEntry } from "../../../common/db"
-import { TableDisplay } from "../../core/tableDisplay"
+import { TableRecord, TableEntry, TableStructure } from "../../../common/db"
+import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
-import { ComponentType, ReactNode, useEffect, useState } from "react"
+import { ComponentType, PropsWithChildren, useState } from "react"
+
+// TODO fix data all null + redirect to ?
 
 export interface DBEntryCreationProps<T extends TableEntry<TableRecord>> extends BaseProps {
     display: TableDisplay<T>
-    open: boolean
+    structure: TableStructure<T>
     onConfirm: (data: Partial<T>) => void
     onClose: () => void
-    InputsContainer?: ComponentType<{ children: ReactNode }>
-    ButtonsContainer?: ComponentType<{ children: ReactNode }>
+    InputsContainer?: ComponentType<PropsWithChildren>
+    ButtonsContainer?: ComponentType<PropsWithChildren>
 }
 
 export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
     display,
-    open,
+    structure,
     InputsContainer = Box,
     ButtonsContainer = Box,
     onConfirm,
     onClose,
 }: DBEntryCreationProps<T>) {
-    const [data, setData] = useState<Partial<T>>({})
+    const keys = (Object.keys(display.keys) as (keyof T)[])
+        .filter(key => structure[key].generate === false)
+    const initialData = Object.fromEntries(keys.map(key => [key, null])) as Partial<T>
 
-    function fullClose() {
-        setData({})
-        onClose()
+    const [data,] = useState<Partial<T>>(initialData)
+
+    async function fullClose() {
+        await onClose()
     }
-
-    useEffect(() => {
-        setData({})
-    }, [open])
 
     return (
         <Box>
             <form
-                onSubmit={() => {
-                    onConfirm(data)
-                    fullClose()
+                onSubmit={async (e) => {
+                    e.preventDefault()
+                    await onConfirm(data)
+                    await fullClose()
                 }}
-                onReset={fullClose}>
+                onReset={async (e) => {
+                    e.preventDefault()
+                    await fullClose()
+                }}>
                 <InputsContainer>
                     <Table
                         variant="soft"
@@ -50,32 +55,29 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
                         }}>
                         <tbody>
                             {
-                                (Object.keys(display.keys) as (keyof T)[]).map(key => {
-                                    const inputNode = display.keys[key].inputNode(
-                                        key,
-                                        display.keys[key].title,
-                                        undefined,
-                                        data
-                                    )
-                                    return (
-                                        inputNode === null ?
-                                            null :
-                                            <tr>
-                                                <th
-                                                    style={{
-                                                        width: "0.1%",
-                                                        whiteSpace: "nowrap",
-                                                    }}>
-                                                    {display.keys[key].title}
-                                                </th>
-                                                <td style={{
-                                                    backgroundColor: "var(--TableCell-headBackground)"
-                                                }}>
-                                                    {inputNode}
-                                                </td>
-                                            </tr>
-                                    )
-                                })
+                                keys.map(key => (
+                                    <tr>
+                                        <th
+                                            style={{
+                                                width: "0.1%",
+                                                whiteSpace: "nowrap",
+                                            }}>
+                                            {display.keys[key].title}
+                                        </th>
+                                        <td style={{
+                                            backgroundColor: "var(--TableCell-headBackground)"
+                                        }}>
+                                            {
+                                                display.keys[key].inputNode(
+                                                    key,
+                                                    display.keys[key].title,
+                                                    undefined,
+                                                    data
+                                                )
+                                            }
+                                        </td>
+                                    </tr>
+                                ))
                             }
                         </tbody>
                     </Table>

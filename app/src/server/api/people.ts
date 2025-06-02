@@ -1,9 +1,5 @@
-import { Router } from "express"
-import { PEOPLE_STRUCTURE } from "../../common/tables/people"
 import { createCRUDRouter } from "./core/crud"
+import { PEOPLE_STRUCTURE } from "../../common/structures"
 
-const peopleRouter = Router()
-
-peopleRouter.use("/", createCRUDRouter("People", PEOPLE_STRUCTURE))
-
+const peopleRouter = createCRUDRouter("People", PEOPLE_STRUCTURE)
 export default peopleRouter

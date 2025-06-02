@@ -4,14 +4,15 @@ import ErrorNotification from "./components/errors/ErrorNotification"
 import { Route, BrowserRouter, Routes, Navigate } from "react-router"
 import MainLayout from "./layouts/MainLayout"
 import OverviewPage from "./pages/OverviewPage"
-import InfrastructurePage from "./pages/InfrastructurePage"
 import PeoplePage from "./pages/PeoplePage"
-import InmatesPage from "./pages/InmatesPage"
-import PersonnelPage from "./pages/PersonnelPage"
-import DeliveriesPage from "./pages/DeliveriesPage"
-import ActivitiesPage from "./pages/ActivitiesPage"
+import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdPestControlRodent } from 'react-icons/md'
+import CellsPage from "./pages/infrastructure/CellsPage"
+import { getTabsRoutes, TabStructure } from "./core/routing"
+import SectorsPage from "./pages/infrastructure/SectorsPage"
+import InmatesPage from "./pages/inmates/InmatesPage"
+import MovementsPage from "./pages/inmates/MovementsPage"
 
-const THEME = extendTheme({
+const theme = extendTheme({
     colorSchemes: {
         light: {
             palette: {
@@ -72,6 +73,153 @@ const THEME = extendTheme({
     }
 })
 
+const tabs: TabStructure[] = [
+    {
+        title: "Overview",
+        icon: <MdBarChart />,
+        routes: {
+            path: "/overview",
+            page: <OverviewPage />,
+        },
+    },
+    {
+        title: "Infrastructure",
+        icon: <MdApartment />,
+        routes: [
+            {
+                title: "Sectors",
+                route: {
+                    path: "/sectors",
+                    page: <SectorsPage />,
+                },
+            },
+            {
+                title: "Cells",
+                route: {
+                    path: "/cells",
+                    page: <CellsPage />,
+                },
+            },
+            {
+                title: "Zones",
+                route: {
+                    path: "/zones",
+                    page: null,
+                },
+            },
+            {
+                title: "Devices",
+                route: {
+                    path: "/devices",
+                    page: null,
+                },
+            },
+        ],
+    },
+    {
+        title: "People",
+        icon: <MdGroup />,
+        routes: {
+            path: "/people",
+            page: <PeoplePage />,
+        },
+    },
+    {
+        title: "Inmates",
+        icon: <MdPestControlRodent />,
+        routes: [
+            {
+                title: "Inmates",
+                route: {
+                    path: "/inmates",
+                    page: <InmatesPage />,
+                },
+            },
+            {
+                title: "Movements",
+                route: {
+                    path: "/movements",
+                    page: <MovementsPage />,
+                },
+            },
+            {
+                title: "Visits",
+                route: {
+                    path: "/visits",
+                    page: null,
+                },
+            },
+        ],
+    },
+    {
+        title: "Personnel",
+        icon: <MdLocalPolice />,
+        routes: [
+            {
+                title: "Personnel",
+                route: {
+                    path: "/personnel",
+                    page: null,
+                }
+            },
+            {
+                title: "Reports",
+                route: {
+                    path: "/reports",
+                    page: null,
+                }
+            },
+        ],
+    },
+    {
+        title: "Deliveries",
+        icon: <MdLocalShipping />,
+        routes: [
+            {
+                title: "Deliveries",
+                route: {
+                    path: "/deliveries",
+                    page: null,
+                }
+            },
+            {
+                title: "Couriers",
+                route: {
+                    path: "/couriers",
+                    page: null,
+                }
+            },
+            {
+                title: "Vehicles",
+                route: {
+                    path: "/vehicles",
+                    page: null,
+                }
+            },
+        ],
+    },
+    {
+        title: "Activities",
+        icon: <MdClass />,
+        routes: [
+            {
+                title: "Activities",
+                route: {
+                    path: "/activities",
+                    page: null,
+                }
+            },
+            {
+                title: "Routines",
+                route: {
+                    path: "/routines",
+                    page: null,
+                }
+            },
+        ],
+    },
+]
+
 export default function App() {
     const [error, setError] = useState<Error | null>(null)
 
@@ -94,8 +242,11 @@ export default function App() {
         }
     }, [])
 
+    const routes = getTabsRoutes(tabs)
+    const defaultRoute = routes[0]
+
     return (
-        <CssVarsProvider theme={THEME}>
+        <CssVarsProvider theme={theme}>
             <CssBaseline />
             <ErrorNotification
                 error={error}
@@ -103,15 +254,13 @@ export default function App() {
             />
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<MainLayout />}>
-                        <Route index element={<Navigate to="/overview" replace />} />
-                        <Route path="overview" element={<OverviewPage />} />
-                        <Route path="infrastructure" element={<InfrastructurePage />} />
-                        <Route path="people" element={<PeoplePage />} />
-                        <Route path="inmates" element={<InmatesPage />} />
-                        <Route path="personnel" element={<PersonnelPage />} />
-                        <Route path="deliveries" element={<DeliveriesPage />} />
-                        <Route path="activities" element={<ActivitiesPage />} />
+                    <Route path="/" element={<MainLayout tabs={tabs} />}>
+                        {
+                            <Route index element={defaultRoute === undefined ? null : <Navigate to={defaultRoute.path} replace />} />
+                        }
+                        {
+                            routes.map(r => <Route path={r.path} element={r.page} />)
+                        }
                     </Route>
                 </Routes>
             </BrowserRouter>

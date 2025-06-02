@@ -2,11 +2,11 @@ import { ErrorRequestHandler, json, Request, RequestHandler } from "express"
 import type { ParamsDictionary } from 'express-serve-static-core'
 import { HTTPError, HttpStatusCode } from "../common/http"
 import { JSONType } from "../common/json"
-import { randomUUID } from "crypto"
+import utils from "../common/utils"
 
 export function logs(): RequestHandler {
     return (req, res, next) => {
-        const id = randomUUID()
+        const id = utils.generateUUID()
         const start = Date.now()
         console.log(`[Request ${id}]`)
         console.log("Method:", req.method)

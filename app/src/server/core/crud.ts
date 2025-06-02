@@ -5,6 +5,11 @@ import { ColumnValue, TableEntry, TableRecord, TableStructure, tableStructurePri
 
 export class SanitizeError extends Error { }
 
+export type OrderByDefinition<T extends TableEntry<TableRecord>> = {
+    column: keyof T,
+    direction: "ASC" | "DESC"
+}[]
+
 export default class CRUDOperations<T extends TableEntry<TableRecord>> {
 
     constructor(
@@ -12,14 +17,16 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         private readonly structure: TableStructure<T>,
     ) { }
 
-    private sanitizeData(
+    private async sanitizeData(
         data: Partial<T>,
         {
             keys = Object.keys(this.structure),
             allowUndefined = false,
+            generateData = false,
         }: {
             keys?: (keyof T)[],
             allowUndefined?: boolean,
+            generateData?: boolean
         } = {},
     ) {
         Object.keys(data).forEach(key => {
@@ -27,40 +34,31 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
                 delete data[key]
             }
         })
-        keys.forEach(<K extends keyof T>(key: K) => {
+        await Promise.all(keys.map(async <K extends keyof T>(key: K) => {
             const generate = this.structure[key].generate
-            switch (typeof generate) {
-                case "boolean": {
-                    if (generate) {
-                        delete data[key]
-                    } else if (data[key] === undefined && !allowUndefined) {
-                        throw new SanitizeError(`Missing key ${key.toString()}`)
-                    }
-                    break
-                }
-                case "function": {
-                    data[key] = generate(data)
-                    break
-                }
-                default: {
-                    throw new Error()
+            if (generate === false && data[key] === undefined && !allowUndefined) {
+                throw new SanitizeError(`Missing key ${key.toString()}`)
+            } else if (generate !== false) {
+                if (generateData && typeof generate === "function") {
+                    delete data[key]
+                    data[key] = await generate()
                 }
             }
-        })
+        }))
     }
 
-    private sanitizePrimaryKey(primaryKey: Partial<T>) {
+    private async sanitizePrimaryKey(primaryKey: Partial<T>) {
         const keys = Object.keys(
             tableStructurePrimaryKey<T, typeof this.structure>(this.structure)
         ) as (keyof T)[]
-        this.sanitizeData(primaryKey, { keys })
+        await this.sanitizeData(primaryKey, { keys })
     }
 
-    private primaryKeyQuery(primaryKey: Partial<T>): {
+    private async primaryKeyQuery(primaryKey: Partial<T>): Promise<{
         query: string,
         values: ColumnValue[],
-    } {
-        this.sanitizePrimaryKey(primaryKey)
+    }> {
+        await this.sanitizePrimaryKey(primaryKey)
         return {
             query: createQuery(
                 "WHERE",
@@ -74,27 +72,28 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
 
     async get({
         primaryKey,
-        keyOnly = false,
+        orderBy = []
     }: {
-        primaryKey?: Partial<T>
-        keyOnly?: boolean
-    }): Promise<T[] | (T | null)> {
+        primaryKey?: Partial<T>,
+        orderBy?: OrderByDefinition<T>
+    } = {}): Promise<T[] | (T | null)> {
         const primaryKeyQuery =
-            primaryKey === undefined ? undefined : this.primaryKeyQuery(primaryKey)
+            primaryKey === undefined ? undefined : await this.primaryKeyQuery(primaryKey)
         const query = createQuery(
-            "SELECT",
-            keyOnly ?
-                Object.keys(tableStructurePrimaryKey<T, typeof this.structure>(this.structure)) :
-                "*",
+            "SELECT *",
             `FROM ${escapeQueryField(this.tableName)}`,
-            primaryKeyQuery?.query ?? ""
+            primaryKeyQuery?.query ?? "",
+            orderBy.length == 0 ? "" : createQuery(
+                "ORDER BY",
+                orderBy.map(o => `${escapeQueryField(o.column.toString())} ${o.direction}`)
+            )
         )
         const res = await db.executeQuery<T[]>(query, primaryKeyQuery?.values ?? undefined)
         return primaryKey === undefined ? res : (res[0] ?? null)
     }
 
     async remove(primaryKey: Partial<T>): Promise<boolean> {
-        const primaryKeyQuery = this.primaryKeyQuery(primaryKey)
+        const primaryKeyQuery = await this.primaryKeyQuery(primaryKey)
         const query = createQuery(
             `DELETE FROM ${escapeQueryField(this.tableName)}`,
             primaryKeyQuery.query
@@ -104,8 +103,8 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
     }
 
     async update(primaryKey: Partial<T>, edits: Partial<T>): Promise<boolean> {
-        this.sanitizeData(edits, { allowUndefined: true })
-        const primaryKeyQuery = this.primaryKeyQuery(primaryKey)
+        await this.sanitizeData(edits, { allowUndefined: true })
+        const primaryKeyQuery = await this.primaryKeyQuery(primaryKey)
 
         if (Object.keys(edits).length == 0) {
             return true
@@ -125,7 +124,7 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
     }
 
     async create(data: Partial<T>) {
-        this.sanitizeData(data)
+        await this.sanitizeData(data, { generateData: true })
 
         const keys = Object.keys(data)
         const query = createQuery(

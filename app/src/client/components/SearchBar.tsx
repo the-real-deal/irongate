@@ -11,8 +11,8 @@ export default function SearchBar({ onChange, delay = 200, sx }: SearchBarProps)
     const [value, setValue] = useState("")
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            onChange(value)
+        const handler = setTimeout(async () => {
+            await onChange(value)
         }, delay)
 
         return () => {

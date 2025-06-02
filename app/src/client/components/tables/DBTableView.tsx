@@ -1,21 +1,21 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../core/utils"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { MdAdd, MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
-import { TableDisplay } from "../../core/tableDisplay"
+import { restrictEntry, TableDisplay } from "../../core/display/tableDisplay"
 import { TableEntry, TableRecord } from "../../../common/db"
 
-export interface DBTableViewProps<U extends TableEntry<TableRecord>, T extends TableDisplay<U>> extends BaseProps {
-    display: T
-    data: U[]
+export interface DBTableViewProps<T extends TableEntry<TableRecord>> extends BaseProps {
+    display: TableDisplay<T>
+    data: T[]
     search?: boolean
-    onExpand?: (entry: U) => void
-    onDelete?: (entry: U) => void
+    onExpand?: (entry: T) => void
+    onDelete?: (entry: T) => void
     onCreate?: () => void
 }
 
-export default function DBTableView<U extends TableEntry<TableRecord>, T extends TableDisplay<U>>({
+export default function DBTableView<T extends TableEntry<TableRecord>>({
     display,
     data,
     search = true,
@@ -23,29 +23,31 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
     onExpand,
     onCreate,
     sx,
-}: DBTableViewProps<U, T>) {
+}: DBTableViewProps<T>) {
     const lastColumn = onDelete != undefined || onExpand != undefined
 
-    const [rows, setRows] = useState<U[]>([])
-
-    useEffect(() => {
-        setRows(data)
-        return () => {
-            setRows([])
-        }
-    }, [data, display])
+    const [rows, setRows] = useState<[Partial<T>, T][]>([])
 
     function searchNormalize(str: string): string {
         return str.toLowerCase().replace(/\s+/g, " ").trim()
     }
 
-    function filterRows(query: string) {
+    const toRows = useCallback((data: T[], query: string): [Partial<T>, T][] => {
         const q = searchNormalize(query).split(" ")
-        return data.filter(row => {
-            const haystack = searchNormalize(Object.values(row).join(" "))
-            return q.every(term => haystack.includes(term))
-        })
-    }
+        return data
+            .map(dataRow => [restrictEntry(dataRow, display), dataRow] as [Partial<T>, T])
+            .filter(([row, _]) => {
+                const haystack = searchNormalize(Object.values(row).join(" "))
+                return q.every(term => haystack.includes(term))
+            })
+    }, [display])
+
+    useEffect(() => {
+        setRows(toRows(data, ""))
+        return () => {
+            setRows([])
+        }
+    }, [data, display, toRows])
 
     return (
         <Box sx={{
@@ -63,7 +65,7 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
                 justifyContent: "space-between",
                 alignItems: "center"
             }}>
-                <Typography level="h1">{display.title}</Typography>
+                <Typography level="h1">{display.title}: {rows.length} entries</Typography>
                 <Box sx={{
                     display: "flex",
                     flexDirection: "row",
@@ -82,7 +84,7 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
                     {
                         search ?
                             <SearchBar onChange={async (query) => {
-                                setRows(filterRows(query))
+                                setRows(toRows(data, query))
                             }} /> :
                             null
                     }
@@ -109,33 +111,37 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
                     <thead>
                         <tr>
                             {
-                                (Object.keys(display.keys) as (keyof U)[]).map(key => {
-                                    return (
-                                        <th>
-                                            {display.keys[key].title}
-                                        </th>
-                                    )
-                                })
+                                (Object.keys(display.keys) as (keyof T)[])
+                                    .filter(key => !display.keys[key].hide)
+                                    .map((key, _, arr) => {
+                                        return (
+                                            <th style={{
+                                                width: `${100 / arr.length}%`,
+                                            }}>
+                                                {display.keys[key].title}
+                                            </th>
+                                        )
+                                    })
                             }
                             {
                                 lastColumn ?
                                     <th style={{
                                         position: "sticky",
                                         right: 0,
-                                        width: "0.1%",
+                                        width: 0,
                                         whiteSpace: "nowrap",
-                                    }}></th> :
+                                    }} /> :
                                     null
                             }
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            rows.map(row => {
+                            rows.map(([row, data]) => {
                                 return (
                                     <tr>
                                         {
-                                            (Object.keys(display.keys) as (keyof U)[]).map(key => {
+                                            (Object.keys(row) as (keyof T)[]).map(key => {
                                                 return (
                                                     <td>{row[key]}</td>
                                                 )
@@ -159,7 +165,7 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
                                                         {
                                                             onExpand !== undefined ?
                                                                 <Button
-                                                                    onClick={() => onExpand(row)}>
+                                                                    onClick={async () => await onExpand(data)}>
                                                                     <MdVisibility />
                                                                 </Button> :
                                                                 null
@@ -168,7 +174,7 @@ export default function DBTableView<U extends TableEntry<TableRecord>, T extends
                                                             onDelete !== undefined ?
                                                                 <Button
                                                                     color="danger"
-                                                                    onClick={() => onDelete(row)}>
+                                                                    onClick={async () => await onDelete(data)}>
                                                                     <MdDelete />
                                                                 </Button> :
                                                                 null

@@ -12,7 +12,7 @@ export interface FetchData {
     }
 }
 
-async function fetchAPI(
+export async function fetchAPI(
     method: HttpMethod,
     endPoint: string,
     {
@@ -53,12 +53,10 @@ async function fetchAPI(
     }
 }
 
-async function fetchJSON<T extends JSONType>(
+export async function fetchJSON<T extends JSONType>(
     method: HttpMethod,
     endPoint: string,
     data: FetchData = {}
 ): Promise<T> {
     return await (await fetchAPI(method, endPoint, data)).json()
 }
-
-export default { fetchAPI, fetchJSON }

@@ -1,10 +1,9 @@
 import { Router } from "express"
 import { TableEntry, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
-import CRUDOperations, { SanitizeError } from "../../core/crud"
+import CRUDOperations, { OrderByDefinition, SanitizeError } from "../../core/crud"
 import { PrimitiveRequest } from "../../middlewares"
 import { HttpStatusCode } from "../../../common/http"
 import utils from "../../../common/utils"
-import { parseJSONPrimitive } from "../../../common/json"
 
 interface MethodOptions {
     enabled?: boolean
@@ -18,7 +17,9 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
     tableName: string,
     structure: TableStructure<T>,
     methods: {
-        get?: MethodOptions
+        get?: MethodOptions & {
+            orderBy?: OrderByDefinition<T>
+        }
         delete?: MethodOptions
         put?: MethodOptions
         post?: MethodOptions
@@ -34,15 +35,9 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
 
     if (methods.get?.enabled) {
         router.get("/", async (req: PrimitiveRequest, res) => {
-            const queryParams = { ...req.query }
-            const keyOnly = queryParams.keyOnly === undefined ? false : parseJSONPrimitive(queryParams.keyOnly)
-            if (typeof keyOnly !== "boolean") {
-                res.status(HttpStatusCode.BAD_REQUEST).send()
-                return
-            }
-            const primaryKey = Object.keys(queryParams).length == 0 ? undefined : recordPrimaryKey(queryParams, structure)
+            const primaryKey = Object.keys(req.query).length == 0 ? undefined : recordPrimaryKey(req.query, structure)
             try {
-                const result = await crud.get({ primaryKey, keyOnly })
+                const result = await crud.get({ primaryKey, orderBy: methods.get?.orderBy })
                 if (result === null) {
                     res.status(HttpStatusCode.NOT_FOUND).send()
                 } else {

@@ -1,34 +1,9 @@
-import { createDisplay, dateInputNode, selectInputNode, stringInputNode } from "../core/tableDisplay"
-import { PEOPLE_STRUCTURE, PeopleEntry } from "../../common/tables/people"
+import { PEOPLE_STRUCTURE } from "../../common/structures"
 import DBTablePage from "../components/tables/DBTablePage"
-import { useEnum } from "../core/enums"
+import { usePeopleDisplay } from "../core/display/displays"
 
 export default function PeoplePage() {
-    const genders = useEnum("Genders")
-
-    const display = createDisplay<PeopleEntry>("People", {
-        DocumentID: {
-            title: "Document ID",
-            inputNode: stringInputNode(),
-        },
-        Name: {
-            inputNode: stringInputNode(),
-        },
-        Surname: {
-            inputNode: stringInputNode(),
-        },
-        GenderID: {
-            title: "Gender",
-            inputNode: selectInputNode(genders),
-        },
-        Birthday: {
-            inputNode: dateInputNode({ includeTime: false }),
-
-        },
-        BirthPlace: {
-            inputNode: stringInputNode(),
-        }
-    })
+    const display = usePeopleDisplay()
 
     return (
         <DBTablePage

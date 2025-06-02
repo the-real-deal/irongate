@@ -13,7 +13,7 @@ export type TableEntry<T extends TableRecord> = {
 export type TableStructure<T extends TableEntry<TableRecord>> = {
     [K in keyof T]: {
         isPrimaryKey: boolean
-        generate: ((data: Partial<T>) => T[K]) | boolean
+        generate: (() => T[K] | Promise<T[K]>) | boolean
     }
 }
 
@@ -21,7 +21,7 @@ export function createTableStructure<T extends TableEntry<TableRecord>>(
     structure: {
         [K in keyof T]: {
             primaryKey?: boolean
-            generate?: ((data: Partial<T>) => T[K]) | boolean
+            generate?: (() => T[K] | Promise<T[K]>) | boolean
         }
     }
 ): TableStructure<T> {

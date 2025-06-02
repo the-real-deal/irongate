@@ -41,12 +41,12 @@ export default function JoyDatePicker({
                 required={required}
                 dateFormat={dateFormat}
                 timeFormat={timeFormat}
-                onChange={date => {
+                onChange={async date => {
                     if (date === null) {
                         return
                     }
                     setValue(date)
-                    onChange(date)
+                    await onChange(date)
                 }}
                 customInput={<Input />}
             />
