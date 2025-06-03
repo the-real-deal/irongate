@@ -1,11 +1,10 @@
 import { ReactElement } from "react"
-import { TableEntry, TableRecord } from "../../../common/db"
-import { Input, Select, Option, Textarea, Checkbox } from "@mui/joy"
+import { ColumnValue, TableEntry, TableRecord, TableStructure } from "../../../common/db"
+import { Input, Textarea, Checkbox } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../../common/dates"
 import JoyDatePicker from "../../components/JoyDatePicker"
 import { BaseProps } from "../utils"
-import { EnumEntry } from "../../../common/structures"
-import ClearableSelect from "../../components/CleareableSelect"
+import ControlledSelect from "../../components/ControlledSelect"
 
 export interface KeyDisplay<T extends TableEntry<TableRecord>, K extends keyof T> {
     title: string
@@ -20,50 +19,41 @@ export type TableDisplay<T extends TableEntry<TableRecord>> = {
     }
 }
 
-export function createDisplay<T extends TableEntry<TableRecord>>({
-    tableTitle,
-    detailTitle,
-    keys,
-}: Omit<TableDisplay<T>, "keys"> & {
-    keys: {
-        [K in keyof T]: Omit<KeyDisplay<T, K>, "title" | "hide"> & {
-            title?: KeyDisplay<T, K>["title"]
+export function createDisplay<T extends TableEntry<TableRecord>>(
+    structure: TableStructure<T>,
+    {
+        tableTitle,
+        detailTitle,
+        keys,
+    }: {
+        tableTitle?: TableDisplay<T>["tableTitle"]
+        detailTitle?: TableDisplay<T>["detailTitle"]
+        keys: {
+            [K in keyof T]: Omit<KeyDisplay<T, K>, "title"> & {
+                title?: KeyDisplay<T, K>["title"]
+            }
         }
-    }
-}): TableDisplay<T> {
+    }): TableDisplay<T> {
     const filledKeys = Object.fromEntries(
         (Object.keys(keys) as (keyof T)[]).map(key => {
-            const keyDisplay = keys[key] ?? {}
-            const title = keyDisplay.title ?? key.toString()
-            const inputNode = keyDisplay.inputNode
+            const title = keys[key].title ?? key.toString()
+            const inputNode = keys[key].inputNode
             return [key, { title, inputNode }]
         })
-    ) as unknown as { [K in keyof T]: KeyDisplay<T, K> }
+    )
 
-    return { tableTitle, detailTitle, keys: filledKeys }
+    tableTitle ??= structure.table
+    detailTitle ??= tableTitle
+
+    return {
+        tableTitle,
+        detailTitle,
+        keys: filledKeys as { [K in keyof T]: typeof filledKeys[string] }
+    }
 }
 
-export function adaptKeyDisplay<
-    FromT extends TableEntry<TableRecord>,
-    FromK extends keyof FromT,
-    ToT extends TableEntry<TableRecord>,
-    ToK extends keyof ToT
->(
-    display: TableDisplay<FromT>,
-    key: FromK
-): FromT[FromK] extends ToT[ToK]
-    ? (ToT[ToK] extends FromT[FromK] ? KeyDisplay<ToT, ToK> : never)
-    : never {
-    const from = display.keys[key]
-    return { ...from } as unknown as FromT[FromK] extends ToT[ToK]
-        ? (ToT[ToK] extends FromT[FromK] ? KeyDisplay<ToT, ToK> : never)
-        : never
-}
-
-export function adaptEnumDisplay(
-    display: TableDisplay<EnumEntry>,
-) {
-    return adaptKeyDisplay(display, "ID")
+function transformStringValue(value: string): string | null {
+    return value.length === 0 ? null : value
 }
 
 export function stringInputNode<T extends TableEntry<TableRecord>>({
@@ -75,16 +65,16 @@ export function stringInputNode<T extends TableEntry<TableRecord>>({
     return <K extends keyof T>(
         key: K,
         title: string,
-        value: T[K] extends string | undefined ? string | undefined : never,
+        value: T[K] extends string | null | undefined ? string | null | undefined : never,
         edits: Partial<T>
     ) => (
         <Input
-            placeholder={title}
-            defaultValue={value}
+            placeholder={title + (required ? " *" : "")}
+            defaultValue={value ?? undefined}
             required={required}
             sx={sx}
             onChange={e => {
-                edits[key] = e.target.value as T[K]
+                edits[key] = transformStringValue(e.target.value) as T[K]
             }}
         />
     )
@@ -99,24 +89,24 @@ export function numberInputNode<T extends TableEntry<TableRecord>>({
     return <K extends keyof T>(
         key: K,
         title: string,
-        value: T[K] extends number | undefined ? number | undefined : never,
+        value: T[K] extends number | null | undefined ? number | null | undefined : never,
         edits: Partial<T>
     ) => (
         <Input
-            placeholder={title}
-            defaultValue={value}
+            placeholder={title + (required ? " *" : "")}
+            defaultValue={value ?? undefined}
             required={required}
             sx={sx}
             type="number"
             onChange={e => {
-                edits[key] = e.target.value as T[K]
+                const value = transformStringValue(e.target.value)
+                edits[key] = (value === null ? null : Number(value)) as T[K]
             }}
         />
     )
 }
 
 export function booleanInputNode<T extends TableEntry<TableRecord>>({
-    required = true,
     sx,
 }: {
     required?: boolean,
@@ -129,10 +119,9 @@ export function booleanInputNode<T extends TableEntry<TableRecord>>({
     ) => (
         <Checkbox
             defaultChecked={value}
-            required={required}
             sx={sx}
             onChange={e => {
-                edits[key] = e.target.value as T[K]
+                edits[key] = e.target.checked as T[K]
             }}
         />
     )
@@ -147,69 +136,56 @@ export function textInputNode<T extends TableEntry<TableRecord>>({
     return <K extends keyof T>(
         key: K,
         title: string,
-        value: T[K] extends string | undefined ? string | undefined : never,
+        value: T[K] extends string | null | undefined ? string | null | undefined : never,
         edits: Partial<T>
     ) => (
         <Textarea
-            placeholder={title}
-            defaultValue={value}
+            placeholder={title + (required ? " *" : "")}
+            defaultValue={value ?? undefined}
             required={required}
             sx={sx}
             onChange={e => {
-                edits[key] = e.target.value as T[K]
+                edits[key] = transformStringValue(e.target.value) as T[K]
             }}
         />
     )
 }
 
-export function selectInputNode<T extends TableEntry<TableRecord>, V extends string>(
+export function selectInputNode<
+    T extends TableEntry<TableRecord>,
+    V extends ColumnValue,
+>(
     values: V[],
     {
         required = true,
+        onChange,
         sx,
     }: {
         required?: boolean,
+        onChange?: (selected: V | null) => void
     } & BaseProps = {},
 ) {
     return <K extends keyof T>(
         key: K,
         title: string,
-        value: T[K] extends V | undefined ? V | undefined : never,
+        value: T[K] extends V | null | undefined ? V | null | undefined : never,
         edits: Partial<T>
     ) => {
-        function handleChange(selected: V | null) {
-            if (selected === null) {
-                return
+        async function handleChange(selected: V | null) {
+            edits[key] = selected as T[K]
+            if (onChange !== undefined) {
+                await onChange(selected)
             }
-            edits[key] = selected as unknown as T[K]
         }
 
         return (
-            required ?
-                <Select<V>
-                    multiple={false}
-                    placeholder={title}
-                    defaultValue={value}
-                    required={true}
-                    sx={sx}
-                    onChange={(_, selected) => handleChange(selected)}>
-                    {
-                        values.map(x => (
-                            <Option value={x}>{x}</Option>
-                        ))
-                    }
-                </Select> :
-                <ClearableSelect
-                    placeholder={title}
-                    defaultValue={value}
-                    sx={sx}
-                    onChange={handleChange}>
-                    {
-                        values.map(x => (
-                            <Option value={x}>{x}</Option>
-                        ))
-                    }
-                </ClearableSelect>
+            <ControlledSelect
+                values={values}
+                required={required}
+                placeholder={title}
+                defaultValue={value}
+                sx={sx}
+                onChange={handleChange} />
         )
     }
 }
@@ -232,7 +208,7 @@ export function dateInputNode<T extends TableEntry<TableRecord>>({
     ) => (
         <JoyDatePicker
             required={required}
-            placeholder={`${title} (${dateFormat})`}
+            placeholder={`${title} (${dateFormat})` + (required ? " *" : "")}
             defaultValue={value === undefined ? value : dates.parse(value, dateFormat)}
             includeTime={includeTime}
             dateFormat={dateFormat}

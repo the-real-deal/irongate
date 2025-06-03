@@ -1,34 +1,33 @@
 import { Router } from "express"
-import { TableEntry, recordPrimaryKey, TableRecord, TableStructure, recordEntry } from "../../../common/db"
-import CRUDOperations, { OrderByDefinition, SanitizeError } from "../../core/crud"
+import { TableEntry, recordPrimaryKey, TableRecord, recordEntry } from "../../../common/db"
+import CRUDOperations, { SanitizeError } from "../../core/crud"
 import { PrimitiveRequest } from "../../middlewares"
 import { HttpStatusCode } from "../../../common/http"
 import utils from "../../../common/utils"
 
-interface MethodOptions {
-    enabled?: boolean
+export interface CRUDRouterOptions {
+    get?: boolean
+    delete?: boolean
+    put?: boolean
+    post?: boolean
 }
 
 export function createCRUDRouter<T extends TableEntry<TableRecord>>(
-    tableName: string,
-    structure: TableStructure<T>,
-    methods: {
-        get?: MethodOptions & {
-            orderBy?: OrderByDefinition<T>
-        }
-        delete?: MethodOptions
-        put?: MethodOptions
-        post?: MethodOptions
-    } = {}
+    crud: CRUDOperations<T>,
+    methods: CRUDRouterOptions = {
+        get: true,
+        delete: true,
+        put: true,
+        post: true,
+    }
 ) {
-    const crud = new CRUDOperations(tableName, structure)
     const router = Router()
 
-    if (methods.get?.enabled ?? true) {
+    if (methods.get) {
         router.get("/", async (req: PrimitiveRequest, res) => {
-            const filter = Object.keys(req.query).length == 0 ? undefined : recordEntry(req.query, structure)
+            const filter = Object.keys(req.query).length == 0 ? null : recordEntry(req.query, crud.structure)
             try {
-                const result = await crud.get({ filter, orderBy: methods.get?.orderBy })
+                const result = await crud.get({ filter })
                 res.send(result)
             } catch (err) {
                 if (err instanceof SanitizeError) {
@@ -40,9 +39,9 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.delete?.enabled ?? true) {
+    if (methods.delete) {
         router.delete("/", async (req: PrimitiveRequest, res) => {
-            const primaryKey = recordPrimaryKey(req.query, structure)
+            const primaryKey = recordPrimaryKey(req.query, crud.structure)
             const ok = await crud.remove(primaryKey)
             if (ok) {
                 res.status(HttpStatusCode.OK).send()
@@ -52,13 +51,13 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.put?.enabled ?? true) {
+    if (methods.put) {
         router.put("/", async (req: PrimitiveRequest, res) => {
             if (Object.keys(req.query).length == 0) {
                 res.status(HttpStatusCode.BAD_REQUEST).send("Missing query parameters")
                 return
             }
-            const primaryKey = recordPrimaryKey(req.query, structure)
+            const primaryKey = recordPrimaryKey(req.query, crud.structure)
             if (req.body === undefined || !utils.isPlainObject(req.body)) {
                 res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)
                 return
@@ -72,7 +71,7 @@ export function createCRUDRouter<T extends TableEntry<TableRecord>>(
         })
     }
 
-    if (methods.post?.enabled ?? true) {
+    if (methods.post) {
         router.post("/", async (req: PrimitiveRequest, res) => {
             if (req.body === undefined || !utils.isPlainObject(req.body)) {
                 res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)

@@ -53,12 +53,12 @@ CREATE TABLE `Inmates` (
 
 DROP TABLE IF EXISTS `Movements`;
 CREATE TABLE `Movements` (
-    `DateTime` DATETIME,
+    `Datetime` DATETIME,
     `InmateNumber` VARCHAR(30),
     `CellSectorID` VARCHAR(40),
     `CellNumber` INT,
     PRIMARY KEY (
-        `DateTime`,
+        `Datetime`,
         `InmateNumber`,
         `CellSectorID`,
         `CellNumber`
@@ -71,18 +71,18 @@ CREATE TABLE `Guests` (`DocumentID` VARCHAR(30) PRIMARY KEY);
 DROP TABLE IF EXISTS `Visits`;
 CREATE TABLE `Visits` (
     `InmateNumber` VARCHAR(30),
-    `DateTime` DATETIME,
-    PRIMARY KEY (`InmateNumber`, `DateTime`)
+    `Datetime` DATETIME,
+    PRIMARY KEY (`InmateNumber`, `Datetime`)
 );
 
 DROP TABLE IF EXISTS `Visitors`;
 CREATE TABLE `Visitors` (
     `VisitInmateNumber` VARCHAR(30),
-    `VisitDateTime` DATETIME,
+    `VisitDatetime` DATETIME,
     `GuestDocumentID` VARCHAR(30),
     PRIMARY KEY (
         `VisitInmateNumber`,
-        `VisitDateTime`,
+        `VisitDatetime`,
         `GuestDocumentID`
     )
 );
@@ -117,7 +117,7 @@ CREATE TABLE `Devices` (
 DROP TABLE IF EXISTS `Reports`;
 CREATE TABLE `Reports` (
     `ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `DateTime` DATETIME NOT NULL,
+    `Datetime` DATETIME NOT NULL,
     `Description` VARCHAR(500) NOT NULL,
     `ResponsiblePersonnelID` VARCHAR(40) NOT NULL
 );
@@ -158,7 +158,7 @@ CREATE TABLE `Couriers` (`DocumentID` VARCHAR(30) PRIMARY KEY);
 DROP TABLE IF EXISTS `Vehicles`;
 CREATE TABLE `Vehicles` (
     `PlateNumber` VARCHAR(10) PRIMARY KEY,
-    `CourierDocumentID` VARCHAR(30) -- courier can be changed
+    `CourierDocumentID` VARCHAR(30) NOT NULL
 );
 
 DROP TABLE IF EXISTS `GoodsTypes`;
@@ -168,11 +168,11 @@ CREATE TABLE `GoodsTypes` (
 
 DROP TABLE IF EXISTS `Deliveries`;
 CREATE TABLE `Deliveries` (
-    `DateTime` DATETIME,
+    `Datetime` DATETIME,
     `GoodsTypeID` VARCHAR(30),
     `Quantity` INT NOT NULL,
     `VehiclePlateNumber` VARCHAR(10) NOT NULL,
-    PRIMARY KEY (`DateTime`, `GoodsTypeID`)
+    PRIMARY KEY (`Datetime`, `GoodsTypeID`)
 );
 
 DROP TABLE IF EXISTS `Activities`;
@@ -204,19 +204,19 @@ CREATE TABLE `Routines` (
     `ZoneNumber` INT,
     `Datetime` DATETIME,
     `ActivityID` VARCHAR(40) NOT NULL,
-    PRIMARY KEY (`ZoneSectorID`, `ZoneNumber`, `DateTime`)
+    PRIMARY KEY (`ZoneSectorID`, `ZoneNumber`, `Datetime`)
 );
 
 DROP TABLE IF EXISTS `Partecipations`;
 CREATE TABLE `Partecipations` (
     `RoutineZoneSectorID` VARCHAR(40),
     `RoutineZoneNumber` INT,
-    `RoutineDateTime` DateTime,
+    `RoutineDatetime` Datetime,
     `SectorID` VARCHAR(40),
     PRIMARY KEY (
         `RoutineZoneSectorID`,
         `RoutineZoneNumber`,
-        `RoutineDateTime`,
+        `RoutineDatetime`,
         `SectorID`
     )
 );
@@ -225,12 +225,12 @@ DROP TABLE IF EXISTS `Surveillances`;
 CREATE TABLE `Surveillances` (
     `RoutineZoneSectorID` VARCHAR(40),
     `RoutineZoneNumber` INT,
-    `RoutineDateTime` DateTime,
+    `RoutineDatetime` Datetime,
     `PersonnelID` VARCHAR(40),
     PRIMARY KEY (
         `RoutineZoneSectorID`,
         `RoutineZoneNumber`,
-        `RoutineDateTime`,
+        `RoutineDatetime`,
         `PersonnelID`
     )
 );
@@ -280,7 +280,7 @@ FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`);
 
 ALTER TABLE `Visitors`
 ADD CONSTRAINT `Visitors_Visits_FK`
-FOREIGN KEY (`VisitInmateNumber`, `VisitDateTime`) REFERENCES `Visits`(`InmateNumber`, `DateTime`);
+FOREIGN KEY (`VisitInmateNumber`, `VisitDatetime`) REFERENCES `Visits`(`InmateNumber`, `Datetime`);
 
 ALTER TABLE `Visitors`
 ADD CONSTRAINT `Visitors_Guests_FK`
@@ -347,8 +347,7 @@ ON DELETE CASCADE;
 
 ALTER TABLE `Vehicles`
 ADD CONSTRAINT `Vehicles_Couriers_FK`
-FOREIGN KEY (`CourierDocumentID`) REFERENCES `Couriers`(`DocumentID`)
-ON DELETE SET NULL;
+FOREIGN KEY (`CourierDocumentID`) REFERENCES `Couriers`(`DocumentID`);
 
 ALTER TABLE `Deliveries`
 ADD CONSTRAINT `Deliveries_GoodsTypes_FK`
@@ -381,7 +380,7 @@ FOREIGN KEY (`ActivityID`) REFERENCES `Activities`(`ID`);
 
 ALTER TABLE `Partecipations`
 ADD CONSTRAINT `Partecipations_Routines_FK`
-FOREIGN KEY (`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`) REFERENCES `Routines`(`ZoneSectorID`, `ZoneNumber`, `DateTime`);
+FOREIGN KEY (`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDatetime`) REFERENCES `Routines`(`ZoneSectorID`, `ZoneNumber`, `Datetime`);
 
 ALTER TABLE `Partecipations`
 ADD CONSTRAINT `Partecipations_Sectors_FK`
@@ -389,7 +388,7 @@ FOREIGN KEY (`SectorID`) REFERENCES `Sectors`(`ID`);
 
 ALTER TABLE `Surveillances`
 ADD CONSTRAINT `Surveillances_Routines_FK`
-FOREIGN KEY (`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`) REFERENCES `Routines`(`ZoneSectorID`, `ZoneNumber`, `DateTime`);
+FOREIGN KEY (`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDatetime`) REFERENCES `Routines`(`ZoneSectorID`, `ZoneNumber`, `Datetime`);
 
 ALTER TABLE `Surveillances`
 ADD CONSTRAINT `Surveillances_Personnel_FK`
@@ -662,7 +661,7 @@ VALUES
 ('26-621-5306', 'IT-YZA45678I', '2020-11-20', 128, 'Carjacking', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 2),
 ('22-897-5812', 'US-678901235', '2006-09-14', 246, 'Forgery', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1);
 
-INSERT INTO `Movements`(`DateTime`, `InmateNumber`, `CellSectorID`, `CellNumber`)
+INSERT INTO `Movements`(`Datetime`, `InmateNumber`, `CellSectorID`, `CellNumber`)
 VALUES 
 ('2020-03-06 12:53:22', '72-733-3969', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1),
 ('2000-06-05 17:25:20', '83-628-8300', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1),
@@ -724,7 +723,7 @@ VALUES
 ('NO-234567890'),
 ('AU-678901235');
 
-INSERT INTO `Visits`(`InmateNumber`, `DateTime`)
+INSERT INTO `Visits`(`InmateNumber`, `Datetime`)
 VALUES 
 ('72-733-3969', '2021-01-15 10:00:00'),
 ('72-733-3969', '2021-08-10 15:00:00'),
@@ -733,7 +732,7 @@ VALUES
 ('21-927-1468', '2008-09-15 15:00:00'),
 ('12-745-2335', '2016-12-01 11:30:00');
 
-INSERT INTO `Visitors`(`VisitInmateNumber`, `VisitDateTime`, `GuestDocumentID`)
+INSERT INTO `Visitors`(`VisitInmateNumber`, `VisitDatetime`, `GuestDocumentID`)
 VALUES 
 ('72-733-3969', '2021-01-15 10:00:00', 'JP-901234568'),
 ('72-733-3969', '2021-01-15 10:00:00', 'CA-567890124'),
@@ -989,7 +988,7 @@ VALUES
 ('0980789648', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 5, 'Computer'),
 ('7080176093', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 6, 'Metal detector');
 
-INSERT INTO `Reports`(`DateTime`, `Description`, `ResponsiblePersonnelID`)
+INSERT INTO `Reports`(`Datetime`, `Description`, `ResponsiblePersonnelID`)
 VALUES 
 ('2019-07-11 08:50:55', 'Inmates escape attempt trough multiple sectors busted', 'PER-b13327fc-9bf5-4b94-98db-57389a795034'),
 ('2008-01-28 12:41:14', 'Computers upgrade', 'PER-caafd732-cf23-4f3b-82ab-58e9194c90ea'),
@@ -1050,7 +1049,7 @@ VALUES
 ('Medical supplies'),
 ('Utensils');
 
-INSERT INTO `Deliveries`(`DateTime`, `GoodsTypeID`, `Quantity`, `VehiclePlateNumber`)
+INSERT INTO `Deliveries`(`Datetime`, `GoodsTypeID`, `Quantity`, `VehiclePlateNumber`)
 VALUES 
 ('2006-12-02 20:56:40', 'Food', 113, 'PLT9X7K2MJ'),
 ('2019-11-03 18:55:24', 'Weapons', 143, 'RX3T8V1NQL'),
@@ -1101,13 +1100,13 @@ VALUES
 ('SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 1, 'Canteen', 20),
 ('SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 1, 'Canteen', 20);
 
-INSERT INTO `Routines`(`ZoneSectorID`, `ZoneNumber`, `DateTime`, `ActivityID`)
+INSERT INTO `Routines`(`ZoneSectorID`, `ZoneNumber`, `Datetime`, `ActivityID`)
 VALUES 
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1'),
 ('SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1, '2020-03-20 15:30:00', 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185'),
 ('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1');
 
-INSERT INTO `Partecipations`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`, `SectorID`)
+INSERT INTO `Partecipations`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDatetime`, `SectorID`)
 VALUES
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0'),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'),
@@ -1117,7 +1116,7 @@ VALUES
 ('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'),
 ('SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f', 1, '2019-02-10 10:30:00', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df');
 
-INSERT INTO `Surveillances`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDateTime`, `PersonnelID`)
+INSERT INTO `Surveillances`(`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDatetime`, `PersonnelID`)
 VALUES 
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'PER-b8da78c0-bcf9-4f7a-bfeb-e5e9f5043050'),
 ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1, '2015-12-05 10:00:00', 'PER-db378a3e-ca5d-4ff7-873e-7799c1257c68'),

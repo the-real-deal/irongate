@@ -2,29 +2,36 @@ import { useEffect, useState } from "react"
 import { HttpMethod } from "../../common/http"
 import { EnumEntry, EnumTable } from "../../common/structures"
 import { fetchJSON } from "./server"
-import { TableEntry, TableRecord } from "../../common/db"
+import { entryRecord, TableEntry, TableRecord } from "../../common/db"
 
 
-export function useDataReference<T extends TableEntry<TableRecord>>(
+export function useTableReference<
+    T extends TableEntry<TableRecord>,
+    K extends keyof T,
+>(
     apiRoute: string,
-    mapTo: keyof T,
-): T[typeof mapTo][] {
-    const [values, setValues] = useState<T[typeof mapTo][]>([])
+    mapTo: K,
+    fetchFilter?: Partial<T>
+): T[K][] {
+    const [values, setValues] = useState<T[K][]>([])
 
     useEffect(() => {
         (async () => {
             const data = await fetchJSON<T[]>(
                 HttpMethod.GET,
                 apiRoute,
+                {
+                    params: fetchFilter === undefined ? undefined : entryRecord(fetchFilter)
+                }
             )
             setValues(data.map(x => x[mapTo]))
         })()
         return () => setValues([])
-    }, [apiRoute, mapTo])
+    }, [apiRoute, mapTo, fetchFilter])
 
     return values
 }
 
-export function useEnumReference(table: EnumTable): string[] {
-    return useDataReference<EnumEntry>(`/enums/${table.toLowerCase()}`, "ID")
+export function useEnumReference(table: EnumTable): EnumEntry["ID"][] {
+    return useTableReference<EnumEntry, "ID">(`/enums/${table.toLowerCase()}`, "ID")
 }

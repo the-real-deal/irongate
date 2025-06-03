@@ -1,7 +1,7 @@
 import { ReactElement, ReactNode } from "react"
 
 export interface RouteStructure {
-    path: string,
+    path: string
     page: ReactNode
 }
 
@@ -12,6 +12,13 @@ export interface TabStructure {
         title: string
         route: RouteStructure
     }[]
+}
+
+export function getRouteStructure<T extends Record<string, ReactNode>>(source: T, key: keyof T): RouteStructure {
+    return {
+        path: key.toString(),
+        page: source[key]
+    }
 }
 
 export function getTabsRoutes(tabs: TabStructure[]): RouteStructure[] {

@@ -2,43 +2,48 @@ import { parseJSONPrimitive } from "./json"
 
 export type ColumnValue = string | number | boolean | null
 
-export type TableRecord = {
-    [k: string]: ColumnValue
-}
+export type TableRecord = Record<string, ColumnValue>
 
 export type TableEntry<T extends TableRecord> = {
     [K in keyof T]: T[K]
 }
 
 export type TableStructure<T extends TableEntry<TableRecord>> = {
-    [K in keyof T]: {
-        isPrimaryKey: boolean
-        generate: (() => T[K] | Promise<T[K]>) | boolean
+    table: string,
+    keys: {
+        [K in keyof T]: {
+            primaryKey: boolean
+            generate: (() => T[K] | Promise<T[K]>) | boolean
+        }
     }
 }
 
 export function createTableStructure<T extends TableEntry<TableRecord>>(
+    table: string,
     structure: {
-        [K in keyof T]: {
-            primaryKey?: boolean
-            generate?: (() => T[K] | Promise<T[K]>) | boolean
-        }
+        [K in keyof T]: Partial<TableStructure<T>["keys"][K]>
     }
 ): TableStructure<T> {
-    return Object.fromEntries((Object.keys(structure) as (keyof T)[]).map(key => {
-        const val = structure[key]
-        const isPrimaryKey = val.primaryKey ?? false
-        const generate = val.generate ?? false
-        return [key, { isPrimaryKey, generate }]
-    })) as TableStructure<T>
+    return {
+        table,
+        keys: Object.fromEntries((Object.keys(structure) as (keyof T)[]).map(key => {
+            const val = structure[key]
+            const primaryKey = val.primaryKey ?? false
+            const generate = val.generate ?? false
+            return [key, { primaryKey, generate }]
+        })) as TableStructure<T>["keys"]
+    }
 }
 
-export function tableStructurePrimaryKey<U extends TableEntry<TableRecord>, T extends TableStructure<U>>(structure: T): Partial<T> {
+export function tableStructurePrimaryKey<
+    U extends TableEntry<TableRecord>,
+    T extends TableStructure<U>
+>(structure: T): Partial<T["keys"]> {
     return Object.fromEntries(
-        (Object.keys(structure) as (keyof T)[])
-            .filter(key => structure[key].isPrimaryKey)
-            .map(key => [key, structure[key]])
-    ) as Partial<T>
+        (Object.keys(structure.keys) as (keyof U)[])
+            .filter(key => structure.keys[key].primaryKey)
+            .map(key => [key, structure.keys[key]])
+    ) as Partial<T["keys"]>
 }
 
 export function recordEntry<T extends TableEntry<TableRecord>>(
@@ -46,7 +51,7 @@ export function recordEntry<T extends TableEntry<TableRecord>>(
     structure: TableStructure<T>,
 ): Partial<T> {
     return Object.fromEntries(
-        Object.keys(structure)
+        Object.keys(structure.keys)
             .map(key => [key, source[key] === undefined ? source[key] : parseJSONPrimitive(source[key])])
     ) as Partial<T>
 }
@@ -58,7 +63,7 @@ export function recordPrimaryKey<T extends TableEntry<TableRecord>>(
     const entry = recordEntry(source, structure)
     return Object.fromEntries(
         (Object.keys(entry) as (keyof T)[])
-            .filter(key => structure[key].isPrimaryKey)
+            .filter(key => structure.keys[key].primaryKey)
             .map(key => [key, entry[key]])
     ) as Partial<T>
 }
@@ -68,7 +73,7 @@ export function entryPrimaryKey<T extends TableEntry<TableRecord>>(
     structure: TableStructure<T>,
 ): Partial<T> {
     return Object.fromEntries(
-        Object.keys(tableStructurePrimaryKey<T, typeof structure>(structure))
+        Object.keys(tableStructurePrimaryKey(structure))
             .map(key => [key, source[key]])
     ) as Partial<T>
 }

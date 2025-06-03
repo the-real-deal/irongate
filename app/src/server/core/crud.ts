@@ -1,26 +1,47 @@
 import { ResultSetHeader } from "mysql2"
-import { db } from "../context"
 import { createQuery, escapeQueryField } from "./db"
 import { ColumnValue, TableEntry, TableRecord, TableStructure, tableStructurePrimaryKey } from "../../common/db"
+import context from "../context"
+import utils from "../../common/utils"
 
 export class SanitizeError extends Error { }
 
-export type OrderByDefinition<T extends TableEntry<TableRecord>> = {
-    column: keyof T,
-    direction: "ASC" | "DESC"
-}[]
+export interface CRUDOptions<T extends TableEntry<TableRecord>> {
+    checkData: ((data: T) => void) | null
+    get: {
+        filter: Partial<T> | null,
+        orderBy: (
+            keyof T | {
+                column: keyof T,
+                direction: "ASC" | "DESC"
+            }
+        )[]
+    }
+}
 
 export default class CRUDOperations<T extends TableEntry<TableRecord>> {
+    public readonly defaultOptions: CRUDOptions<T>
 
     constructor(
-        private readonly tableName: string,
-        private readonly structure: TableStructure<T>,
-    ) { }
+        public readonly structure: TableStructure<T>,
+        defaultOptions: {
+            [K in keyof CRUDOptions<T>]?: Partial<CRUDOptions<T>[K]>
+        } = {},
+    ) {
+        this.defaultOptions = {
+            checkData: null,
+            get: {
+                filter: null,
+                orderBy: [],
+                ...defaultOptions.get
+            }
+        }
+    }
 
     private async sanitizeData(
         data: Partial<T>,
         {
-            keys = Object.keys(this.structure),
+            keys = Object.keys(this.structure.keys),
             allowUndefined = false,
             generateData = false,
         }: {
@@ -35,7 +56,7 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
             }
         })
         await Promise.all(keys.map(async <K extends keyof T>(key: K) => {
-            const generate = this.structure[key].generate
+            const generate = this.structure.keys[key].generate
             if (generate === false && data[key] === undefined) {
                 if (allowUndefined) {
                     delete data[key]
@@ -73,28 +94,28 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         }
     }
 
-    async get({
-        filter,
-        orderBy = []
-    }: {
-        filter?: Partial<T>,
-        orderBy?: OrderByDefinition<T>
-    } = {}): Promise<T[]> {
+    async get(options: Partial<CRUDOptions<T>["get"]> = {}): Promise<T[]> {
+        const { filter, orderBy } = {
+            ...this.defaultOptions.get,
+            ...options,
+        }
         const filterQuery =
-            filter === undefined ? undefined : await (async () => {
+            filter === null ? null : await (async () => {
                 this.sanitizeData(filter, { allowUndefined: true })
                 return this.filterQuery(filter)
             })()
         const query = createQuery(
             "SELECT *",
-            `FROM ${escapeQueryField(this.tableName)}`,
+            `FROM ${escapeQueryField(this.structure.table)}`,
             filterQuery?.query ?? "",
             orderBy.length == 0 ? "" : createQuery(
                 "ORDER BY",
-                orderBy.map(o => `${escapeQueryField(o.column.toString())} ${o.direction}`)
+                orderBy.map(
+                    o => utils.isPlainObject(o) ? `${escapeQueryField(o.column.toString())} ${o.direction}` : escapeQueryField(o.toString())
+                )
             )
         )
-        const res = await db.executeQuery<T[]>(query, filterQuery?.values ?? undefined)
+        const res = await context.db.executeQuery<T[]>(query, filterQuery?.values ?? undefined)
         return res
     }
 
@@ -102,10 +123,10 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         await this.sanitizePrimaryKey(primaryKey)
         const primaryKeyQuery = await this.filterQuery(primaryKey)
         const query = createQuery(
-            `DELETE FROM ${escapeQueryField(this.tableName)}`,
+            `DELETE FROM ${escapeQueryField(this.structure.table)}`,
             primaryKeyQuery.query
         )
-        const res = await db.executeQuery<ResultSetHeader>(query, primaryKeyQuery.values)
+        const res = await context.db.executeQuery<ResultSetHeader>(query, primaryKeyQuery.values)
         return res.affectedRows > 0
     }
 
@@ -118,13 +139,13 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
             return true
         }
         const query = createQuery(
-            `UPDATE ${escapeQueryField(this.tableName)} SET`,
+            `UPDATE ${escapeQueryField(this.structure.table)} SET`,
             (Object.keys(edits)).map(
                 key => `${escapeQueryField(key)} = ?`
             ),
             primaryKeyQuery.query
         )
-        const res = await db.executeQuery<ResultSetHeader>(query, [
+        const res = await context.db.executeQuery<ResultSetHeader>(query, [
             ...(Object.values(edits)),
             ...primaryKeyQuery.values
         ])
@@ -136,14 +157,14 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
 
         const keys = Object.keys(data)
         const query = createQuery(
-            `INSERT INTO ${escapeQueryField(this.tableName)} (`,
+            `INSERT INTO ${escapeQueryField(this.structure.table)} (`,
             (keys.map(key => `${escapeQueryField(key)}`)),
             ") VALUES (",
             (keys.map(_ => "?")),
             ")",
         )
 
-        await db.executeQuery<ResultSetHeader>(query, Object.values(data))
+        await context.db.executeQuery<ResultSetHeader>(query, Object.values(data))
     }
 
 }

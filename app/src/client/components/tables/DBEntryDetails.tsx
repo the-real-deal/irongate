@@ -124,7 +124,7 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
                                     }}>
                                     <tbody>
                                         {
-                                            (Object.keys(data) as (keyof T)[]).map(key => {
+                                            (Object.keys(display.keys) as (keyof T)[]).map(key => {
                                                 return (
                                                     <tr>
                                                         <th style={{
@@ -135,7 +135,7 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
                                                         </th>
                                                         <td>
                                                             {
-                                                                !editing || structure[key].generate !== false ?
+                                                                !editing || structure.keys[key].generate !== false ?
                                                                     data[key] :
                                                                     display.keys[key].inputNode(
                                                                         key,

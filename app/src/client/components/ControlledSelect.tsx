@@ -2,23 +2,28 @@ import Select, { SelectStaticProps } from '@mui/joy/Select'
 import IconButton from '@mui/joy/IconButton'
 import { MdClose } from 'react-icons/md'
 import { BaseProps } from '../core/utils'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Option } from '@mui/joy'
+import { ColumnValue } from '../../common/db'
 
 // https://mui.com/joy-ui/react-select/#clear-action
 
-export interface ClearableSelectProps<T> extends BaseProps {
+export interface ControlledSelectProps<T extends ColumnValue> extends BaseProps {
+    values: T[]
     placeholder?: string
+    required?: boolean
     defaultValue?: T | null,
     onChange?: (value: T | null) => void
 }
 
-export default function ClearableSelect<T>({
+export default function ControlledSelect<T extends ColumnValue>({
+    values,
     placeholder,
+    required = false,
     defaultValue = null,
     onChange,
     sx,
-    children,
-}: PropsWithChildren<ClearableSelectProps<T>>) {
+}: ControlledSelectProps<T>) {
     const [value, setValue] = useState<T | null>(defaultValue)
     const action: SelectStaticProps['action'] = useRef(null)
 
@@ -34,11 +39,11 @@ export default function ClearableSelect<T>({
         <Select
             action={action}
             value={value}
+            required={required}
             multiple={false}
             placeholder={placeholder}
             onChange={(_, newValue) => setValue(newValue as T | null)}
-            sx={sx}
-            {...(value && {
+            {...(!required && value && {
                 // display the button and remove select indicator
                 // when user has selected a value
                 endDecorator: (
@@ -58,8 +63,11 @@ export default function ClearableSelect<T>({
                     </IconButton>
                 ),
                 indicator: null,
-            })}>
-            {children}
+            })}
+            sx={sx}>
+            {
+                values.map(x => <Option value={x}>{x}</Option>)
+            }
         </Select>
     )
 }

@@ -4,8 +4,6 @@ import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { ComponentType, PropsWithChildren, useState } from "react"
 
-// TODO fix data all null + redirect to ?
-
 export interface DBEntryCreationProps<T extends TableEntry<TableRecord>> extends BaseProps {
     display: TableDisplay<T>
     structure: TableStructure<T>
@@ -27,7 +25,7 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
 }: DBEntryCreationProps<T>) {
     const initialData = Object.fromEntries(
         (Object.keys(display.keys) as (keyof T)[])
-            .filter(key => structure[key].generate === false)
+            .filter(key => structure.keys[key].generate === false)
             .map(key => [key, defaultData[key] ?? null])
     ) as Partial<T>
 
@@ -59,7 +57,7 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
                         }}>
                         <tbody>
                             {
-                                (Object.keys(initialData) as (keyof T)[])
+                                (Object.keys(display.keys) as (keyof T)[])
                                     .map(key => (
                                         <tr>
                                             <th

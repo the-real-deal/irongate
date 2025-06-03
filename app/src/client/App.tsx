@@ -3,14 +3,161 @@ import { useEffect, useState } from "react"
 import ErrorNotification from "./components/errors/ErrorNotification"
 import { Route, BrowserRouter, Routes, Navigate } from "react-router"
 import MainLayout from "./layouts/MainLayout"
-import OverviewPage from "./pages/OverviewPage"
-import PeoplePage from "./pages/PeoplePage"
+import OverviewPage from "./pages/tabs/OverviewPage"
+import PeoplePage from "./pages/tabs/PeoplePage"
 import { MdApartment, MdBarChart, MdClass, MdGroup, MdLocalPolice, MdLocalShipping, MdPestControlRodent } from 'react-icons/md'
-import CellsPage from "./pages/infrastructure/CellsPage"
-import { getTabsRoutes, TabStructure } from "./core/routing"
-import SectorsPage from "./pages/infrastructure/SectorsPage"
-import InmatesPage from "./pages/inmates/InmatesPage"
-import MovementsPage from "./pages/inmates/MovementsPage"
+import CellsPage from "./pages/tabs/infrastructure/CellsPage"
+import { getRouteStructure, TabStructure } from "./core/routing"
+import SectorsPage from "./pages/tabs/infrastructure/SectorsPage"
+import InmatesPage from "./pages/tabs/inmates/InmatesPage"
+import MovementsPage from "./pages/tabs/inmates/MovementsPage"
+import PersonnelPage from "./pages/tabs/personnel/PersonnelPage"
+import DeliveriesPage from "./pages/tabs/deliveries/DeliveriesPage"
+import ActivitiesPage from "./pages/tabs/activities/ActivitiesPage"
+import NotFountPage from "./pages/NotFoundPage"
+import GuestsPage from "./pages/routes/GuestsPage"
+import VisitsPage from "./pages/tabs/inmates/VisitsPage"
+import VisitorsPage from "./pages/routes/VisitorsPage"
+import DevicesPage from "./pages/tabs/infrastructure/DevicesPage"
+import ReportsPage from "./pages/tabs/personnel/ReportsPage"
+import EngagedInmatesPage from "./pages/routes/EngagedInmatesPage"
+import EngagedPersonnelPage from "./pages/routes/EngagedPersonnelPage"
+import EngagedSectorsPage from "./pages/routes/EngagedSectorsPage"
+import EngagedDevicesPage from "./pages/routes/EngagedDevicesPage"
+import CouriersPage from "./pages/tabs/deliveries/CouriersPage"
+import VehiclesPage from "./pages/tabs/deliveries/VehiclesPage"
+import { AvailabilitiesPage } from "./pages/routes/AvailabilitiesPage"
+import ZonesPage from "./pages/tabs/infrastructure/ZonesPage"
+import RoutinesPage from "./pages/tabs/activities/RoutinesPage"
+import PartecipationsPage from "./pages/routes/PartecipationsPage"
+import SurveillancesPage from "./pages/routes/SurveillancesPage"
+
+const routes = {
+    "/overview": <OverviewPage />,
+    "/people": <PeoplePage />,
+    "/sectors": <SectorsPage />,
+    "/cells": <CellsPage />,
+    "/inmates": <InmatesPage />,
+    "/movements": <MovementsPage />,
+    "/guests": <GuestsPage />,
+    "/visits": <VisitsPage />,
+    "/visitors": <VisitorsPage />,
+    "/personnel": <PersonnelPage />,
+    "/devices": <DevicesPage />,
+    "/reports": <ReportsPage />,
+    "/engaged-inmates": <EngagedInmatesPage />,
+    "/engaged-personnel": <EngagedPersonnelPage />,
+    "/engaged-sectors": <EngagedSectorsPage />,
+    "/engaged-devices": <EngagedDevicesPage />,
+    "/couriers": <CouriersPage />,
+    "/vehicles": <VehiclesPage />,
+    "/deliveries": <DeliveriesPage />,
+    "/activities": <ActivitiesPage />,
+    "/availabilities": <AvailabilitiesPage />,
+    "/zones": <ZonesPage />,
+    "/routines": <RoutinesPage />,
+    "/partecipations": <PartecipationsPage />,
+    "/surveillances": <SurveillancesPage />,
+} as const
+
+const tabs: TabStructure[] = [
+    {
+        title: "Overview",
+        icon: <MdBarChart />,
+        routes: getRouteStructure(routes, "/overview"),
+    },
+    {
+        title: "Infrastructure",
+        icon: <MdApartment />,
+        routes: [
+            {
+                title: "Sectors",
+                route: getRouteStructure(routes, "/sectors"),
+            },
+            {
+                title: "Cells",
+                route: getRouteStructure(routes, "/cells"),
+            },
+            {
+                title: "Zones",
+                route: getRouteStructure(routes, "/zones"),
+            },
+            {
+                title: "Devices",
+                route: getRouteStructure(routes, "/devices"),
+            },
+        ],
+    },
+    {
+        title: "People",
+        icon: <MdGroup />,
+        routes: getRouteStructure(routes, "/people"),
+    },
+    {
+        title: "Inmates",
+        icon: <MdPestControlRodent />,
+        routes: [
+            {
+                title: "Inmates",
+                route: getRouteStructure(routes, "/inmates"),
+            },
+            {
+                title: "Movements",
+                route: getRouteStructure(routes, "/movements"),
+            },
+            {
+                title: "Visits",
+                route: getRouteStructure(routes, "/visits"),
+            },
+        ],
+    },
+    {
+        title: "Personnel",
+        icon: <MdLocalPolice />,
+        routes: [
+            {
+                title: "Personnel",
+                route: getRouteStructure(routes, "/personnel"),
+            },
+            {
+                title: "Reports",
+                route: getRouteStructure(routes, "/reports"),
+            },
+        ],
+    },
+    {
+        title: "Deliveries",
+        icon: <MdLocalShipping />,
+        routes: [
+            {
+                title: "Deliveries",
+                route: getRouteStructure(routes, "/deliveries"),
+            },
+            {
+                title: "Couriers",
+                route: getRouteStructure(routes, "/couriers")
+            },
+            {
+                title: "Vehicles",
+                route: getRouteStructure(routes, "/vehicles")
+            },
+        ],
+    },
+    {
+        title: "Activities",
+        icon: <MdClass />,
+        routes: [
+            {
+                title: "Activities",
+                route: getRouteStructure(routes, "/activities")
+            },
+            {
+                title: "Routines",
+                route: getRouteStructure(routes, "/routines")
+            },
+        ],
+    },
+]
 
 const theme = extendTheme({
     colorSchemes: {
@@ -73,153 +220,6 @@ const theme = extendTheme({
     }
 })
 
-const tabs: TabStructure[] = [
-    {
-        title: "Overview",
-        icon: <MdBarChart />,
-        routes: {
-            path: "/overview",
-            page: <OverviewPage />,
-        },
-    },
-    {
-        title: "Infrastructure",
-        icon: <MdApartment />,
-        routes: [
-            {
-                title: "Sectors",
-                route: {
-                    path: "/sectors",
-                    page: <SectorsPage />,
-                },
-            },
-            {
-                title: "Cells",
-                route: {
-                    path: "/cells",
-                    page: <CellsPage />,
-                },
-            },
-            {
-                title: "Zones",
-                route: {
-                    path: "/zones",
-                    page: null,
-                },
-            },
-            {
-                title: "Devices",
-                route: {
-                    path: "/devices",
-                    page: null,
-                },
-            },
-        ],
-    },
-    {
-        title: "People",
-        icon: <MdGroup />,
-        routes: {
-            path: "/people",
-            page: <PeoplePage />,
-        },
-    },
-    {
-        title: "Inmates",
-        icon: <MdPestControlRodent />,
-        routes: [
-            {
-                title: "Inmates",
-                route: {
-                    path: "/inmates",
-                    page: <InmatesPage />,
-                },
-            },
-            {
-                title: "Movements",
-                route: {
-                    path: "/movements",
-                    page: <MovementsPage />,
-                },
-            },
-            {
-                title: "Visits",
-                route: {
-                    path: "/visits",
-                    page: null,
-                },
-            },
-        ],
-    },
-    {
-        title: "Personnel",
-        icon: <MdLocalPolice />,
-        routes: [
-            {
-                title: "Personnel",
-                route: {
-                    path: "/personnel",
-                    page: null,
-                }
-            },
-            {
-                title: "Reports",
-                route: {
-                    path: "/reports",
-                    page: null,
-                }
-            },
-        ],
-    },
-    {
-        title: "Deliveries",
-        icon: <MdLocalShipping />,
-        routes: [
-            {
-                title: "Deliveries",
-                route: {
-                    path: "/deliveries",
-                    page: null,
-                }
-            },
-            {
-                title: "Couriers",
-                route: {
-                    path: "/couriers",
-                    page: null,
-                }
-            },
-            {
-                title: "Vehicles",
-                route: {
-                    path: "/vehicles",
-                    page: null,
-                }
-            },
-        ],
-    },
-    {
-        title: "Activities",
-        icon: <MdClass />,
-        routes: [
-            {
-                title: "Activities",
-                route: {
-                    path: "/activities",
-                    page: null,
-                }
-            },
-            {
-                title: "Routines",
-                route: {
-                    path: "/routines",
-                    page: null,
-                }
-            },
-        ],
-    },
-]
-
 export default function App() {
     const [error, setError] = useState<Error | null>(null)
 
@@ -242,8 +242,9 @@ export default function App() {
         }
     }, [])
 
-    const routes = getTabsRoutes(tabs)
-    const defaultRoute = routes[0]
+    const routeStructures = (Object.keys(routes) as (keyof typeof routes)[])
+        .map(key => getRouteStructure(routes, key))
+    const defaultRoute = routeStructures[0]
 
     return (
         <CssVarsProvider theme={theme}>
@@ -259,9 +260,10 @@ export default function App() {
                             <Route index element={defaultRoute === undefined ? null : <Navigate to={defaultRoute.path} replace />} />
                         }
                         {
-                            routes.map(r => <Route path={r.path} element={r.page} />)
+                            routeStructures.map(r => <Route path={r.path} element={r.page} />)
                         }
                     </Route>
+                    <Route path="*" element={<NotFountPage />} />
                 </Routes>
             </BrowserRouter>
         </CssVarsProvider >
