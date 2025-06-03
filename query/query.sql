@@ -35,7 +35,6 @@ INSERT INTO Movement ('DateTime',
     'CellNumber')
 VALUES('2021-11-11 12:12:12', '43-867-9999', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 8)
 
-
 UPDATE Inmates, Sector
 FROM Inmates I JOIN Sector S ON (I.CellSectorID=S.ID)
 SET Inmates.CellNumber = 8, Inmates.CellSectorID='SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 
@@ -65,7 +64,6 @@ INSERT INTO Movement ('DateTime',
     'CellNumber')
 VALUES('2021-11-11 12:12:13', '43-867-9998', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 7)
 
-
 UPDATE Inmates
 SET
     CellNumber = CASE
@@ -89,7 +87,6 @@ WHERE (SELECT GenderID
 INSERT INTO Report ('DateTime', 'Description', ResponsiblePersonnelID)
 VALUES ('2025-12-12 12:12:12','Briefing', 'PER-b13327fc-9bf5-4b94-98db-57389a795034')
 
-
 --inserimento personale
 INSERT INTO Personnel (ID, DocumentID, PersonnelTypeID, SectorID)
 VALUES ('PER-b13327fc-9bf5-4b94-98db-57389a795034', 'IT-FENSDO808', 'Guard','SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0')
@@ -104,14 +101,17 @@ WHERE ID='PER-b13327fc-9bf5-4b94-98db-57389a795034'
 DELETE FROM People
 WHERE DocumentID='IT-FENSDO808'
 
+
 --modifica personale
 UPDATE Personnel
 SET SectorID= 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'
 WHERE PersonnelTypeID='Guard'
 
+
 --inserimento consegne
 INSERT INTO Delivery('DateTime', 'GoodsTypeID', Quantity, VehiclePlateNumber)
 VALUES ('2020-12-12 12:12:12', 'Food', 20, 'XE8P1R6TWK')
+
 
 --modifica consegne
 UPDATE Delivery D
@@ -137,17 +137,23 @@ VALUES ('43-867-9999', '2020-12-12 12:12:12','IT-FENSDO800')
 INSERT INTO Activities (ID, 'Description', Duration)
 VALUES ('ACT-2220d028-ca56-473e-94c6-cd4788ce1185','Reading',45)
 
+INSERT INTO `Availabilities`(`SecurityLevelID`, `ActivityID`)
+VALUES ("Medium", 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185')
+
 
 --Modifica attività
 UPDATE Activities
 SET Duration=50
 WHERE ID = 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185'
 
+UPDATE Availabilities
+SET SecurityLevelID="High"
+WHERE ActivityID = 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185'
+
 
 --Inserimento nuova routine
 INSERT INTO Routines (ZoneSectorID, ZoneNumber, 'DateTime', ActivityID)
 VALUES ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0',2,'2025-12-12 12:12:12', 'ACT-2220d028-ca56-473e-94c6-cd4788ce1185') 
-
 
 INSERT INTO Partecipations (RoutineZoneSectorID, RoutineZoneNumber, RountineDateTime, SectorID)
 VALUES ('SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0',2,'2025-12-12 12:12:12','SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0')
