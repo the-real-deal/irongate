@@ -64,14 +64,7 @@ export default function Sidebar({
                     width: "100%",
                 }}>
                     <Box sx={{
-                        paddingInline: "1em",
-                        paddingBlock: "0.5em",
-                        flex: "0 0 auto",
-                    }}>
-                        <Typography level="h4">Pages</Typography>
-                    </Box>
-                    <Box sx={{
-                        flex: "1 1 auto",
+                        flex: 1,
                         overflowY: "auto",
                         '&::-webkit-scrollbar': { display: "none" },
                     }}>
@@ -102,24 +95,11 @@ export default function Sidebar({
                                                     startDecorator={icon}
                                                     sx={{
                                                         paddingBlock: "0.5em",
-                                                        paddingInline: "1em",
+                                                        paddingInlineStart: "1em",
                                                     }}>
                                                     {title}
                                                 </Typography>
                                                 <Box sx={{ position: "relative" }}>
-                                                    <Divider
-                                                        orientation="vertical"
-                                                        sx={{
-                                                            position: "absolute",
-                                                            left: 0,
-                                                            top: 0,
-                                                            zIndex: 500,
-                                                            marginInlineStart: "1.5em",
-                                                            width: ".2em",
-                                                            height: "100%",
-                                                            pointerEvents: "none",
-                                                            backgroundColor: "neutral.500"
-                                                        }} />
                                                     <Stack sx={{ width: "100%" }}>
                                                         {
                                                             routes.map(({ title, route }) => (
@@ -131,9 +111,9 @@ export default function Sidebar({
                                                                     sx={{
                                                                         width: "100%",
                                                                         paddingBlock: "0.5em",
-                                                                        paddingInline: "3em",
+                                                                        paddingInlineStart: "3.5em",
                                                                     }}>
-                                                                    <Typography level="title-lg">{title}</Typography>
+                                                                    <Typography level="title-md">{title}</Typography>
                                                                 </Tab>
                                                             ))
                                                         }
@@ -148,7 +128,7 @@ export default function Sidebar({
                                                 sx={{
                                                     width: "100%",
                                                     paddingBlock: "0.5em",
-                                                    paddingInline: "1em",
+                                                    paddingInlineStart: "1em",
                                                 }}>
                                                 <Typography level="title-lg" startDecorator={icon}>{title}</Typography>
                                             </Tab>
@@ -157,9 +137,11 @@ export default function Sidebar({
                             </TabList>
                         </Tabs>
                     </Box>
+                    <Divider />
                     <Box sx={{
-                        flex: "0 0 auto",
-                        padding: "1em",
+                        flex: 0,
+                        paddingBlock: "1em",
+                        paddingInline: "1em",
                     }}>
                         <Typography level="h4">Theme</Typography>
                         <ThemeSwitcher sx={{ width: "100%", marginTop: "0.5em" }} />
