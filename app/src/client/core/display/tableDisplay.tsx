@@ -182,7 +182,7 @@ export function selectInputNode<
             <ControlledSelect
                 values={values}
                 required={required}
-                placeholder={title}
+                placeholder={title + (required ? " *" : "")}
                 defaultValue={value}
                 sx={sx}
                 onChange={handleChange} />

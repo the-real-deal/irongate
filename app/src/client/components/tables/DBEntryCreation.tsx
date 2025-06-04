@@ -57,7 +57,7 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
                         }}>
                         <tbody>
                             {
-                                (Object.keys(display.keys) as (keyof T)[])
+                                (Object.keys(initialData) as (keyof T)[])
                                     .map(key => (
                                         <tr>
                                             <th
