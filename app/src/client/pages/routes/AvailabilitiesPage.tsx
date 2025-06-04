@@ -1,6 +1,8 @@
 import { AVAILABILITIES_STRUCTURE, AvailabilitiesEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
 import { useAvailabilitiesDisplay } from "../../core/display/displays"
+import { tableDetailsViewProps } from "../../core/utils"
+import ActivitiesPage from "../tabs/activities/ActivitiesPage"
 
 export type AvailabilitiesPageProps = Partial<DBTablePageProps<AvailabilitiesEntry>>
 
@@ -9,9 +11,15 @@ export function AvailabilitiesPage(props: AvailabilitiesPageProps) {
 
     return (
         <DBTablePage
-            apiRoot="/availabilities"
+            route="/availabilities"
             display={display}
             structure={AVAILABILITIES_STRUCTURE}
+            detailsBody={({ ActivityID }) => (
+                <ActivitiesPage
+                    {...tableDetailsViewProps()}
+                    fixedData={{ ID: ActivityID }}
+                />
+            )}
             {...props}
         />
     )

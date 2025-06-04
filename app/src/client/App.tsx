@@ -16,7 +16,7 @@ import DeliveriesPage from "./pages/tabs/deliveries/DeliveriesPage"
 import ActivitiesPage from "./pages/tabs/activities/ActivitiesPage"
 import NotFountPage from "./pages/NotFoundPage"
 import GuestsPage from "./pages/routes/GuestsPage"
-import VisitsPage from "./pages/tabs/inmates/VisitsPage"
+import VisitsPage from "./pages/routes/VisitsPage"
 import VisitorsPage from "./pages/routes/VisitorsPage"
 import DevicesPage from "./pages/tabs/infrastructure/DevicesPage"
 import ReportsPage from "./pages/tabs/personnel/ReportsPage"
@@ -24,16 +24,18 @@ import EngagedInmatesPage from "./pages/routes/EngagedInmatesPage"
 import EngagedPersonnelPage from "./pages/routes/EngagedPersonnelPage"
 import EngagedSectorsPage from "./pages/routes/EngagedSectorsPage"
 import EngagedDevicesPage from "./pages/routes/EngagedDevicesPage"
-import CouriersPage from "./pages/tabs/deliveries/CouriersPage"
-import VehiclesPage from "./pages/tabs/deliveries/VehiclesPage"
+import CouriersPage from "./pages/routes/CouriersPage"
+import VehiclesPage from "./pages/routes/VehiclesPage"
 import { AvailabilitiesPage } from "./pages/routes/AvailabilitiesPage"
 import ZonesPage from "./pages/tabs/infrastructure/ZonesPage"
 import RoutinesPage from "./pages/tabs/activities/RoutinesPage"
 import PartecipationsPage from "./pages/routes/PartecipationsPage"
 import SurveillancesPage from "./pages/routes/SurveillancesPage"
+import VisitsAndGuestsPage from "./pages/tabs/inmates/VisitsAndGuestsPage"
+import CouriersAndVehiclesPage from "./pages/tabs/deliveries/CouriersAndVehiclesPage"
 
 const routes = {
-    "/overview": <OverviewPage />,
+    // api
     "/people": <PeoplePage />,
     "/sectors": <SectorsPage />,
     "/cells": <CellsPage />,
@@ -58,6 +60,10 @@ const routes = {
     "/routines": <RoutinesPage />,
     "/partecipations": <PartecipationsPage />,
     "/surveillances": <SurveillancesPage />,
+    // other
+    "/overview": <OverviewPage />,
+    "/visits-and-guests": <VisitsAndGuestsPage />,
+    "/couriers-and-vehicles": <CouriersAndVehiclesPage />,
 } as const
 
 const tabs: TabStructure[] = [
@@ -65,6 +71,11 @@ const tabs: TabStructure[] = [
         title: "Overview",
         icon: <MdBarChart />,
         routes: getRouteStructure(routes, "/overview"),
+    },
+    {
+        title: "People",
+        icon: <MdGroup />,
+        routes: getRouteStructure(routes, "/people"),
     },
     {
         title: "Infrastructure",
@@ -89,11 +100,6 @@ const tabs: TabStructure[] = [
         ],
     },
     {
-        title: "People",
-        icon: <MdGroup />,
-        routes: getRouteStructure(routes, "/people"),
-    },
-    {
         title: "Inmates",
         icon: <MdPestControlRodent />,
         routes: [
@@ -106,8 +112,8 @@ const tabs: TabStructure[] = [
                 route: getRouteStructure(routes, "/movements"),
             },
             {
-                title: "Visits",
-                route: getRouteStructure(routes, "/visits"),
+                title: "Visits & Guests",
+                route: getRouteStructure(routes, "/visits-and-guests"),
             },
         ],
     },
@@ -134,12 +140,8 @@ const tabs: TabStructure[] = [
                 route: getRouteStructure(routes, "/deliveries"),
             },
             {
-                title: "Couriers",
-                route: getRouteStructure(routes, "/couriers")
-            },
-            {
-                title: "Vehicles",
-                route: getRouteStructure(routes, "/vehicles")
+                title: "Couriers & Vehicles",
+                route: getRouteStructure(routes, "/couriers-and-vehicles")
             },
         ],
     },

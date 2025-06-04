@@ -34,7 +34,9 @@ export default function MainLayout({
 
     return (
         <Box sx={{
+            minHeight: "100dvh",
             height: "100dvh",
+            minWidth: "100dvw",
             width: "100dvw",
             display: "flex",
             margin: 0,
@@ -47,7 +49,7 @@ export default function MainLayout({
                 width: "100%",
                 height: "100%",
                 padding: "1em",
-                paddingInlineStart: "3em",
+                paddingInlineStart: "3.5em",
             }}>
                 <Outlet />
             </Sheet>

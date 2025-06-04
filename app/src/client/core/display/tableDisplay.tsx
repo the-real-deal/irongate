@@ -56,6 +56,18 @@ function transformStringValue(value: string): string | null {
     return value.length === 0 ? null : value
 }
 
+export function sortPartialFilledKeys<T extends TableEntry<TableRecord>>(data: Partial<T>) {
+    return (k1: keyof T, k2: keyof T) => {
+        if (data[k1] === undefined && data[k2] !== undefined) {
+            return 1
+        }
+        if (data[k1] !== undefined && data[k2] === undefined) {
+            return -1
+        }
+        return 0
+    }
+}
+
 export function stringInputNode<T extends TableEntry<TableRecord>>({
     required = true,
     sx,

@@ -89,10 +89,6 @@ export function useInmatesDisplay() {
                 title: "Sentence duration (months)",
                 inputNode: numberInputNode()
             },
-            CriminalRecord: {
-                title: "Criminal record",
-                inputNode: textInputNode()
-            },
             CellSectorID: {
                 title: "Cell sector ID",
                 inputNode: stringInputNode()
@@ -100,6 +96,10 @@ export function useInmatesDisplay() {
             CellNumber: {
                 title: "Cell number",
                 inputNode: numberInputNode()
+            },
+            CriminalRecord: {
+                title: "Criminal record",
+                inputNode: textInputNode()
             },
         }
     })

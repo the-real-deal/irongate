@@ -9,7 +9,7 @@ export default function PeoplePage(props: PeoplePageProps) {
 
     return (
         <DBTablePage
-            apiRoot="/people"
+            route="/people"
             display={display}
             structure={PEOPLE_STRUCTURE}
             {...props}

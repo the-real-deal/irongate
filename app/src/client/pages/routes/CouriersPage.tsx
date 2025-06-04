@@ -1,19 +1,19 @@
-import { GUESTS_STRUCTURE, GuestsEntry } from "../../../common/structures"
-import { useGuestsDisplay } from "../../core/display/displays"
+import { COURIERS_STRUCTURE, CouriersEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import PeoplePage from "../tabs/PeoplePage"
+import { useCouriersDisplay } from "../../core/display/displays"
 import { tableDetailsViewProps } from "../../core/utils"
+import PeoplePage from "../tabs/PeoplePage"
 
-export type GuestsPageProps = Partial<DBTablePageProps<GuestsEntry>>
+export type CouriersPageProps = Partial<DBTablePageProps<CouriersEntry>>
 
-export default function GuestsPage(props: GuestsPageProps) {
-    const display = useGuestsDisplay()
+export default function CouriersPage(props: CouriersPageProps) {
+    const display = useCouriersDisplay()
 
     return (
         <DBTablePage
-            route="/guests"
+            route="/couriers"
             display={display}
-            structure={GUESTS_STRUCTURE}
+            structure={COURIERS_STRUCTURE}
             detailsBody={({ DocumentID }) => (
                 <PeoplePage
                     {...tableDetailsViewProps()}

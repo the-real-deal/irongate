@@ -1,6 +1,8 @@
 import { DEVICES_STRUCTURE, DevicesEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
 import { useDevicesDisplay } from "../../../core/display/displays"
+import { tableDetailsViewProps } from "../../../core/utils"
+import SectorsPage from "./SectorsPage"
 
 export type DevicesPageProps = Partial<DBTablePageProps<DevicesEntry>>
 
@@ -9,9 +11,15 @@ export default function DevicesPage(props: DevicesPageProps) {
 
     return (
         <DBTablePage
-            apiRoot="/devices"
+            route="/devices"
             display={display}
             structure={DEVICES_STRUCTURE}
+            detailsBody={({ SectorID }) => (
+                <SectorsPage
+                    {...tableDetailsViewProps()}
+                    fixedData={{ ID: SectorID }}
+                />
+            )}
             {...props}
         />
     )

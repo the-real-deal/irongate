@@ -7,7 +7,6 @@ import utils from "../../common/utils"
 export class SanitizeError extends Error { }
 
 export interface CRUDOptions<T extends TableEntry<TableRecord>> {
-    checkData: ((data: T) => void) | null
     get: {
         filter: Partial<T> | null,
         orderBy: (
@@ -29,7 +28,6 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         } = {},
     ) {
         this.defaultOptions = {
-            checkData: null,
             get: {
                 filter: null,
                 orderBy: [],

@@ -3,7 +3,7 @@ import { TableEntry, entryPrimaryKey, entryRecord, recordPrimaryKey, TableRecord
 import { TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useNavigate, useSearchParams } from "react-router"
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog, Sheet, Table } from "@mui/joy"
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Modal, ModalDialog, Sheet, Table } from "@mui/joy"
 import DBTableView from "./DBTableView"
 import DBEntryDetails from "./DBEntryDetails"
 import { JSONObject } from "../../../common/json"
@@ -11,16 +11,21 @@ import DBEntryCreation from "./DBEntryCreation"
 import utils from "../../../common/utils"
 import { HttpMethod } from "../../../common/http"
 import { fetchAPI, fetchJSON } from "../../core/server"
+import { MdOpenInNew } from "react-icons/md"
 
 export interface DBTablePageProps<T extends TableEntry<TableRecord>> extends BaseProps {
-    apiRoot: string
+    route: string
     display: TableDisplay<T>
     structure: TableStructure<T>
     fixedData?: Partial<T>
     dataFetchFilter?: Partial<T>
     hiddenTableColumns?: (keyof T)[]
-    extraDetails?: (data: T) => ReactNode
+    detailsLink?: boolean
+    detailsBody?: (data: T) => ReactNode
+    defaultDetails?: boolean
+    search?: boolean
     expand?: boolean
+    edit?: boolean
     remove?: boolean
     create?: boolean
 }
@@ -30,14 +35,18 @@ function searchParamsRecord(searchParams: URLSearchParams): Record<string, strin
 }
 
 export default function DBTablePage<T extends TableEntry<TableRecord>>({
-    apiRoot,
+    route,
     display,
     structure,
     fixedData,
     dataFetchFilter,
     hiddenTableColumns,
-    extraDetails,
+    detailsLink = false,
+    detailsBody,
+    defaultDetails = false,
+    search = true,
     expand = true,
+    edit = true,
     remove = true,
     create = true,
     sx,
@@ -47,6 +56,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     const [searchParams,] = useSearchParams()
     const navigate = useNavigate()
 
+
     const getDefaultData = useCallback(() => {
         return searchParams.size === 0 ? [] : null
     }, [searchParams])
@@ -54,12 +64,12 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
     const [data, setData] = useState<T[] | T | null>(getDefaultData())
 
     const fetchData = useCallback(async () => {
-        const primaryKey = window.location.pathname !== apiRoot || searchParams.size === 0 ?
+        const primaryKey = window.location.pathname !== route || searchParams.size === 0 ?
             undefined :
             entryRecord(recordPrimaryKey(searchParamsRecord(searchParams), structure))
         const data = await fetchJSON<T[]>(
             HttpMethod.GET,
-            apiRoot,
+            route,
             {
                 params: primaryKey === undefined ?
                     (
@@ -71,8 +81,8 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                     ) : primaryKey
             }
         )
-        setData(primaryKey === undefined ? data : data[0] ?? getDefaultData())
-    }, [searchParams, apiRoot, structure, getDefaultData, dataFetchFilter, fixedData])
+        setData(primaryKey !== undefined || defaultDetails ? (data[0] ?? getDefaultData()) : data)
+    }, [searchParams, route, structure, getDefaultData, dataFetchFilter, fixedData, defaultDetails])
 
     useEffect(() => {
         fetchData()
@@ -81,10 +91,15 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
         }
     }, [fetchData, getDefaultData])
 
+    function expandEntry(entry: T) {
+        const primaryKey = entryPrimaryKey(entry, structure)
+        navigate(`${route}?${new URLSearchParams(entryRecord(primaryKey))}`)
+    }
+
     return (
         <Box sx={{
+            width: "100%",
             height: "100%",
-            maxHeight: "100%",
             ...sx,
         }}>
             {
@@ -99,31 +114,39 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 fixedData === undefined ? [] : Object.keys(fixedData)
                             )
                         ]}
+                        search={search}
                         data={data ?? []}
-                        onExpand={expand ? (entry => {
-                            const primaryKey = entryPrimaryKey(entry, structure)
-                            navigate(`${apiRoot}?${new URLSearchParams(entryRecord(primaryKey))}`)
-                        }) : undefined}
+                        onExpand={expand ? expandEntry : undefined}
                         onDelete={remove ? setDeleteCandidate : undefined}
                         onCreate={create ? (() => setShowCreationModal(true)) : undefined}
                     /> :
                     <Sheet sx={{
                         width: "100%",
-                        height: "100%",
-                        maxHeight: "100%",
+                        minHeight: "100%",
                         display: "flex",
                         flexDirection: "column",
+                        overflow: "scroll",
+                        gap: "1em"
                     }}>
                         <DBEntryDetails
                             data={data ?? undefined}
                             display={display}
                             structure={structure}
-                            onDelete={setDeleteCandidate}
-                            onEdit={async (old, edits) => {
+                            header={
+                                detailsLink && data !== undefined && data !== null ?
+                                    <IconButton
+                                        component="a"
+                                        onClick={() => expandEntry(data)}>
+                                        <MdOpenInNew />
+                                    </IconButton>
+                                    : null
+                            }
+                            onDelete={remove ? setDeleteCandidate : undefined}
+                            onEdit={edit ? async (old, edits) => {
                                 const primaryKey = entryPrimaryKey(old, structure)
                                 await fetchAPI(
                                     HttpMethod.PUT,
-                                    apiRoot,
+                                    route,
                                     {
                                         params: entryRecord(primaryKey),
                                         body: edits as JSONObject
@@ -133,21 +156,21 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 if (utils.areObjectsEqual(entryRecord(primaryKey), entryRecord(newPrimaryKey))) {
                                     await fetchData()
                                 } else {
-                                    navigate(`${apiRoot}?${new URLSearchParams(entryRecord(newPrimaryKey))}`, {
+                                    navigate(`${route}?${new URLSearchParams(entryRecord(newPrimaryKey))}`, {
                                         replace: true
                                     })
                                 }
-                            }}
+                            } : undefined}
                         />
                         {
-                            data !== null && extraDetails !== undefined ?
+                            data !== null && detailsBody !== undefined ?
                                 <Sheet sx={{
                                     width: "100%",
-                                    height: 0,
+                                    height: "40dvh",
                                     flexGrow: 1,
-                                    paddingTop: "1em"
+                                    overflow: "scroll",
                                 }}>
-                                    {extraDetails(data)}
+                                    {detailsBody(data)}
                                 </Sheet> :
                                 null
                         }
@@ -209,16 +232,16 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 const primaryKey = entryPrimaryKey(deleteCandidate, structure)
                                 await fetchAPI(
                                     HttpMethod.DELETE,
-                                    apiRoot,
+                                    route,
                                     {
                                         params: entryRecord(primaryKey)
                                     }
                                 )
                                 setDeleteCandidate(null)
-                                if (searchParams.size !== 0) {
-                                    navigate(-1)
-                                } else {
+                                if (Array.isArray(data)) {
                                     await fetchData()
+                                } else {
+                                    navigate(-1)
                                 }
                             }}>
                             Delete
@@ -255,7 +278,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 onConfirm={async (data) => {
                                     await fetchAPI(
                                         HttpMethod.POST,
-                                        apiRoot,
+                                        route,
                                         {
                                             body: data as JSONObject
                                         }

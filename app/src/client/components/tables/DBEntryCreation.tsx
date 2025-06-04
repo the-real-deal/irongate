@@ -1,6 +1,6 @@
 import { Box, Button, Table } from "@mui/joy"
 import { TableRecord, TableEntry, TableStructure } from "../../../common/db"
-import { TableDisplay } from "../../core/display/tableDisplay"
+import { sortPartialFilledKeys, TableDisplay } from "../../core/display/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { ComponentType, PropsWithChildren, useState } from "react"
 
@@ -26,6 +26,7 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
     const initialData = Object.fromEntries(
         (Object.keys(display.keys) as (keyof T)[])
             .filter(key => structure.keys[key].generate === false)
+            .sort(sortPartialFilledKeys(defaultData))
             .map(key => [key, defaultData[key] ?? null])
     ) as Partial<T>
 

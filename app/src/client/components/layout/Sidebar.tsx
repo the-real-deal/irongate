@@ -29,6 +29,7 @@ export default function Sidebar({
                     position: "fixed",
                     top: 0,
                     height: "100dvh",
+                    width: "2.5em",
                     zIndex: 100,
                     ...sx
                 }}>
@@ -85,7 +86,13 @@ export default function Sidebar({
                                 width: "100%",
                             }}
                         >
-                            <TabList disableUnderline sx={{ width: "100%" }}>
+                            <TabList
+                                disableUnderline
+                                sx={{
+                                    width: "100%",
+                                    display: "flex",
+                                    gap: "0.2em",
+                                }}>
                                 {
                                     tabs.map(({ title, icon, routes }) => (
                                         Array.isArray(routes) ?

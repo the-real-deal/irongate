@@ -156,11 +156,13 @@ export default function DBTableView<T extends TableEntry<TableRecord>>({
                                 return (
                                     <tr>
                                         {
-                                            (Object.keys(row) as (keyof T)[]).map(key => {
-                                                return (
-                                                    <td>{row[key]}</td>
-                                                )
-                                            })
+                                            (Object.keys(display.keys) as (keyof T)[])
+                                                .filter(filterVisibleKeys)
+                                                .map(key => {
+                                                    return (
+                                                        <td>{row[key]}</td>
+                                                    )
+                                                })
                                         }
                                         {
                                             lastColumn ?

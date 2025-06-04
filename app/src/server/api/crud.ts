@@ -1,9 +1,9 @@
 import { Router } from "express"
-import { TableEntry, recordPrimaryKey, TableRecord, recordEntry } from "../../../common/db"
-import CRUDOperations, { SanitizeError } from "../../core/crud"
-import { PrimitiveRequest } from "../../middlewares"
-import { HttpStatusCode } from "../../../common/http"
-import utils from "../../../common/utils"
+import { TableEntry, recordPrimaryKey, TableRecord, recordEntry } from "../../common/db"
+import CRUDOperations, { SanitizeError } from "../core/crud"
+import { PrimitiveRequest } from "../middlewares"
+import { HttpStatusCode } from "../../common/http"
+import utils from "../../common/utils"
 
 export interface CRUDRouterOptions {
     get?: boolean

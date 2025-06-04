@@ -1,6 +1,8 @@
 import { PARTECIPATIONS_STRUCTURE, PartecipationsEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
 import { usePartecipationsDisplay } from "../../core/display/displays"
+import { tableDetailsViewProps } from "../../core/utils"
+import SectorsPage from "../tabs/infrastructure/SectorsPage"
 
 export type PartecipationsPageProps = Partial<DBTablePageProps<PartecipationsEntry>>
 
@@ -9,9 +11,15 @@ export default function PartecipationsPage(props: PartecipationsPageProps) {
 
     return (
         <DBTablePage
-            apiRoot="/partecipations"
+            route="/partecipations"
             display={display}
             structure={PARTECIPATIONS_STRUCTURE}
+            detailsBody={({ SectorID }) => (
+                <SectorsPage
+                    {...tableDetailsViewProps()}
+                    fixedData={{ ID: SectorID }}
+                />
+            )}
             {...props}
         />
     )

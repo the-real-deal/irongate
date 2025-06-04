@@ -2,13 +2,14 @@ import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../core/utils"
 import { TableDisplay } from "../../core/display/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import { TableEntry, TableRecord, TableStructure } from "../../../common/db"
 
 export interface DBEntryDetailsProps<T extends TableEntry<TableRecord>> extends BaseProps {
     display: TableDisplay<T>
     structure: TableStructure<T>
     data?: T
+    header?: ReactNode
     onEdit?: (old: T, edits: Partial<T>) => void
     onDelete?: (data: T) => void
 }
@@ -17,6 +18,7 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
     display,
     structure,
     data,
+    header = null,
     onEdit,
     onDelete,
     sx,
@@ -56,7 +58,16 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
                         justifyContent: "space-between",
                         alignItems: "center",
                     }}>
-                        <Typography level="h1">{display.detailTitle} details</Typography>
+                        <Box sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "flex-start",
+                            gap: "0.2em",
+                        }}>
+                            <Typography level="h1">{display.detailTitle} details</Typography>
+                            {header}
+                        </Box>
                         <Box sx={{
                             display: "flex",
                             flexDirection: "row",
