@@ -174,50 +174,50 @@ SET D.SectorID = 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9',
                     FROM Devices
                     WHERE D.SectorID = 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9'
                     LIMIT 1 ) + 1
-WHERE D.Serial = 1164422448
+WHERE D.Serial = 1164422448;
 
 
---query statistiche
+-- query statistiche
 
---attività più svolte in determinate fasce orarie.
+-- attività più svolte in determinate fasce orarie.
 SELECT R.ActivityID, COUNT(R.ActivityID) AS assignNum
 FROM Routines R
-WHERE HOUR(R.DateTime) BETWEEN 15 AND 18
+WHERE HOUR(R.DateTime) BETWEEN 0 AND 23
 GROUP BY R.ActivityID
-ORDER BY assignNum DESC
+ORDER BY assignNum DESC;
 
 
---Numero di detenuti per ogni grado di sicurezza nei settori.
+-- Numero di detenuti per ogni grado di sicurezza nei settori.
 SELECT S.TotalInmates
 FROM Inmates I JOIN Sectors S ON (I.CellSectorID=S.ID)
-GROUP BY S.SecurityLevel, S.ID
+GROUP BY S.SecurityLevel, S.ID;
 
---Settore con più detenuti per security level
+-- Settore con più detenuti per security level
 SELECT MAX(S.TotalInmates)
 FROM Inmates I JOIN Sectors S ON (I.CellSectorID=S.ID)
-GROUP BY S.SecurityLevel, S.ID
+GROUP BY S.SecurityLevel, S.ID;
 
 
---Classifica delle guardie assegnate con maggior frequenza ad ogni attività.
+-- Classifica delle guardie assegnate con maggior frequenza ad ogni attività.
 SELECT R.ActivityID, P.PersonnelID, COUNT(P.PersonnelID) AS assignNum
 FROM Routines R JOIN Surveillances S ON (R.ZoneNumber=S.ZoneNumber AND R.ZoneSectorID=S.ZoneSectorID AND R.DateTime=S.DateTime) 
     JOIN Personnel P ON (S.PersonnelID=P.PersonnelID)
 WHERE P.PersonnelTypeID='Guard'
 GROUP BY P.PersonnelID, R.ActivityID
 ORDER BY assignNum DESC
-LIMIT 10 
+LIMIT 10;
 
 
---Classifica dei detenuti coinvolti insieme nei diversi report.
+-- Classifica dei detenuti coinvolti insieme nei diversi report.
 SELECT COUNT(DISTINCT E.InmateNumber) AS assignNum
 FROM EngagedInmates E JOIN EngagedInmates EE ON (E.ReportID=EE.ReportID)
 GROUP BY E.ReportID
 WHERE E.InmateNumber <> EE.InmateNumber 
-ORDER BY assignNum DESC
+ORDER BY assignNum DESC;
 
 
---Dati due detenuti, determinare quante volte sono stati coinvolti assieme in diversi report.
+-- Dati due detenuti, determinare quante volte sono stati coinvolti assieme in diversi report.
 SELECT COUNT(DISTINCT R.ReportID)
 FROM Report R JOIN EngagedInmates E ON (R.ID=E.ReportID) JOIN EngagedInmates EE ON (E.ReportID=EE.ReportID)
-WHERE E.InmateNumber='x' AND EE.InmateNumber='y' AND E.InmateNumber<>EE.InmateNumber
+WHERE E.InmateNumber='x' AND EE.InmateNumber='y' AND E.InmateNumber<>EE.InmateNumber;
 
