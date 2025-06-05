@@ -180,11 +180,13 @@ WHERE D.Serial = 1164422448;
 -- query statistiche
 
 -- attività più svolte in determinate fasce orarie.
-SELECT R.ActivityID, COUNT(R.ActivityID) AS assignNum
-FROM Routines R
-WHERE HOUR(R.DateTime) BETWEEN 0 AND 23
-GROUP BY R.ActivityID
-ORDER BY assignNum DESC;
+SELECT
+    R.`ActivityID` AS ActivityID,
+    COUNT(R.`ActivityID`) AS Popularity
+FROM `Routines` R
+WHERE HOUR(R.`DateTime`) BETWEEN 0 AND 23
+GROUP BY R.`ActivityID`
+ORDER BY Popularity DESC;
 
 
 -- Numero di detenuti per ogni grado di sicurezza nei settori.

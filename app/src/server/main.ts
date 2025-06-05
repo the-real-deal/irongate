@@ -4,6 +4,7 @@ import ViteExpress from "vite-express"
 import { HTTPError, HttpStatusCode } from "../common/http"
 import { jsonErrors, logs, primitiveRequest } from "./middlewares"
 import { TABLE_DAOS } from "./api/tableDAO"
+import statsRouter from "./api/stats"
 
 const app = express()
 const router = Router()
@@ -13,6 +14,8 @@ router.use(primitiveRequest())
 for (const dao of TABLE_DAOS) {
     router.use(dao.route, dao.router)
 }
+
+router.use("/stats", statsRouter)
 
 router.use((_req, _res, next) => {
     next(new HTTPError(HttpStatusCode.NOT_FOUND, "Not Found"))

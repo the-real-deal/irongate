@@ -2,7 +2,7 @@ import { ReactElement } from "react"
 import { ColumnValue, TableEntry, TableRecord, TableStructure } from "../../../common/db"
 import { Input, Textarea, Checkbox } from "@mui/joy"
 import dates, { MYSQL_DATE_FORMAT, MYSQL_DATETIME_FORMAT, MYSQL_TIME_FORMAT } from "../../../common/dates"
-import JoyDatePicker from "../../components/JoyDatePicker"
+import ControlledDatePicker from "../../components/ControlledDatePicker"
 import { BaseProps } from "../utils"
 import ControlledSelect from "../../components/ControlledSelect"
 
@@ -218,7 +218,7 @@ export function dateInputNode<T extends TableEntry<TableRecord>>({
         value: T[K] extends string | undefined ? string | undefined : never,
         edits: Partial<T>
     ) => (
-        <JoyDatePicker
+        <ControlledDatePicker
             required={required}
             placeholder={`${title} (${dateFormat})` + (required ? " *" : "")}
             defaultValue={value === undefined ? value : dates.parse(value, dateFormat)}

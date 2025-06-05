@@ -40,7 +40,6 @@ export default function ControlledSelect<T extends ColumnValue>({
             action={action}
             value={value}
             required={required}
-            multiple={false}
             placeholder={placeholder}
             onChange={(_, newValue) => setValue(newValue as T | null)}
             {...(!required && value && {

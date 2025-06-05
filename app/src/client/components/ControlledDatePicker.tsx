@@ -15,7 +15,7 @@ export interface JoyDatePickerProps extends BaseProps {
     onChange: (value: Date) => void
 }
 
-export default function JoyDatePicker({
+export default function ControlledDatePicker({
     defaultValue,
     placeholder,
     includeTime,
