@@ -65,8 +65,7 @@ export default function Sidebar({
                 }}>
                     <Box sx={{
                         flex: 1,
-                        overflowY: "auto",
-                        '&::-webkit-scrollbar': { display: "none" },
+                        overflowY: "scroll",
                     }}>
                         <Tabs
                             value={currentRoute}

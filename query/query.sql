@@ -190,22 +190,52 @@ ORDER BY Popularity DESC;
 
 
 -- Numero di detenuti per ogni grado di sicurezza nei settori.
-SELECT S.TotalInmates
-FROM Inmates I JOIN Sectors S ON (I.CellSectorID=S.ID)
-GROUP BY S.SecurityLevel, S.ID;
+SELECT 
+    S.`SecurityLevelID`,
+    SUM(S.`TotalInmates`) as TotalInmates
+FROM `Sectors` S
+GROUP BY S.`SecurityLevelID`;
 
 -- Settore con più detenuti per security level
-SELECT MAX(S.TotalInmates)
-FROM Inmates I JOIN Sectors S ON (I.CellSectorID=S.ID)
-GROUP BY S.SecurityLevel, S.ID;
+UPDATE `Sectors` SET `TotalInmates` = 0 WHERE ID = 'SCT-08ad4254-4804-462e-b23a-1269cfdb5b5f';
+UPDATE `Sectors` SET `TotalInmates` = 8 WHERE ID = 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0';
+UPDATE `Sectors` SET `TotalInmates` = 8 WHERE ID = 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343';
+UPDATE `Sectors` SET `TotalInmates` = 6 WHERE ID = 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9';
+UPDATE `Sectors` SET `TotalInmates` = 5 WHERE ID = 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df';
+UPDATE `Sectors` SET `TotalInmates` = 4 WHERE ID = 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce';
+UPDATE `Sectors` SET `TotalInmates` = 3 WHERE ID = 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7';
+UPDATE `Sectors` SET `TotalInmates` = 2 WHERE ID = 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961';
+UPDATE `Sectors` SET `TotalInmates` = 1 WHERE ID = 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc';
+
+-- SELECT MAX(S.TotalInmates)
+-- FROM Inmates I JOIN Sectors S ON (I.CellSectorID=S.ID)
+-- GROUP BY S.SecurityLevelID, S.ID;
+
+SELECT 
+    S1.`SecurityLevelID`, 
+    S1.`ID` AS SectorID, 
+    S1.`TotalInmates` AS SectorTotalInmates
+FROM `Sectors` S1
+WHERE S1.`TotalInmates` = (
+    SELECT MAX(S2.`TotalInmates`)
+    FROM `Sectors` S2
+    WHERE S2.`SecurityLevelID` = S1.`SecurityLevelID`
+);
 
 
 -- Classifica delle guardie assegnate con maggior frequenza ad ogni attività.
-SELECT R.ActivityID, P.PersonnelID, COUNT(P.PersonnelID) AS assignNum
-FROM Routines R JOIN Surveillances S ON (R.ZoneNumber=S.ZoneNumber AND R.ZoneSectorID=S.ZoneSectorID AND R.DateTime=S.DateTime) 
-    JOIN Personnel P ON (S.PersonnelID=P.PersonnelID)
-WHERE P.PersonnelTypeID='Guard'
-GROUP BY P.PersonnelID, R.ActivityID
+SELECT 
+    R.`ActivityID`, 
+    P.`ID`, 
+    COUNT(P.`ID`) AS assignNum
+FROM `Routines` R 
+    JOIN `Surveillances` S 
+        ON R.`ZoneNumber` = S.`RoutineZoneNumber` 
+        AND R.`ZoneSectorID` = S.`RoutineZoneSectorID` 
+        AND R.`DateTime` = S.`RoutineDateTime` 
+    JOIN `Personnel` P ON S.`PersonnelID` = P.`ID`
+WHERE P.`PersonnelTypeID` = 'Guard'
+GROUP BY P.`ID`, R.`ActivityID`
 ORDER BY assignNum DESC
 LIMIT 10;
 

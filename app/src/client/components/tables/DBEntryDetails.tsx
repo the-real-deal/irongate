@@ -139,8 +139,9 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
                                                 return (
                                                     <tr>
                                                         <th style={{
-                                                            width: "0.1%",
+                                                            width: 0,
                                                             whiteSpace: "nowrap",
+                                                            verticalAlign: "top",
                                                         }}>
                                                             {display.keys[key].title}
                                                         </th>

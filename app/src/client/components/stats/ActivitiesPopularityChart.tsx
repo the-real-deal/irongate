@@ -16,11 +16,11 @@ function hoursOptions() {
     ))
 }
 
-export type ActivitiesPopularityProps = BaseProps
+export type ActivitiesPopularityChartProps = BaseProps
 
-export default function ActivitiesPopularity({
+export default function ActivitiesPopularityChart({
     sx
-}: ActivitiesPopularityProps) {
+}: ActivitiesPopularityChartProps) {
     const [from, setFrom] = useState(FIRST_HOUR)
     const [to, setTo] = useState(LAST_HOUR)
     const [data, setData] = useState<ActivitiesPopularityStats>([])
@@ -29,7 +29,7 @@ export default function ActivitiesPopularity({
         (async () => {
             const fetchData = await fetchJSON<ActivitiesPopularityStats>(
                 HttpMethod.GET,
-                "/stats/popular-activities",
+                "/stats/activities/popularity",
                 {
                     params: { from, to }
                 }
@@ -43,7 +43,6 @@ export default function ActivitiesPopularity({
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            width: "100%",
             height: "100%",
             gap: "1em",
             ...sx
@@ -55,7 +54,6 @@ export default function ActivitiesPopularity({
                 alignItems: "center",
                 gap: "1em",
             }}>
-                <Typography level="h3">Activities popularity</Typography>
                 <Typography>From</Typography>
                 <Select
                     value={from}
@@ -71,7 +69,7 @@ export default function ActivitiesPopularity({
             </Box>
             <PieChart
                 sx={{
-                    flex: 1,
+                    // flex: 1,
                     width: "fit-content",
                 }}
                 series={[

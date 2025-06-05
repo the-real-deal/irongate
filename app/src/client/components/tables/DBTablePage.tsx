@@ -7,7 +7,7 @@ import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, IconBu
 import DBTableView from "./DBTableView"
 import DBEntryDetails from "./DBEntryDetails"
 import { JSONObject } from "../../../common/json"
-import DBEntryCreation from "./DBEntryCreation"
+import DBEntryCreationModal from "./DBEntryCreationModal"
 import utils from "../../../common/utils"
 import { HttpMethod } from "../../../common/http"
 import { fetchAPI, fetchJSON } from "../../core/server"
@@ -261,42 +261,24 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                     </DialogActions>
                 </ModalDialog>
             </Modal>
-            <Modal
+            <DBEntryCreationModal
                 open={showCreationModal}
-                onClose={() => setShowCreationModal(false)}>
-                <ModalDialog
-                    variant="outlined"
-                    sx={{
-                        minWidth: "40%"
-                    }}>
-                    <DialogTitle>
-                        Create new entry
-                    </DialogTitle>
-                    <Divider />
-                    {
-                        showCreationModal ?
-                            <DBEntryCreation
-                                display={display}
-                                structure={structure}
-                                defaultData={fixedData}
-                                InputsContainer={DialogContent}
-                                ButtonsContainer={DialogActions}
-                                onConfirm={async (data) => {
-                                    await fetchAPI(
-                                        HttpMethod.POST,
-                                        route,
-                                        {
-                                            body: data as JSONObject
-                                        }
-                                    )
-                                    setShowCreationModal(false)
-                                    await fetchData()
-                                }}
-                                onClose={() => setShowCreationModal(false)}
-                            /> : null
-                    }
-                </ModalDialog>
-            </Modal>
+                onClose={() => setShowCreationModal(false)}
+                display={display}
+                structure={structure}
+                defaultData={fixedData}
+                onConfirm={async (data) => {
+                    await fetchAPI(
+                        HttpMethod.POST,
+                        route,
+                        {
+                            body: data as JSONObject
+                        }
+                    )
+                    setShowCreationModal(false)
+                    await fetchData()
+                }}
+            />
         </Box>
     )
 }
