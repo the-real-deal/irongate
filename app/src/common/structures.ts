@@ -1,5 +1,4 @@
 import { createTableStructure, TableEntry, TableStructure } from "./db"
-import utils from "./utils"
 
 export const ENUM_TABLES = [
     "Genders",
@@ -44,15 +43,19 @@ export type SectorsEntry = TableEntry<{
     Name: string
     GenderID: EnumEntry["ID"] | null
     SecurityLevelID: EnumEntry["ID"]
+    TotalInmates: number
 }>
 export const SECTORS_STRUCTURE = createTableStructure<SectorsEntry>("Sectors", {
     ID: {
         primaryKey: true,
-        generate: () => "SCT-" + utils.generateUUID()
+        generated: true,
     },
     Name: {},
     GenderID: {},
     SecurityLevelID: {},
+    TotalInmates: {
+        generated: true,
+    },
 })
 
 export type CellsEntry = TableEntry<{
@@ -160,7 +163,7 @@ export type PersonnelEntry = TableEntry<{
 export const PERSONNEL_STRUCTURE = createTableStructure<PersonnelEntry>("Personnel", {
     ID: {
         primaryKey: true,
-        generate: () => "PER-" + utils.generateUUID()
+        generated: true,
     },
     DocumentID: {},
     PersonnelTypeID: {},
@@ -191,7 +194,7 @@ export type ReportsEntry = TableEntry<{
 export const REPORTS_STRUCTURE = createTableStructure<ReportsEntry>("Reports", {
     ID: {
         primaryKey: true,
-        generate: true
+        generated: true
     },
     Datetime: {},
     Description: {},
@@ -295,7 +298,7 @@ export type ActivitiesEntry = TableEntry<{
 export const ACTIVITIES_STRUCTURE = createTableStructure<ActivitiesEntry>("Activities", {
     ID: {
         primaryKey: true,
-        generate: () => "ACT-" + utils.generateUUID()
+        generated: true,
     },
     Description: {},
     Duration: {},

@@ -25,7 +25,7 @@ export default function DBEntryCreation<T extends TableEntry<TableRecord>>({
 }: DBEntryCreationProps<T>) {
     const initialData = Object.fromEntries(
         (Object.keys(display.keys) as (keyof T)[])
-            .filter(key => structure.keys[key].generate === false)
+            .filter(key => !structure.keys[key].generated)
             .sort(sortPartialFilledKeys(defaultData))
             .map(key => [key, defaultData[key] ?? null])
     ) as Partial<T>

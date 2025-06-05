@@ -48,6 +48,10 @@ export function useSectorsDisplay() {
                 title: "Security level",
                 inputNode: selectInputNode(useEnumReference("SecurityLevels"))
             },
+            TotalInmates: {
+                title: "Total inmates",
+                inputNode: numberInputNode(),
+            },
         }
     })
 }

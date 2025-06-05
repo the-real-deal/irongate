@@ -45,7 +45,7 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
         }: {
             keys?: (keyof T)[],
             allowUndefined?: boolean,
-            generateData?: boolean
+            generateData?: boolean,
         } = {},
     ) {
         Object.keys(data).forEach(key => {
@@ -54,17 +54,15 @@ export default class CRUDOperations<T extends TableEntry<TableRecord>> {
             }
         })
         await Promise.all(keys.map(async <K extends keyof T>(key: K) => {
-            const generate = this.structure.keys[key].generate
-            if (generate === false && data[key] === undefined) {
+            const generated = this.structure.keys[key].generated
+            if (generated && generateData) {
+                delete data[key]
+            }
+            else if (data[key] === undefined) {
                 if (allowUndefined) {
                     delete data[key]
                 } else {
                     throw new SanitizeError(`Missing key ${key.toString()}`)
-                }
-            } else if (generate !== false) {
-                if (generateData && typeof generate === "function") {
-                    delete data[key]
-                    data[key] = await generate()
                 }
             }
         }))

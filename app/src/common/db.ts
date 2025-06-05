@@ -13,7 +13,7 @@ export type TableStructure<T extends TableEntry<TableRecord>> = {
     keys: {
         [K in keyof T]: {
             primaryKey: boolean
-            generate: (() => T[K] | Promise<T[K]>) | boolean
+            generated: boolean
         }
     }
 }
@@ -29,8 +29,8 @@ export function createTableStructure<T extends TableEntry<TableRecord>>(
         keys: Object.fromEntries((Object.keys(structure) as (keyof T)[]).map(key => {
             const val = structure[key]
             const primaryKey = val.primaryKey ?? false
-            const generate = val.generate ?? false
-            return [key, { primaryKey, generate }]
+            const generated = val.generated ?? false
+            return [key, { primaryKey, generated }]
         })) as TableStructure<T>["keys"]
     }
 }

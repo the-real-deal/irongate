@@ -146,7 +146,7 @@ export default function DBEntryDetails<T extends TableEntry<TableRecord>>({
                                                         </th>
                                                         <td>
                                                             {
-                                                                !editing || structure.keys[key].generate !== false ?
+                                                                !editing || structure.keys[key].generated ?
                                                                     data[key] :
                                                                     display.keys[key].inputNode(
                                                                         key,

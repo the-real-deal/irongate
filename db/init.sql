@@ -26,10 +26,11 @@ CREATE TABLE `SecurityLevels` (
 
 DROP TABLE IF EXISTS `Sectors`;
 CREATE TABLE `Sectors` (
-    `ID` VARCHAR(40) PRIMARY KEY,
+    `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('SCT-', UUID())),
     `Name` VARCHAR(20) NOT NULL,
     `GenderID` VARCHAR(10),
-    `SecurityLevelID` VARCHAR(20) NOT NULL
+    `SecurityLevelID` VARCHAR(20) NOT NULL,
+    `TotalInmates` INT NOT NULL DEFAULT 0
 );
 
 DROP TABLE IF EXISTS `Cells`;
@@ -94,7 +95,7 @@ CREATE TABLE `PersonnelTypes` (
 
 DROP TABLE IF EXISTS `Personnel`;
 CREATE TABLE `Personnel` (
-    `ID` VARCHAR(40) PRIMARY KEY,
+    `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('PER-', UUID())),
     `DocumentID` VARCHAR(30) NOT NULL UNIQUE,
     `PersonnelTypeID` VARCHAR(30) NOT NULL,
     `SectorID` VARCHAR(40) -- can be NULL because only guards have an assigned sector
@@ -177,7 +178,7 @@ CREATE TABLE `Deliveries` (
 
 DROP TABLE IF EXISTS `Activities`;
 CREATE TABLE `Activities` (
-    `ID` VARCHAR(40) PRIMARY KEY,
+    `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('ACT-', UUID())),
     `Description` VARCHAR(200) NOT NULL,
     `Duration` INT NOT NULL
 );
@@ -393,6 +394,8 @@ FOREIGN KEY (`RoutineZoneSectorID`, `RoutineZoneNumber`, `RoutineDatetime`) REFE
 ALTER TABLE `Surveillances`
 ADD CONSTRAINT `Surveillances_Personnel_FK`
 FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);
+
+-- checks
 
 -- data
 
