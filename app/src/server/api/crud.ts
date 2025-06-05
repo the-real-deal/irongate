@@ -1,86 +1,197 @@
 import { Router } from "express"
-import { TableEntry, recordPrimaryKey, TableRecord, recordEntry } from "../../common/db"
-import CRUDOperations, { SanitizeError } from "../core/crud"
-import { PrimitiveRequest } from "../middlewares"
-import { HttpStatusCode } from "../../common/http"
-import utils from "../../common/utils"
+import { ACTIVITIES_STRUCTURE, AVAILABILITIES_STRUCTURE, CELLS_STRUCTURE, COURIERS_STRUCTURE, DELIVERIES_STRUCTURE, DEVICES_STRUCTURE, ENGAGED_DEVICES_STRUCTURE, ENGAGED_INMATES_STRUCTURE, ENGAGED_PERSONNEL_STRUCTURE, ENGAGED_SECTORS_STRUCTURE, ENUM_TABLES, enumStructure, GUESTS_STRUCTURE, INMATES_STRUCTURE, MOVEMENTS_STRUCTURE, PARTECIPATIONS_STRUCTURE, PEOPLE_STRUCTURE, PERSONNEL_STRUCTURE, REPORTS_STRUCTURE, ROUTINES_STRUCTURE, SECTORS_STRUCTURE, SURVEILLANCES_STRUCTURE, VEHICLES_STRUCTURE, VISITORS_STRUCTURE, VISITS_STRUCTURE, ZONES_STRUCTURE } from "../../common/structures"
+import CRUDOperations, { createCRUDRouter } from "../core/crud"
 
-export interface CRUDRouterOptions {
-    get?: boolean
-    delete?: boolean
-    put?: boolean
-    post?: boolean
-}
+const crudRouter = Router()
 
-export function createCRUDRouter<T extends TableEntry<TableRecord>>(
-    crud: CRUDOperations<T>,
-    methods: CRUDRouterOptions = {
-        get: true,
-        delete: true,
-        put: true,
-        post: true,
-    }
-) {
-    const router = Router()
-
-    if (methods.get) {
-        router.get("/", async (req: PrimitiveRequest, res) => {
-            const filter = Object.keys(req.query).length == 0 ? null : recordEntry(req.query, crud.structure)
-            try {
-                const result = await crud.get({ filter })
-                res.send(result)
-            } catch (err) {
-                if (err instanceof SanitizeError) {
-                    res.status(HttpStatusCode.BAD_REQUEST).send()
-                } else {
-                    throw err
+for (const table of ENUM_TABLES) {
+    crudRouter.use(
+        `/enums/${table.toLowerCase()}`,
+        createCRUDRouter(
+            new CRUDOperations(enumStructure(table), {
+                get: {
+                    orderBy: ["ID"]
                 }
-            }
-        })
-    }
-
-    if (methods.delete) {
-        router.delete("/", async (req: PrimitiveRequest, res) => {
-            const primaryKey = recordPrimaryKey(req.query, crud.structure)
-            const ok = await crud.remove(primaryKey)
-            if (ok) {
-                res.status(HttpStatusCode.OK).send()
-            } else {
-                res.status(HttpStatusCode.NOT_FOUND).send()
-            }
-        })
-    }
-
-    if (methods.put) {
-        router.put("/", async (req: PrimitiveRequest, res) => {
-            if (Object.keys(req.query).length == 0) {
-                res.status(HttpStatusCode.BAD_REQUEST).send("Missing query parameters")
-                return
-            }
-            const primaryKey = recordPrimaryKey(req.query, crud.structure)
-            if (req.body === undefined || !utils.isPlainObject(req.body)) {
-                res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)
-                return
-            }
-            const ok = await crud.update(primaryKey, req.body as Partial<T>)
-            if (ok) {
-                res.status(HttpStatusCode.OK).send()
-            } else {
-                res.status(HttpStatusCode.NOT_FOUND).send()
-            }
-        })
-    }
-
-    if (methods.post) {
-        router.post("/", async (req: PrimitiveRequest, res) => {
-            if (req.body === undefined || !utils.isPlainObject(req.body)) {
-                res.status(HttpStatusCode.BAD_REQUEST).send(`Invalid body ${req.body}`)
-                return
-            }
-            await crud.create(req.body as Partial<T>)
-            res.status(HttpStatusCode.OK).send()
-        })
-    }
-
-    return router
+            }),
+            {
+                get: true,
+                delete: false,
+                put: false,
+                post: false,
+            },
+        ))
 }
+
+crudRouter.use(
+    "/people",
+    createCRUDRouter(new CRUDOperations(PEOPLE_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/sectors",
+    createCRUDRouter(new CRUDOperations(SECTORS_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/cells",
+    createCRUDRouter(new CRUDOperations(CELLS_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/inmates",
+    createCRUDRouter(new CRUDOperations(INMATES_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/movements",
+    createCRUDRouter(new CRUDOperations(MOVEMENTS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "Datetime", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/guests",
+    createCRUDRouter(new CRUDOperations(GUESTS_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/visits",
+    createCRUDRouter(new CRUDOperations(VISITS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "Datetime", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/visitors",
+    createCRUDRouter(new CRUDOperations(VISITORS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "VisitDatetime", direction: "DESC" }, "VisitInmateNumber"]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/personnel",
+    createCRUDRouter(new CRUDOperations(PERSONNEL_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/devices",
+    createCRUDRouter(new CRUDOperations(DEVICES_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/reports",
+    createCRUDRouter(new CRUDOperations(REPORTS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "ID", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/engaged-inmates",
+    createCRUDRouter(new CRUDOperations(ENGAGED_INMATES_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "ReportID", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/engaged-personnel",
+    createCRUDRouter(new CRUDOperations(ENGAGED_PERSONNEL_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "ReportID", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/engaged-sectors",
+    createCRUDRouter(new CRUDOperations(ENGAGED_SECTORS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "ReportID", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/engaged-devices",
+    createCRUDRouter(new CRUDOperations(ENGAGED_DEVICES_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "ReportID", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/couriers",
+    createCRUDRouter(new CRUDOperations(COURIERS_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/vehicles",
+    createCRUDRouter(new CRUDOperations(VEHICLES_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/deliveries",
+    createCRUDRouter(new CRUDOperations(DELIVERIES_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "Datetime", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/activities",
+    createCRUDRouter(new CRUDOperations(ACTIVITIES_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/availabilities",
+    createCRUDRouter(new CRUDOperations(AVAILABILITIES_STRUCTURE, {
+        get: {
+            orderBy: ["SecurityLevelID"]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/zones",
+    createCRUDRouter(new CRUDOperations(ZONES_STRUCTURE)),
+)
+
+crudRouter.use(
+    "/routines",
+    createCRUDRouter(new CRUDOperations(ROUTINES_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "Datetime", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/partecipations",
+    createCRUDRouter(new CRUDOperations(PARTECIPATIONS_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "RoutineDatetime", direction: "DESC" }]
+        }
+    })),
+)
+
+crudRouter.use(
+    "/surveillances",
+    createCRUDRouter(new CRUDOperations(SURVEILLANCES_STRUCTURE, {
+        get: {
+            orderBy: [{ column: "RoutineDatetime", direction: "DESC" }]
+        }
+    })),
+)
+
+export default crudRouter

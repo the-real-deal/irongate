@@ -19,7 +19,7 @@ export function useTableReference<
         (async () => {
             const data = await fetchJSON<T[]>(
                 HttpMethod.GET,
-                apiRoute,
+                `/crud${apiRoute}`,
                 {
                     params: fetchFilter === undefined ? undefined : entryRecord(fetchFilter)
                 }

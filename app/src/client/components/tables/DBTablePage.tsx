@@ -69,7 +69,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
             entryRecord(recordPrimaryKey(searchParamsRecord(searchParams), structure))
         const data = await fetchJSON<T[]>(
             HttpMethod.GET,
-            route,
+            `/crud${route}`,
             {
                 params: primaryKey === undefined ?
                     (
@@ -144,6 +144,12 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                             onDelete={remove ? setDeleteCandidate : undefined}
                             onEdit={edit ? async (old, edits) => {
                                 const primaryKey = entryPrimaryKey(old, structure)
+                                for (const key of (Object.keys(edits) as (keyof T)[])) {
+                                    if (edits[key] === old[key]) {
+                                        delete edits[key]
+                                    }
+                                }
+                                utils.debugAlert({ primaryKey, old, edits })
                                 await fetchAPI(
                                     HttpMethod.PUT,
                                     route,

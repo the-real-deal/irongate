@@ -3,18 +3,15 @@ import env from "../common/env"
 import ViteExpress from "vite-express"
 import { HTTPError, HttpStatusCode } from "../common/http"
 import { jsonErrors, logs, primitiveRequest } from "./middlewares"
-import { TABLE_DAOS } from "./api/tableDAO"
 import statsRouter from "./api/stats"
+import crudRouter from "./api/crud"
 
 const app = express()
 const router = Router()
 router.use(logs())
 router.use(primitiveRequest())
 
-for (const dao of TABLE_DAOS) {
-    router.use(dao.route, dao.router)
-}
-
+router.use("/crud", crudRouter)
 router.use("/stats", statsRouter)
 
 router.use((_req, _res, next) => {
