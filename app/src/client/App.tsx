@@ -65,6 +65,7 @@ const routes = {
     "/visits-and-guests": <VisitsAndGuestsPage />,
     "/couriers-and-vehicles": <CouriersAndVehiclesPage />,
 } as const
+const defaultRoute: keyof typeof routes = "/overview" as const
 
 const tabs: TabStructure[] = [
     {
@@ -246,7 +247,6 @@ export default function App() {
 
     const routeStructures = (Object.keys(routes) as (keyof typeof routes)[])
         .map(key => getRouteStructure(routes, key))
-    const defaultRoute = routeStructures[0]
 
     return (
         <CssVarsProvider theme={theme}>
@@ -259,7 +259,7 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<MainLayout tabs={tabs} />}>
                         {
-                            <Route index element={defaultRoute === undefined ? null : <Navigate to={defaultRoute.path} replace />} />
+                            <Route index element={defaultRoute === undefined ? null : <Navigate to={defaultRoute} replace />} />
                         }
                         {
                             routeStructures.map(r => <Route path={r.path} element={r.page} />)

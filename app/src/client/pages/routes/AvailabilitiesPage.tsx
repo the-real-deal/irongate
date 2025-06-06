@@ -1,6 +1,6 @@
 import { AVAILABILITIES_STRUCTURE, AvailabilitiesEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useAvailabilitiesDisplay } from "../../core/display/displays"
+import { useAvailabilitiesDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import ActivitiesPage from "../tabs/activities/ActivitiesPage"
 

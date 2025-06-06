@@ -1,6 +1,6 @@
 import { ZONES_STRUCTURE, ZonesEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useZonesDisplay } from "../../../core/display/displays"
+import { useZonesDisplay } from "../../../core/tables"
 import { tableDetailsViewProps } from "../../../core/utils"
 import SectorsPage from "./SectorsPage"
 

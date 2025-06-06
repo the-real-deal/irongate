@@ -1,6 +1,6 @@
 import { VISITORS_STRUCTURE, VisitorsEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useVisitorsDisplay } from "../../core/display/displays"
+import { useVisitorsDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import PeoplePage from "../tabs/PeoplePage"
 

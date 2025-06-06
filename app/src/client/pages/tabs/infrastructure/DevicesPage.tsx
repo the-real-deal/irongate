@@ -1,6 +1,6 @@
 import { DEVICES_STRUCTURE, DevicesEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useDevicesDisplay } from "../../../core/display/displays"
+import { useDevicesDisplay } from "../../../core/tables"
 import { tableDetailsViewProps } from "../../../core/utils"
 import SectorsPage from "./SectorsPage"
 

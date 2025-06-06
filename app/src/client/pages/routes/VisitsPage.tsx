@@ -1,5 +1,5 @@
 import { VISITS_STRUCTURE, VisitsEntry } from "../../../common/structures"
-import { useVisitsDisplay } from "../../core/display/displays"
+import { useVisitsDisplay } from "../../core/tables"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
 import VisitorsPage from "./VisitorsPage"
 

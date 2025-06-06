@@ -1,6 +1,6 @@
 import { Box, Button, Sheet, Table, Typography } from "@mui/joy"
 import { BaseProps } from "../../core/utils"
-import { TableDisplay } from "../../core/display/tableDisplay"
+import { TableDisplay } from "../../core/tableDisplay"
 import { MdCheck, MdClear, MdDelete, MdEdit } from "react-icons/md"
 import { ReactNode, useState } from "react"
 import { TableEntry, TableRecord, TableStructure } from "../../../common/db"

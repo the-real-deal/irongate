@@ -1,6 +1,6 @@
 import { PEOPLE_STRUCTURE, PeopleEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { usePeopleDisplay } from "../../core/display/displays"
+import { usePeopleDisplay } from "../../core/tables"
 
 export type PeoplePageProps = Partial<DBTablePageProps<PeopleEntry>>
 

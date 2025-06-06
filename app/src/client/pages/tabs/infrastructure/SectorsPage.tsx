@@ -1,6 +1,6 @@
 import { SECTORS_STRUCTURE, SectorsEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useSectorsDisplay } from "../../../core/display/displays"
+import { useSectorsDisplay } from "../../../core/tables"
 import { AvailabilitiesPage } from "../../routes/AvailabilitiesPage"
 
 export type SectorsPageProps = Partial<DBTablePageProps<SectorsEntry>>

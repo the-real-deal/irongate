@@ -1,6 +1,6 @@
 import { ENGAGED_SECTORS_STRUCTURE, EngagedSectorsEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useEngagedSectorsDisplay } from "../../core/display/displays"
+import { useEngagedSectorsDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import SectorsPage from "../tabs/infrastructure/SectorsPage"
 

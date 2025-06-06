@@ -1,6 +1,6 @@
 import { SURVEILLANCES_STRUCTURE, SurveillancesEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useSurveillancesDisplay } from "../../core/display/displays"
+import { useSurveillancesDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import PersonnelPage from "../tabs/personnel/PersonnelPage"
 

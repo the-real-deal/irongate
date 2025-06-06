@@ -1,6 +1,6 @@
 import { COURIERS_STRUCTURE, CouriersEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useCouriersDisplay } from "../../core/display/displays"
+import { useCouriersDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import PeoplePage from "../tabs/PeoplePage"
 

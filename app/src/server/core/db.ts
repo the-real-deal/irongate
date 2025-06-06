@@ -103,6 +103,7 @@ export class DBManager {
 export function createQuery(...lines: (string | string[])[]): string {
     return lines
         .map(l => Array.isArray(l) ? l.join(", ") : l)
+        .filter(l => l.length > 0)
         .join("\n")
 }
 

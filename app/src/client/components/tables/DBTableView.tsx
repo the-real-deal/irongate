@@ -3,7 +3,7 @@ import { BaseProps } from "../../core/utils"
 import { useCallback, useEffect, useState } from "react"
 import { MdAdd, MdDelete, MdVisibility } from "react-icons/md"
 import SearchBar from "../SearchBar"
-import { TableDisplay } from "../../core/display/tableDisplay"
+import { TableDisplay } from "../../core/tableDisplay"
 import { TableEntry, TableRecord } from "../../../common/db"
 
 export interface DBTableViewProps<T extends TableEntry<TableRecord>> extends BaseProps {

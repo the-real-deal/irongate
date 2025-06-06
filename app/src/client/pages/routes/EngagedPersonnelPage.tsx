@@ -1,6 +1,6 @@
 import { ENGAGED_PERSONNEL_STRUCTURE, EngagedPersonnelEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useEngagedPersonnelDisplay } from "../../core/display/displays"
+import { useEngagedPersonnelDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import PersonnelPage from "../tabs/personnel/PersonnelPage"
 

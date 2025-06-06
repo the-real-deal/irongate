@@ -1,5 +1,5 @@
 import { GUESTS_STRUCTURE, GuestsEntry } from "../../../common/structures"
-import { useGuestsDisplay } from "../../core/display/displays"
+import { useGuestsDisplay } from "../../core/tables"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
 import PeoplePage from "../tabs/PeoplePage"
 import { tableDetailsViewProps } from "../../core/utils"

@@ -1,4 +1,4 @@
-import { usePersonnelDisplay } from "../../../core/display/displays"
+import { usePersonnelDisplay } from "../../../core/tables"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
 import { PERSONNEL_STRUCTURE, PersonnelEntry } from "../../../../common/structures"
 import ScrollFillBox from "../../../components/ScrollFillBox"

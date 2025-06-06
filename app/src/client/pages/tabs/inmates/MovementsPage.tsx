@@ -1,7 +1,7 @@
 import { MOVEMENTS_STRUCTURE, MovementsEntry } from "../../../../common/structures"
 import ScrollFillBox from "../../../components/ScrollFillBox"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useMovementsDisplay } from "../../../core/display/displays"
+import { useMovementsDisplay } from "../../../core/tables"
 import { tableDetailsViewProps } from "../../../core/utils"
 import CellsPage from "../infrastructure/CellsPage"
 import InmatesPage from "./InmatesPage"

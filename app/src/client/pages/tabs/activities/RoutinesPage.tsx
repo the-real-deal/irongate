@@ -1,7 +1,7 @@
 import { ROUTINES_STRUCTURE, RoutinesEntry } from "../../../../common/structures"
 import ScrollFillBox from "../../../components/ScrollFillBox"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useRoutinesDisplay } from "../../../core/display/displays"
+import { useRoutinesDisplay } from "../../../core/tables"
 import { tablePageViewProps } from "../../../core/utils"
 import PartecipationsPage from "../../routes/PartecipationsPage"
 import SurveillancesPage from "../../routes/SurveillancesPage"

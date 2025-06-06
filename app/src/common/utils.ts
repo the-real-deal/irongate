@@ -6,7 +6,7 @@ function removeUndefinedKeys<T extends object>(obj: T): Partial<T> {
     ) as Partial<T>
 }
 
-function isPlainObject<T>(value: unknown): value is Record<string, T> {
+function isPlainObject<K extends string | number | symbol, T>(value: unknown): value is Record<K, T> {
     return (
         typeof value === "object" &&
         value !== null &&

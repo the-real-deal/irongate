@@ -1,6 +1,6 @@
 import { REPORTS_STRUCTURE, ReportsEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useReportsDisplay } from "../../../core/display/displays"
+import { useReportsDisplay } from "../../../core/tables"
 import EngagedInmatesPage from "../../routes/EngagedInmatesPage"
 import EngagedPersonnelPage from "../../routes/EngagedPersonnelPage"
 import EngagedSectorsPage from "../../routes/EngagedSectorsPage"

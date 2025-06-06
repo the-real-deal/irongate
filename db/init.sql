@@ -60,9 +60,7 @@ CREATE TABLE `Movements` (
     `CellNumber` INT,
     PRIMARY KEY (
         `Datetime`,
-        `InmateNumber`,
-        `CellSectorID`,
-        `CellNumber`
+        `InmateNumber`
     )
 );
 

@@ -1,7 +1,7 @@
 import { CELLS_STRUCTURE, CellsEntry } from "../../../../common/structures"
 import ScrollFillBox from "../../../components/ScrollFillBox"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useCellsDisplay } from "../../../core/display/displays"
+import { useCellsDisplay } from "../../../core/tables"
 import { tableDetailsViewProps, tablePageViewProps } from "../../../core/utils"
 import InmatesPage from "../inmates/InmatesPage"
 import SectorsPage from "./SectorsPage"

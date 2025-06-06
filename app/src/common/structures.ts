@@ -107,12 +107,8 @@ export const MOVEMENTS_STRUCTURE = createTableStructure<MovementsEntry>("Movemen
     InmateNumber: {
         primaryKey: true
     },
-    CellSectorID: {
-        primaryKey: true
-    },
-    CellNumber: {
-        primaryKey: true
-    },
+    CellSectorID: {},
+    CellNumber: {},
 })
 
 export type GuestsEntry = TableEntry<{

@@ -2,22 +2,23 @@ import Select, { SelectStaticProps } from '@mui/joy/Select'
 import IconButton from '@mui/joy/IconButton'
 import { MdClose } from 'react-icons/md'
 import { BaseProps } from '../core/utils'
-import { useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { Option } from '@mui/joy'
-import { ColumnValue } from '../../common/db'
 
 // https://mui.com/joy-ui/react-select/#clear-action
 
-export interface ControlledSelectProps<T extends ColumnValue> extends BaseProps {
+export interface ControlledSelectProps<T> extends BaseProps {
     values: T[]
+    map: (value: T) => ReactNode
     placeholder?: string
     required?: boolean
     defaultValue?: T | null,
     onChange?: (value: T | null) => void
 }
 
-export default function ControlledSelect<T extends ColumnValue>({
+export default function ControlledSelect<T>({
     values,
+    map,
     placeholder,
     required = false,
     defaultValue = null,
@@ -65,7 +66,7 @@ export default function ControlledSelect<T extends ColumnValue>({
             })}
             sx={sx}>
             {
-                values.map(x => <Option value={x}>{x}</Option>)
+                values.map(x => <Option value={x}>{map(x)}</Option>)
             }
         </Select>
     )

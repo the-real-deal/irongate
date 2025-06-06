@@ -1,7 +1,7 @@
 import { ACTIVITIES_STRUCTURE, ActivitiesEntry } from "../../../../common/structures"
 import ScrollFillBox from "../../../components/ScrollFillBox"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useActivitiesDisplay } from "../../../core/display/displays"
+import { useActivitiesDisplay } from "../../../core/tables"
 import { tablePageViewProps } from "../../../core/utils"
 import { AvailabilitiesPage } from "../../routes/AvailabilitiesPage"
 import RoutinesPage from "./RoutinesPage"

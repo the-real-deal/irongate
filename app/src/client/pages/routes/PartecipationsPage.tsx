@@ -1,6 +1,6 @@
 import { PARTECIPATIONS_STRUCTURE, PartecipationsEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { usePartecipationsDisplay } from "../../core/display/displays"
+import { usePartecipationsDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import SectorsPage from "../tabs/infrastructure/SectorsPage"
 

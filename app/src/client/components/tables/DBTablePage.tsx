@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, useEffect, useState } from "react"
 import { TableEntry, entryPrimaryKey, entryRecord, recordPrimaryKey, TableRecord, TableStructure } from "../../../common/db"
-import { TableDisplay } from "../../core/display/tableDisplay"
+import { TableDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useNavigate, useSearchParams } from "react-router"
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Modal, ModalDialog, Sheet, Table } from "@mui/joy"
@@ -149,10 +149,9 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                         delete edits[key]
                                     }
                                 }
-                                utils.debugAlert({ primaryKey, old, edits })
                                 await fetchAPI(
                                     HttpMethod.PUT,
-                                    route,
+                                    `/crud${route}`,
                                     {
                                         params: entryRecord(primaryKey),
                                         body: edits as JSONObject
@@ -238,7 +237,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                                 const primaryKey = entryPrimaryKey(deleteCandidate, structure)
                                 await fetchAPI(
                                     HttpMethod.DELETE,
-                                    route,
+                                    `/crud${route}`,
                                     {
                                         params: entryRecord(primaryKey)
                                     }
@@ -270,7 +269,7 @@ export default function DBTablePage<T extends TableEntry<TableRecord>>({
                 onConfirm={async (data) => {
                     await fetchAPI(
                         HttpMethod.POST,
-                        route,
+                        `/crud${route}`,
                         {
                             body: data as JSONObject
                         }

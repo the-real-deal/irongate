@@ -1,6 +1,6 @@
 import { Button, DialogActions, DialogContent, DialogTitle, Divider, Modal, ModalDialog, Table } from "@mui/joy"
 import { TableRecord, TableEntry, TableStructure } from "../../../common/db"
-import { sortPartialFilledKeys, TableDisplay } from "../../core/display/tableDisplay"
+import { sortPartialFilledKeys, TableDisplay } from "../../core/tableDisplay"
 import { BaseProps } from "../../core/utils"
 import { useState } from "react"
 

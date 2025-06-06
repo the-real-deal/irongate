@@ -7,16 +7,16 @@ import { Box } from '@mui/joy'
 
 export interface JoyDatePickerProps extends BaseProps {
     includeTime: boolean
-    defaultValue?: Date
+    defaultValue?: Date | null
     placeholder?: string
     required?: boolean
     dateFormat: string
     timeFormat: string
-    onChange: (value: Date) => void
+    onChange: (value: Date | null) => void
 }
 
 export default function ControlledDatePicker({
-    defaultValue,
+    defaultValue = null,
     placeholder,
     includeTime,
     required = false,
@@ -42,9 +42,6 @@ export default function ControlledDatePicker({
                 dateFormat={dateFormat}
                 timeFormat={timeFormat}
                 onChange={async date => {
-                    if (date === null) {
-                        return
-                    }
                     setValue(date)
                     await onChange(date)
                 }}

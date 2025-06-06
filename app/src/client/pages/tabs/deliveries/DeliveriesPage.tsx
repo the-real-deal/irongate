@@ -1,6 +1,6 @@
 import { DELIVERIES_STRUCTURE, DeliveriesEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useDeliveriesDisplay } from "../../../core/display/displays"
+import { useDeliveriesDisplay } from "../../../core/tables"
 import { tableDetailsViewProps } from "../../../core/utils"
 import VehiclesPage from "../../routes/VehiclesPage"
 

@@ -1,6 +1,6 @@
 import { VEHICLES_STRUCTURE, VehiclesEntry } from "../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../components/tables/DBTablePage"
-import { useVehiclesDisplay } from "../../core/display/displays"
+import { useVehiclesDisplay } from "../../core/tables"
 import { tableDetailsViewProps } from "../../core/utils"
 import PeoplePage from "../tabs/PeoplePage"
 

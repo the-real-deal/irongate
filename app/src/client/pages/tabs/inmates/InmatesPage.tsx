@@ -1,6 +1,6 @@
 import { INMATES_STRUCTURE, InmatesEntry } from "../../../../common/structures"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
-import { useInmatesDisplay } from "../../../core/display/displays"
+import { useInmatesDisplay } from "../../../core/tables"
 import MovementsPage from "./MovementsPage"
 import ScrollFillBox from "../../../components/ScrollFillBox"
 import { tableDetailsViewProps, tablePageViewProps } from "../../../core/utils"
