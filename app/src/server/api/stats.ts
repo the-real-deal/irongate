@@ -66,7 +66,12 @@ statsRouter.get("/securitylevels/biggest-sectors", async (_, res) => {
 statsRouter.get("/activities/surveillances-ranking", async (req: PrimitiveRequest, res) => {
     const ActivityID = req.query.ActivityID === undefined ? undefined : parseJSONPrimitive(req.query.ActivityID)
     const limit = req.query.limit === undefined ? 3 : parseJSONPrimitive(req.query.limit)
-    if (ActivityID === undefined || typeof ActivityID !== "string" || typeof limit !== "number") {
+    if (
+        ActivityID === undefined ||
+        typeof ActivityID !== "string" ||
+        typeof limit !== "number" ||
+        limit < 1
+    ) {
         res.status(HttpStatusCode.BAD_REQUEST).send()
         return
     }
