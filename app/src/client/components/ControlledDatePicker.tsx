@@ -39,8 +39,10 @@ export default function ControlledDatePicker({
                 selected={value}
                 placeholderText={placeholder}
                 required={required}
+                isClearable={!required}
                 dateFormat={dateFormat}
                 timeFormat={timeFormat}
+                portalId="root-portal"
                 onChange={async date => {
                     setValue(date)
                     await onChange(date)

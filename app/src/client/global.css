@@ -1,0 +1,4 @@
+.react-datepicker-popper,
+.react-datepicker-popper * {
+    z-index: calc(var(--joy-zIndex-modal) + 100) !important;
+}
