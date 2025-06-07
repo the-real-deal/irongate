@@ -10,7 +10,7 @@ export type SecurityLevelsTotalInmatesChartProps = BaseProps
 
 export default function SecurityLevelsTotalInmatesChart({
     sx
-}: BaseProps) {
+}: SecurityLevelsTotalInmatesChartProps) {
     const [data, setData] = useState<SecurityLevelsTotalInmatesStats>([])
 
     useEffect(() => {
@@ -27,10 +27,7 @@ export default function SecurityLevelsTotalInmatesChart({
     return (
         <Box sx={sx}>
             <BarChart
-                sx={{
-                    height: "100%",
-                    width: "100%",
-                }}
+                height={300}
                 xAxis={[{ data: data.map(({ SecurityLevelID }) => SecurityLevelID) }]}
                 series={[
                     { data: data.map(({ TotalInmates }) => TotalInmates) }

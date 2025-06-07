@@ -4,7 +4,7 @@ import { PrimitiveRequest } from "../middlewares"
 import { HttpStatusCode } from "../../common/http"
 import context from "../context"
 import { createQuery } from "../core/db"
-import { ActivitiesPopularityStats, SecurityLevelsBiggestSectorsStats, SecurityLevelsTotalInmatesStats } from "../../common/stats"
+import { ActivitiesPopularityStats, ActivitiesSurveillancesRankingStats, InmatesReportsTogetherStats, SecurityLevelsBiggestSectorsStats, SecurityLevelsTotalInmatesStats } from "../../common/stats"
 
 const statsRouter = Router()
 
@@ -44,7 +44,7 @@ statsRouter.get("/securitylevels/total-inmates", async (_, res) => {
     res.send(result)
 })
 
-statsRouter.use("/securitylevels/biggest-sectors", async (_, res) => {
+statsRouter.get("/securitylevels/biggest-sectors", async (_, res) => {
     const query = createQuery(
         "SELECT",
         [
@@ -60,6 +60,68 @@ statsRouter.use("/securitylevels/biggest-sectors", async (_, res) => {
         ")",
     )
     const result = await context.db.executeQuery<SecurityLevelsBiggestSectorsStats>(query)
+    res.send(result)
+})
+
+statsRouter.get("/activities/surveillances-ranking", async (req: PrimitiveRequest, res) => {
+    const ActivityID = req.query.ActivityID === undefined ? undefined : parseJSONPrimitive(req.query.ActivityID)
+    const limit = req.query.limit === undefined ? 3 : parseJSONPrimitive(req.query.limit)
+    if (ActivityID === undefined || typeof ActivityID !== "string" || typeof limit !== "number") {
+        res.status(HttpStatusCode.BAD_REQUEST).send()
+        return
+    }
+    const query = createQuery(
+        "SELECT ",
+        [
+            "S.`PersonnelID`",
+            "COUNT(P.`ID`) AS TotalSurveillances",
+        ],
+        "FROM `Routines` R",
+        "    JOIN `Surveillances` S",
+        "        ON R.`ZoneNumber` = S.`RoutineZoneNumber`",
+        "        AND R.`ZoneSectorID` = S.`RoutineZoneSectorID`",
+        "        AND R.`DateTime` = S.`RoutineDateTime`",
+        "    JOIN `Personnel` P ON S.`PersonnelID` = P.`ID`",
+        "WHERE",
+        "    P.`PersonnelTypeID` = 'Guard'",
+        "    AND R.`ActivityID` = ?",
+        "GROUP BY",
+        [
+            "S.`PersonnelID`"
+        ],
+        "ORDER BY",
+        [
+            "R.`ActivityID`",
+            "TotalSurveillances DESC",
+        ],
+        `LIMIT ${limit}`,
+    )
+    const result = await context.db.executeQuery<ActivitiesSurveillancesRankingStats>(query, [ActivityID])
+    res.send(result)
+})
+
+statsRouter.get("/inmates/reports-toghether", async (_, res) => {
+    const query = createQuery(
+        "SELECT",
+        [
+            "LEAST(E1.`InmateNumber`, E2.`InmateNumber`) AS FirstInmateNumber",
+            "GREATEST(E1.`InmateNumber`, E2.`InmateNumber`) AS SecondInmateNumber",
+            "COUNT(DISTINCT E1.`ReportID`) AS TotalReportsTogether",
+        ],
+        "FROM `EngagedInmates` E1",
+        "    JOIN `EngagedInmates` E2 ON E1.`ReportID` = E2.`ReportID`",
+        "WHERE E1.`InmateNumber` <> E2.`InmateNumber`",
+        "GROUP BY",
+        [
+            "FirstInmateNumber",
+            "SecondInmateNumber",
+        ],
+        "ORDER BY",
+        [
+            "TotalReportsTogether DESC",
+        ],
+    )
+    const result = await context.db.executeQuery<InmatesReportsTogetherStats>(query)
     res.send(result)
 })
 

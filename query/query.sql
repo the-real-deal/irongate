@@ -223,32 +223,43 @@ WHERE S1.`TotalInmates` = (
 );
 
 -- Classifica delle guardie assegnate con maggior frequenza ad ogni attività.
--- SELECT 
---     R.`ActivityID`, 
---     P.`ID`, 
---     COUNT(P.`ID`) AS assignNum
--- FROM `Routines` R 
---     JOIN `Surveillances` S 
---         ON R.`ZoneNumber` = S.`RoutineZoneNumber` 
---         AND R.`ZoneSectorID` = S.`RoutineZoneSectorID` 
---         AND R.`DateTime` = S.`RoutineDateTime` 
---     JOIN `Personnel` P ON S.`PersonnelID` = P.`ID`
--- WHERE P.`PersonnelTypeID` = 'Guard'
--- GROUP BY P.`ID`, R.`ActivityID`
--- ORDER BY assignNum DESC
--- LIMIT 10;
-
+SELECT 
+    S.`PersonnelID`, 
+    COUNT(P.`ID`) AS TotalSurveillances
+FROM `Routines` R 
+    JOIN `Surveillances` S 
+        ON R.`ZoneNumber` = S.`RoutineZoneNumber` 
+        AND R.`ZoneSectorID` = S.`RoutineZoneSectorID` 
+        AND R.`DateTime` = S.`RoutineDateTime` 
+    JOIN `Personnel` P ON S.`PersonnelID` = P.`ID`
+WHERE 
+    P.`PersonnelTypeID` = 'Guard'
+    AND R.`ActivityID` = 'ACT-c1471994-7ba9-4ce2-a28c-a4811ba54fd1'
+GROUP BY S.`PersonnelID`
+ORDER BY R.`ActivityID`, TotalSurveillances DESC;
 
 -- Classifica dei detenuti coinvolti insieme nei diversi report.
-SELECT COUNT(DISTINCT E.InmateNumber) AS assignNum
-FROM EngagedInmates E JOIN EngagedInmates EE ON (E.ReportID=EE.ReportID)
-GROUP BY E.ReportID
-WHERE E.InmateNumber <> EE.InmateNumber 
-ORDER BY assignNum DESC;
+SELECT
+    LEAST(E1.`InmateNumber`, E2.`InmateNumber`) AS FirstInmateNumber,
+    GREATEST(E1.`InmateNumber`, E2.`InmateNumber`) AS SecondInmateNumber,
+    COUNT(DISTINCT E1.`ReportID`) AS TotalReportsTogether
+FROM `EngagedInmates` E1
+    JOIN `EngagedInmates` E2 ON E1.`ReportID` = E2.`ReportID`
+WHERE E1.`InmateNumber` <> E2.`InmateNumber`
+GROUP BY
+    FirstInmateNumber,
+    SecondInmateNumber
+ORDER BY TotalReportsTogether DESC
+LIMIT 5;
 
 
 -- Dati due detenuti, determinare quante volte sono stati coinvolti assieme in diversi report.
-SELECT COUNT(DISTINCT R.ReportID)
-FROM Report R JOIN EngagedInmates E ON (R.ID=E.ReportID) JOIN EngagedInmates EE ON (E.ReportID=EE.ReportID)
-WHERE E.InmateNumber='x' AND EE.InmateNumber='y' AND E.InmateNumber<>EE.InmateNumber;
+SELECT COUNT(DISTINCT R.`ID`)
+FROM `Reports` R 
+    JOIN `EngagedInmates` E ON R.`ID` = E.`ReportID` 
+    JOIN `EngagedInmates` EE ON E.`ReportID` = EE.`ReportID`
+WHERE 
+    E.`InmateNumber`='x' 
+    AND EE.`InmateNumber`='y' 
+    AND E.`InmateNumber` <> EE.`InmateNumber`;
 

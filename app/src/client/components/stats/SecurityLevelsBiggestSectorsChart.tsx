@@ -46,7 +46,7 @@ export default function SecurityLevelsBiggestSectorsChart({
         <Sheet variant="outlined" sx={sx}>
             <Table
                 variant="soft"
-                borderAxis="yBetween"
+                borderAxis="bothBetween"
                 sx={{
                     tableLayout: "auto",
                     overflow: "scroll",
@@ -55,13 +55,14 @@ export default function SecurityLevelsBiggestSectorsChart({
                     {
                         (Object.keys(groupedData) as (keyof typeof groupedData)[]).map(key => (
                             <tr>
-                                <th style={{
+                                <td style={{
                                     width: 0,
                                     whiteSpace: "nowrap",
                                     verticalAlign: "top",
+                                    backgroundColor: "var(--TableCell-headBackground)"
                                 }}>
                                     {key} ({groupedData[key].total} {groupedData[key].total === 1 ? "inmate" : "inmates"})
-                                </th>
+                                </td>
                                 <td>
                                     {
                                         groupedData[key].sectors.map((sectorID) => (

@@ -40,13 +40,14 @@ export default function ActivitiesPopularityChart({
     }, [from, to])
 
     return (
-        <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            gap: "1em",
-            ...sx
-        }}>
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                gap: "1em",
+                ...sx
+            }}>
             <Box sx={{
                 display: "flex",
                 flexDirection: "row",
@@ -68,9 +69,9 @@ export default function ActivitiesPopularityChart({
                 </Select>
             </Box>
             <PieChart
+                height={300}
                 sx={{
-                    // flex: 1,
-                    width: "fit-content",
+                    width: "100%",
                 }}
                 series={[
                     {

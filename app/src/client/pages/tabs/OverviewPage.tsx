@@ -2,6 +2,8 @@ import { Box, Divider, Sheet, Typography } from "@mui/joy"
 import ActivitiesPopularityChart from "../../components/stats/ActivitiesPopularityChart"
 import SecurityLevelsTotalInmatesChart from "../../components/stats/SecuriryLevelsTotalInmatesChart"
 import SecurityLevelsBiggestSectorsChart from "../../components/stats/SecurityLevelsBiggestSectorsChart"
+import ActivitiesSurveillancesRankingChartChart from "../../components/stats/ActivitiesSurveillancesRankingChart"
+import InmatesReportsTogetherChart from "../../components/stats/InmatesReportsTogetherChart"
 
 export default function OverviewPage() {
     return (
@@ -21,6 +23,13 @@ export default function OverviewPage() {
             </Typography>
             <ActivitiesPopularityChart />
             <Divider sx={{ marginBlock: "2em" }} />
+            <Typography
+                level="h3"
+                paddingBottom={".5em"}>
+                Activities surveillances ranking
+            </Typography>
+            <ActivitiesSurveillancesRankingChartChart />
+            <Divider sx={{ marginBlock: "2em" }} />
             <Box sx={{
                 display: "flex",
                 flexDirection: "row",
@@ -31,15 +40,20 @@ export default function OverviewPage() {
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
+                    maxWidth: "50%",
                 }}>
                     <Typography
                         level="h3"
                         paddingBottom={".5em"}>
                         Total inmates per security level
                     </Typography>
-                    <SecurityLevelsTotalInmatesChart sx={{ flex: 1 }} />
+                    <SecurityLevelsTotalInmatesChart />
                 </Box>
-                <Box>
+                <Box sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                }}>
                     <Typography
                         level="h3"
                         paddingBottom={".5em"}>
@@ -49,6 +63,12 @@ export default function OverviewPage() {
                 </Box>
             </Box>
             <Divider sx={{ marginBlock: "2em" }} />
+            <Typography
+                level="h3"
+                paddingBottom={".5em"}>
+                Inmates total reports together
+            </Typography>
+            <InmatesReportsTogetherChart />
         </Sheet>
     )
 }
