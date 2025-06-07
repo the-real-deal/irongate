@@ -51,13 +51,15 @@ export default function ActivitiesSurveillancesRankingChartChart({
                 flexDirection: "row",
                 justifyContent: "start",
                 alignItems: "center",
-                // width: "fit-content",
                 gap: "1em",
             }}>
                 <Typography>Activity</Typography>
                 <Select
                     value={ActivityID}
                     placeholder="Select an activity"
+                    sx={{
+                        flex: 1
+                    }}
                     onChange={(_, value) => setActivityID(value)}>
                     {
                         activities.ID.map(id => <Option value={id}>{id}</Option>)
@@ -71,7 +73,8 @@ export default function ActivitiesSurveillancesRankingChartChart({
                     min={1}
                     max={20}
                     sx={{
-                        marginInlineEnd: "1%"
+                        // marginInlineEnd: "1%",
+                        flex: 1,
                     }}
                     onChange={(_, value) => {
                         if (Array.isArray(value)) {

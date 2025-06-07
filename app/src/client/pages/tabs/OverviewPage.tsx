@@ -10,6 +10,8 @@ export default function OverviewPage() {
         <Sheet sx={{
             maxHeight: "100%",
             overflow: "scroll",
+            margin: "-1em",
+            padding: "1em",
         }}>
             <Typography
                 level="h1"
