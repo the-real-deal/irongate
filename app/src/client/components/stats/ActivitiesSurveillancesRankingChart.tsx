@@ -1,4 +1,4 @@
-import { Box, Input, Option, Select, Typography } from "@mui/joy"
+import { Box, Option, Select, Slider, Typography } from "@mui/joy"
 import { BaseProps, chartSlotProps } from "../../core/utils"
 import { useEffect, useState } from "react"
 import { ActivitiesSurveillancesRankingStats } from "../../../common/stats"
@@ -51,6 +51,7 @@ export default function ActivitiesSurveillancesRankingChartChart({
                 flexDirection: "row",
                 justifyContent: "start",
                 alignItems: "center",
+                // width: "fit-content",
                 gap: "1em",
             }}>
                 <Typography>Activity</Typography>
@@ -63,12 +64,19 @@ export default function ActivitiesSurveillancesRankingChartChart({
                     }
                 </Select>
                 <Typography>Limit</Typography>
-                <Input
-                    type="number"
-                    placeholder="Limit"
+                <Slider
+                    marks
                     value={limit}
-                    onChange={(e) => {
-                        const value = Number(e.target.value)
+                    valueLabelDisplay="auto"
+                    min={1}
+                    max={20}
+                    sx={{
+                        marginInlineEnd: "1%"
+                    }}
+                    onChange={(_, value) => {
+                        if (Array.isArray(value)) {
+                            return
+                        }
                         setLimit(
                             isNaN(value) ?
                                 DEFAULT_LIMIT :
