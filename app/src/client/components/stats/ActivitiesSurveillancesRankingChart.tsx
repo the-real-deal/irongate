@@ -69,7 +69,11 @@ export default function ActivitiesSurveillancesRankingChartChart({
                     value={limit}
                     onChange={(e) => {
                         const value = Number(e.target.value)
-                        setLimit(isNaN(value) ? DEFAULT_LIMIT : value)
+                        setLimit(
+                            isNaN(value) ?
+                                DEFAULT_LIMIT :
+                                value < 1 ? 1 : value
+                        )
                     }}
                 />
             </Box>
