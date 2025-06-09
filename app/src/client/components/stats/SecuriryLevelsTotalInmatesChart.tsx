@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { BaseProps, chartSlotProps } from "../../core/utils"
-import { SecurityLevelsTotalInmatesStats } from "../../../common/stats"
+import { SecurityLevelsTotalInmatesStats } from "../../../common/api/stats"
 import { fetchJSON } from "../../core/server"
 import { HttpMethod } from "../../../common/http"
 import { Box } from "@mui/joy"

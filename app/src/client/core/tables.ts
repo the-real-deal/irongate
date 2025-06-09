@@ -1,3 +1,4 @@
+import { FreeDocumentIDsEntry } from "../../common/api/people"
 import { ACTIVITIES_STRUCTURE, ActivitiesEntry, AVAILABILITIES_STRUCTURE, AvailabilitiesEntry, CELLS_STRUCTURE, CellsEntry, COURIERS_STRUCTURE, CouriersEntry, DELIVERIES_STRUCTURE, DeliveriesEntry, DEVICES_STRUCTURE, DevicesEntry, ENGAGED_DEVICES_STRUCTURE, ENGAGED_INMATES_STRUCTURE, ENGAGED_PERSONNEL_STRUCTURE, ENGAGED_SECTORS_STRUCTURE, EngagedDevicesEntry, EngagedInmatesEntry, EngagedPersonnelEntry, EngagedSectorsEntry, EnumEntry, EnumTable, GUESTS_STRUCTURE, GuestsEntry, INMATES_STRUCTURE, InmatesEntry, MOVEMENTS_STRUCTURE, MovementsEntry, PARTECIPATIONS_STRUCTURE, PartecipationsEntry, PEOPLE_STRUCTURE, PeopleEntry, PERSONNEL_STRUCTURE, PersonnelEntry, REPORTS_STRUCTURE, ReportsEntry, ROUTINES_STRUCTURE, RoutinesEntry, SECTORS_STRUCTURE, SectorsEntry, SURVEILLANCES_STRUCTURE, SurveillancesEntry, VEHICLES_STRUCTURE, VehiclesEntry, VISITORS_STRUCTURE, VisitorsEntry, VISITS_STRUCTURE, VisitsEntry, ZONES_STRUCTURE, ZonesEntry } from "../../common/structures"
 import { useTableReference, useTableReferenceFilter } from "./dataReference"
 import { createDisplay, dateInputNode, numberInputNode, selectInputNode, stringInputNode, textInputNode } from "./tableDisplay"
@@ -38,6 +39,14 @@ export function usePeopleDisplay() {
 export function usePeopleReference() {
     const apiRoute = "/people"
     const DocumentID = useTableReference<PeopleEntry, "DocumentID">(apiRoute, "DocumentID")
+    return { DocumentID }
+}
+
+export function useFreePeopleReference() {
+    const apiRoute = "/people/free-documents"
+    const DocumentID = useTableReference<FreeDocumentIDsEntry, "DocumentID">(apiRoute, "DocumentID", {
+        apiRoot: ""
+    })
     return { DocumentID }
 }
 
@@ -97,7 +106,9 @@ export function useCellsReference() {
         values: useTableReference<CellsEntry, "SectorID">(apiRoute, "SectorID"),
         filter: useTableReferenceFilter<CellsEntry, "SectorID">("SectorID")
     }
-    const Number = useTableReference<CellsEntry, "Number">(apiRoute, "Number", SectorID.filter.fetchFilter)
+    const Number = useTableReference<CellsEntry, "Number">(apiRoute, "Number", {
+        fetchFilter: SectorID.filter.fetchFilter
+    })
     return {
         SectorID: {
             values: SectorID.values,
@@ -109,8 +120,7 @@ export function useCellsReference() {
 }
 
 export function useInmatesDisplay() {
-    const people = usePeopleReference()
-    const cells = useCellsReference()
+    const freePeople = useFreePeopleReference()
 
     return createDisplay<InmatesEntry>(INMATES_STRUCTURE, {
         detailTitle: "Inmate",
@@ -120,7 +130,7 @@ export function useInmatesDisplay() {
             },
             DocumentID: {
                 title: "Document ID",
-                inputNode: selectInputNode(people.DocumentID)
+                inputNode: selectInputNode(freePeople.DocumentID)
             },
             IncarcerationDate: {
                 title: "Incarceration date",
@@ -129,14 +139,6 @@ export function useInmatesDisplay() {
             SentenceDuration: {
                 title: "Sentence duration (months)",
                 inputNode: numberInputNode()
-            },
-            CellSectorID: {
-                title: "Cell sector ID",
-                inputNode: selectInputNode(cells.SectorID.values, { onChange: cells.SectorID.setValue })
-            },
-            CellNumber: {
-                title: "Cell number",
-                inputNode: selectInputNode(cells.Number)
             },
             CriminalRecord: {
                 title: "Criminal record",
@@ -182,7 +184,9 @@ export function useMovementsReference() {
         values: useTableReference<MovementsEntry, "Datetime">(apiRoute, "Datetime"),
         filter: useTableReferenceFilter<MovementsEntry, "Datetime">("Datetime"),
     }
-    const InmateNumber = useTableReference<MovementsEntry, "InmateNumber">(apiRoute, "InmateNumber", Datetime.filter.fetchFilter)
+    const InmateNumber = useTableReference<MovementsEntry, "InmateNumber">(apiRoute, "InmateNumber", {
+        fetchFilter: Datetime.filter.fetchFilter
+    })
     return {
         Datetime: {
             values: Datetime.values,
@@ -193,14 +197,14 @@ export function useMovementsReference() {
 }
 
 export function useGuestsDisplay() {
-    const people = usePeopleReference()
+    const freePeople = usePeopleReference()
 
     return createDisplay<GuestsEntry>(GUESTS_STRUCTURE, {
         detailTitle: "Guest",
         keys: {
             DocumentID: {
                 title: "Document ID",
-                inputNode: selectInputNode(people.DocumentID)
+                inputNode: selectInputNode(freePeople.DocumentID)
             }
         }
     })
@@ -233,7 +237,9 @@ export function useVisitsReference() {
         values: useTableReference<VisitsEntry, "Datetime">(apiRoute, "Datetime"),
         filter: useTableReferenceFilter<VisitsEntry, "Datetime">("Datetime"),
     }
-    const InmateNumber = useTableReference<VisitsEntry, "InmateNumber">(apiRoute, "InmateNumber", Datetime.filter.fetchFilter)
+    const InmateNumber = useTableReference<VisitsEntry, "InmateNumber">(apiRoute, "InmateNumber", {
+        fetchFilter: Datetime.filter.fetchFilter
+    })
     return {
         Datetime: {
             values: Datetime.values,
@@ -271,7 +277,9 @@ export function useVisitorsReference() {
         values: useTableReference<VisitorsEntry, "VisitDatetime">(apiRoute, "VisitDatetime"),
         filter: useTableReferenceFilter<VisitsEntry, "Datetime">("Datetime"),
     }
-    const InmatesNumber = useTableReference<VisitsEntry, "InmateNumber">(apiRoute, "InmateNumber", VisitsDatetime.filter.fetchFilter)
+    const InmatesNumber = useTableReference<VisitsEntry, "InmateNumber">(apiRoute, "InmateNumber", {
+        fetchFilter: VisitsDatetime.filter.fetchFilter
+    })
     return {
         VisitsDatetime: {
             values: VisitsDatetime.values,
@@ -283,7 +291,7 @@ export function useVisitorsReference() {
 
 export function usePersonnelDisplay() {
     const personnelTypes = useEnumReference("PersonnelTypes")
-    const people = usePeopleReference()
+    const freePeople = usePeopleReference()
     const sectors = useSectorsReference()
 
     return createDisplay<PersonnelEntry>(PERSONNEL_STRUCTURE, {
@@ -293,7 +301,7 @@ export function usePersonnelDisplay() {
             },
             DocumentID: {
                 title: "Document ID",
-                inputNode: selectInputNode(people.DocumentID)
+                inputNode: selectInputNode(freePeople.DocumentID)
             },
             PersonnelTypeID: {
                 title: "Personnel type",
@@ -395,7 +403,9 @@ export function useEngagedInmatesReference() {
         values: useTableReference<EngagedInmatesEntry, "ReportID">(apiRoute, "ReportID"),
         filter: useTableReferenceFilter<EngagedInmatesEntry, "ReportID">("ReportID"),
     }
-    const InmateNumber = useTableReference<EngagedInmatesEntry, "InmateNumber">(apiRoute, "InmateNumber", ReportID.filter.fetchFilter)
+    const InmateNumber = useTableReference<EngagedInmatesEntry, "InmateNumber">(apiRoute, "InmateNumber", {
+        fetchFilter: ReportID.filter.fetchFilter
+    })
     return {
         ReportID: {
             values: ReportID.values,
@@ -429,7 +439,9 @@ export function useEngagedPersonnelReference() {
         values: useTableReference<EngagedPersonnelEntry, "ReportID">(apiRoute, "ReportID"),
         filter: useTableReferenceFilter<EngagedPersonnelEntry, "ReportID">("ReportID"),
     }
-    const PersonnelID = useTableReference<EngagedPersonnelEntry, "PersonnelID">(apiRoute, "PersonnelID", ReportID.filter.fetchFilter)
+    const PersonnelID = useTableReference<EngagedPersonnelEntry, "PersonnelID">(apiRoute, "PersonnelID", {
+        fetchFilter: ReportID.filter.fetchFilter
+    })
     return {
         ReportID: {
             values: ReportID.values,
@@ -464,7 +476,9 @@ export function useEngagedSectorsReference() {
         values: useTableReference<EngagedSectorsEntry, "ReportID">(apiRoute, "ReportID"),
         filter: useTableReferenceFilter<EngagedSectorsEntry, "ReportID">("ReportID"),
     }
-    const SectorID = useTableReference<EngagedSectorsEntry, "SectorID">(apiRoute, "SectorID", ReportID.filter.fetchFilter)
+    const SectorID = useTableReference<EngagedSectorsEntry, "SectorID">(apiRoute, "SectorID", {
+        fetchFilter: ReportID.filter.fetchFilter
+    })
     return {
         ReportID: {
             values: ReportID.values,
@@ -499,7 +513,9 @@ export function useEngagedDevicesReference() {
         values: useTableReference<EngagedDevicesEntry, "ReportID">(apiRoute, "ReportID"),
         filter: useTableReferenceFilter<EngagedDevicesEntry, "ReportID">("ReportID"),
     }
-    const DeviceSerial = useTableReference<EngagedDevicesEntry, "DeviceSerial">(apiRoute, "DeviceSerial", ReportID.filter.fetchFilter)
+    const DeviceSerial = useTableReference<EngagedDevicesEntry, "DeviceSerial">(apiRoute, "DeviceSerial", {
+        fetchFilter: ReportID.filter.fetchFilter
+    })
     return {
         ReportID: {
             values: ReportID.values,
@@ -510,14 +526,14 @@ export function useEngagedDevicesReference() {
 }
 
 export function useCouriersDisplay() {
-    const people = usePeopleReference()
+    const freePeople = usePeopleReference()
 
     return createDisplay<CouriersEntry>(COURIERS_STRUCTURE, {
         detailTitle: "Courier",
         keys: {
             DocumentID: {
                 title: "Document ID",
-                inputNode: selectInputNode(people.DocumentID)
+                inputNode: selectInputNode(freePeople.DocumentID)
             },
         }
     })
@@ -581,7 +597,9 @@ export function useDeliveriesReference() {
         values: useTableReference<DeliveriesEntry, "Datetime">(apiRoute, "Datetime"),
         filter: useTableReferenceFilter<DeliveriesEntry, "GoodsTypeID">("GoodsTypeID"),
     }
-    const GoodsTypeID = useTableReference<DeliveriesEntry, "GoodsTypeID">(apiRoute, "GoodsTypeID", Datetime.filter.fetchFilter)
+    const GoodsTypeID = useTableReference<DeliveriesEntry, "GoodsTypeID">(apiRoute, "GoodsTypeID", {
+        fetchFilter: Datetime.filter.fetchFilter
+    })
     return {
         Datetime: {
             values: Datetime.values,
@@ -638,7 +656,9 @@ export function useAvailabilitiesReference() {
         values: useTableReference<AvailabilitiesEntry, "SecurityLevelID">(apiRoute, "SecurityLevelID"),
         filter: useTableReferenceFilter<AvailabilitiesEntry, "SecurityLevelID">("SecurityLevelID"),
     }
-    const ActivityID = useTableReference<AvailabilitiesEntry, "ActivityID">(apiRoute, "ActivityID", SecurityLevelID.filter.fetchFilter)
+    const ActivityID = useTableReference<AvailabilitiesEntry, "ActivityID">(apiRoute, "ActivityID", {
+        fetchFilter: SecurityLevelID.filter.fetchFilter
+    })
     return {
         SecurityLevelID: {
             values: SecurityLevelID.values,
@@ -676,7 +696,9 @@ export function useZonesReference() {
         values: useTableReference<ZonesEntry, "SectorID">(apiRoute, "SectorID"),
         filter: useTableReferenceFilter<ZonesEntry, "SectorID">("SectorID"),
     }
-    const Number = useTableReference<ZonesEntry, "Number">(apiRoute, "Number", SectorID.filter.fetchFilter)
+    const Number = useTableReference<ZonesEntry, "Number">(apiRoute, "Number", {
+        fetchFilter: SectorID.filter.fetchFilter
+    })
     return {
         SectorID: {
             values: SectorID.values,
@@ -718,10 +740,14 @@ export function useRoutinesReference() {
         filter: useTableReferenceFilter<RoutinesEntry, "Datetime">("Datetime"),
     }
     const ZoneSectorID = {
-        values: useTableReference<RoutinesEntry, "ZoneSectorID">(apiRoute, "ZoneSectorID", Datetime.filter.fetchFilter),
+        values: useTableReference<RoutinesEntry, "ZoneSectorID">(apiRoute, "ZoneSectorID", {
+            fetchFilter: Datetime.filter.fetchFilter
+        }),
         filter: useTableReferenceFilter<RoutinesEntry, "ZoneSectorID">("ZoneSectorID"),
     }
-    const ZoneNumber = useTableReference<RoutinesEntry, "ZoneNumber">(apiRoute, "ZoneNumber", ZoneSectorID.filter.fetchFilter)
+    const ZoneNumber = useTableReference<RoutinesEntry, "ZoneNumber">(apiRoute, "ZoneNumber", {
+        fetchFilter: ZoneSectorID.filter.fetchFilter
+    })
     return {
         Datetime: {
             values: Datetime.values,
@@ -768,14 +794,20 @@ export function usePartecipationsReference() {
         filter: useTableReferenceFilter<PartecipationsEntry, "RoutineDatetime">("RoutineDatetime"),
     }
     const RoutineZoneSectorID = {
-        values: useTableReference<PartecipationsEntry, "RoutineZoneSectorID">(apiRoute, "RoutineZoneSectorID", RoutineDatetime.filter.fetchFilter),
+        values: useTableReference<PartecipationsEntry, "RoutineZoneSectorID">(apiRoute, "RoutineZoneSectorID", {
+            fetchFilter: RoutineDatetime.filter.fetchFilter
+        }),
         filter: useTableReferenceFilter<PartecipationsEntry, "RoutineZoneSectorID">("RoutineZoneSectorID"),
     }
     const RoutineZoneNumber = {
-        values: useTableReference<PartecipationsEntry, "RoutineZoneNumber">(apiRoute, "RoutineZoneNumber", RoutineZoneSectorID.filter.fetchFilter),
+        values: useTableReference<PartecipationsEntry, "RoutineZoneNumber">(apiRoute, "RoutineZoneNumber", {
+            fetchFilter: RoutineZoneSectorID.filter.fetchFilter
+        }),
         filter: useTableReferenceFilter<PartecipationsEntry, "RoutineZoneNumber">("RoutineZoneNumber"),
     }
-    const SectorID = useTableReference<PartecipationsEntry, "SectorID">(apiRoute, "SectorID", RoutineZoneNumber.filter.fetchFilter)
+    const SectorID = useTableReference<PartecipationsEntry, "SectorID">(apiRoute, "SectorID", {
+        fetchFilter: RoutineZoneNumber.filter.fetchFilter
+    })
     return {
         RoutineDatetime: {
             values: RoutineDatetime.values,
@@ -826,14 +858,20 @@ export function useSurveillancesReference() {
         filter: useTableReferenceFilter<SurveillancesEntry, "RoutineDatetime">("RoutineDatetime"),
     }
     const RoutineZoneSectorID = {
-        values: useTableReference<SurveillancesEntry, "RoutineZoneSectorID">(apiRoute, "RoutineZoneSectorID", RoutineDatetime.filter.fetchFilter),
+        values: useTableReference<SurveillancesEntry, "RoutineZoneSectorID">(apiRoute, "RoutineZoneSectorID", {
+            fetchFilter: RoutineDatetime.filter.fetchFilter
+        }),
         filter: useTableReferenceFilter<SurveillancesEntry, "RoutineZoneSectorID">("RoutineZoneSectorID"),
     }
     const RoutineZoneNumber = {
-        values: useTableReference<SurveillancesEntry, "RoutineZoneNumber">(apiRoute, "RoutineZoneNumber", RoutineZoneSectorID.filter.fetchFilter),
+        values: useTableReference<SurveillancesEntry, "RoutineZoneNumber">(apiRoute, "RoutineZoneNumber", {
+            fetchFilter: RoutineZoneSectorID.filter.fetchFilter
+        }),
         filter: useTableReferenceFilter<SurveillancesEntry, "RoutineZoneNumber">("RoutineZoneNumber"),
     }
-    const PersonnelID = useTableReference<SurveillancesEntry, "PersonnelID">(apiRoute, "PersonnelID", RoutineZoneNumber.filter.fetchFilter)
+    const PersonnelID = useTableReference<SurveillancesEntry, "PersonnelID">(apiRoute, "PersonnelID", {
+        fetchFilter: RoutineZoneNumber.filter.fetchFilter
+    })
     return {
         RoutineDatetime: {
             values: RoutineDatetime.values,

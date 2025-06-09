@@ -79,8 +79,6 @@ export type InmatesEntry = TableEntry<{
     IncarcerationDate: string
     SentenceDuration: number
     CriminalRecord: string
-    CellSectorID: CellsEntry["SectorID"]
-    CellNumber: CellsEntry["Number"]
 }>
 export const INMATES_STRUCTURE = createTableStructure<InmatesEntry>("Inmates", {
     Number: {
@@ -90,8 +88,6 @@ export const INMATES_STRUCTURE = createTableStructure<InmatesEntry>("Inmates", {
     IncarcerationDate: {},
     SentenceDuration: {},
     CriminalRecord: {},
-    CellSectorID: {},
-    CellNumber: {},
 })
 
 export type MovementsEntry = TableEntry<{

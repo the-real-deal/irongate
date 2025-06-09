@@ -411,11 +411,15 @@ CREATE VIEW `UsedDocumentIDs` AS (
     SELECT `DocumentID`
     FROM `Guests`
 );
+
 DROP VIEW IF EXISTS `FreeDocumentIDs`;
 CREATE VIEW `FreeDocumentIDs` AS (
     SELECT `DocumentID`
     FROM `People`
-    WHERE `DocumentID` NOT IN `UsedDocumentIDs`
+    WHERE `DocumentID` NOT IN (
+        SELECT *
+        FROM `UsedDocumentIDs`
+    )
 );
 
 -- checks

@@ -1,5 +1,5 @@
-import { TableEntry } from "./db"
-import { ActivitiesEntry, EngagedInmatesEntry, EnumEntry, SectorsEntry, SurveillancesEntry } from "./structures"
+import { TableEntry } from "../db"
+import { ActivitiesEntry, EngagedInmatesEntry, EnumEntry, SectorsEntry, SurveillancesEntry } from "../structures"
 
 export type ActivitiesPopularityStats = TableEntry<{
     ActivityID: ActivitiesEntry["ID"]

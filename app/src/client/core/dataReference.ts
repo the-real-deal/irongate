@@ -14,18 +14,24 @@ export function useTableReference<
 >(
     apiRoute: string,
     key: K,
-    fetch?: TableReferenceFilter<T>
+    {
+        fetchFilter,
+        apiRoot = "/crud",
+    }: {
+        fetchFilter?: TableReferenceFilter<T>
+        apiRoot?: string
+    } = {}
 ): T[K][] {
     const [result, setResult] = useState<T[K][]>([])
 
-    const { condition = true, filter } = fetch ?? {}
+    const { condition = true, filter } = fetchFilter ?? {}
 
     useEffect(() => {
         (async () => {
             if (condition) {
                 const fetchData = await fetchJSON<T[]>(
                     HttpMethod.GET,
-                    `/crud${apiRoute}`,
+                    `${apiRoot}${apiRoute}`,
                     {
                         params: filter === undefined ? undefined : entryRecord(filter)
                     }
@@ -36,7 +42,7 @@ export function useTableReference<
             }
         })()
         return () => setResult([])
-    }, [apiRoute, key, condition, filter])
+    }, [apiRoute, key, condition, filter, apiRoot])
 
     return result
 }

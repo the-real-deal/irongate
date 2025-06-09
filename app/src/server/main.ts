@@ -5,6 +5,7 @@ import { HTTPError, HttpStatusCode } from "../common/http"
 import { jsonErrors, logs, primitiveRequest } from "./middlewares"
 import statsRouter from "./api/stats"
 import crudRouter from "./api/crud"
+import peopleRouter from "./api/people"
 
 const app = express()
 const router = Router()
@@ -12,6 +13,7 @@ router.use(logs())
 router.use(primitiveRequest())
 
 router.use("/crud", crudRouter)
+router.use("/people", peopleRouter)
 router.use("/stats", statsRouter)
 
 router.use((_req, _res, next) => {

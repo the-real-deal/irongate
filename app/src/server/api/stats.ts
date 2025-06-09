@@ -4,7 +4,7 @@ import { PrimitiveRequest } from "../middlewares"
 import { HttpStatusCode } from "../../common/http"
 import context from "../context"
 import { createQuery } from "../core/db"
-import { ActivitiesPopularityStats, ActivitiesSurveillancesRankingStats, InmatesReportsTogetherStats, SecurityLevelsBiggestSectorsStats, SecurityLevelsTotalInmatesStats } from "../../common/stats"
+import { ActivitiesPopularityStats, ActivitiesSurveillancesRankingStats, InmatesReportsTogetherStats, SecurityLevelsBiggestSectorsStats, SecurityLevelsTotalInmatesStats } from "../../common/api/stats"
 
 const statsRouter = Router()
 

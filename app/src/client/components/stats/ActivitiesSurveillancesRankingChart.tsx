@@ -1,7 +1,7 @@
 import { Box, Option, Select, Slider, Typography } from "@mui/joy"
 import { BaseProps, chartSlotProps } from "../../core/utils"
 import { useEffect, useState } from "react"
-import { ActivitiesSurveillancesRankingStats } from "../../../common/stats"
+import { ActivitiesSurveillancesRankingStats } from "../../../common/api/stats"
 import { fetchJSON } from "../../core/server"
 import { HttpMethod } from "../../../common/http"
 import { PieChart } from "@mui/x-charts"

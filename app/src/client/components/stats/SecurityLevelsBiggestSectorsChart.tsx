@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { SecurityLevelsBiggestSectorsStats } from "../../../common/stats"
+import { SecurityLevelsBiggestSectorsStats } from "../../../common/api/stats"
 import { BaseProps } from "../../core/utils"
 import { HttpMethod } from "../../../common/http"
 import { fetchJSON } from "../../core/server"
