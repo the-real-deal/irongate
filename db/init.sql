@@ -9,12 +9,14 @@ CREATE TABLE `Genders` (
     `ID` VARCHAR(10) PRIMARY KEY
 );
 
+
+-- trigger data nascita < currdate, crea view per tutti documentid occupati, unione di tabelle
 DROP TABLE IF EXISTS `People`;
 CREATE TABLE `People` (
     `DocumentID` VARCHAR(30) PRIMARY KEY,
     `Name` VARCHAR(30) NOT NULL,
     `Surname` VARCHAR(30) NOT NULL,
-    `Birthday` DATE NOT NULL,
+    `Birthday` DATE NOT NULL, 
     `BirthPlace` VARCHAR(50) NOT NULL,
     `GenderID` VARCHAR(10) NOT NULL
 );
@@ -37,21 +39,23 @@ DROP TABLE IF EXISTS `Cells`;
 CREATE TABLE `Cells` (
     `SectorID` VARCHAR(40),
     `Number` INT,
-    `Capacity` INT NOT NULL,
+    `Capacity` INT NOT NULL CHECK(`Capacity` > 0),
     PRIMARY KEY (`SectorID`, `Number`)
 );
 
+-- trigger incarcerationdate <= currentdate, documentid che non compare nel complesso.
 DROP TABLE IF EXISTS `Inmates`;
 CREATE TABLE `Inmates` (
     `Number` VARCHAR(30) PRIMARY KEY,
     `DocumentID` VARCHAR(30) NOT NULL UNIQUE,
     `IncarcerationDate` DATE NOT NULL,
-    `SentenceDuration` INT NOT NULL,
-    `CriminalRecord` VARCHAR(500) NOT NULL,
-    `CellSectorID` VARCHAR(40) NOT NULL,
-    `CellNumber` INT NOT NULL
+    `SentenceDuration` INT NOT NULL CHECK(`SentenceDuration` > 0),
+    `CriminalRecord` VARCHAR(500) NOT NULL
 );
 
+-- trigger datetime <= currentdate
+-- before insert trigger controllo cella libera, view numinmate per cella
+-- controllo gender = o null
 DROP TABLE IF EXISTS `Movements`;
 CREATE TABLE `Movements` (
     `Datetime` DATETIME,
@@ -67,6 +71,8 @@ CREATE TABLE `Movements` (
 DROP TABLE IF EXISTS `Guests`;
 CREATE TABLE `Guests` (`DocumentID` VARCHAR(30) PRIMARY KEY);
 
+
+-- trigger datetime
 DROP TABLE IF EXISTS `Visits`;
 CREATE TABLE `Visits` (
     `InmateNumber` VARCHAR(30),
@@ -91,6 +97,7 @@ CREATE TABLE `PersonnelTypes` (
     `ID` VARCHAR(30) PRIMARY KEY
 );
 
+-- se il tipo != guardia trigger, conrolla che il documentID sia diverso dagli inmate
 DROP TABLE IF EXISTS `Personnel`;
 CREATE TABLE `Personnel` (
     `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('PER-', UUID())),
@@ -113,6 +120,7 @@ CREATE TABLE `Devices` (
     UNIQUE (`SectorID`, `Number`)
 );
 
+-- datetime
 DROP TABLE IF EXISTS `Reports`;
 CREATE TABLE `Reports` (
     `ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -149,8 +157,6 @@ CREATE TABLE `EngagedDevices` (
     PRIMARY KEY(`ReportID`, `DeviceSerial`)
 );
 
--- check er
-
 DROP TABLE IF EXISTS `Couriers`;
 CREATE TABLE `Couriers` (`DocumentID` VARCHAR(30) PRIMARY KEY);
 
@@ -165,6 +171,7 @@ CREATE TABLE `GoodsTypes` (
     `ID` VARCHAR(30) PRIMARY KEY
 );
 
+-- datetime
 DROP TABLE IF EXISTS `Deliveries`;
 CREATE TABLE `Deliveries` (
     `Datetime` DATETIME,
@@ -178,7 +185,7 @@ DROP TABLE IF EXISTS `Activities`;
 CREATE TABLE `Activities` (
     `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('ACT-', UUID())),
     `Description` VARCHAR(200) NOT NULL,
-    `Duration` INT NOT NULL
+    `Duration` INT NOT NULL CHECK (`Duration` > 0)
 );
 
 DROP TABLE IF EXISTS `Availabilities`;
@@ -193,10 +200,11 @@ CREATE TABLE `Zones` (
     `SectorID` VARCHAR(40),
     `Number` INT,
     `Name` VARCHAR(30) NOT NULL,
-    `Capacity` INT NOT NULL,
+    `Capacity` INT NOT NULL CHECK(`Capacity` > 0),
     PRIMARY KEY (`SectorID`, `Number`)
 );
 
+-- datetime
 DROP TABLE IF EXISTS `Routines`;
 CREATE TABLE `Routines` (
     `ZoneSectorID` VARCHAR(40),
@@ -206,6 +214,7 @@ CREATE TABLE `Routines` (
     PRIMARY KEY (`ZoneSectorID`, `ZoneNumber`, `Datetime`)
 );
 
+-- controllo attività disponibile per securitylevel, gender settore =/null gender settore della zona attuale
 DROP TABLE IF EXISTS `Partecipations`;
 CREATE TABLE `Partecipations` (
     `RoutineZoneSectorID` VARCHAR(40),
@@ -219,6 +228,7 @@ CREATE TABLE `Partecipations` (
         `SectorID`
     )
 );
+
 
 DROP TABLE IF EXISTS `Surveillances`;
 CREATE TABLE `Surveillances` (
@@ -255,14 +265,6 @@ ALTER TABLE `Inmates`
 ADD CONSTRAINT `Inmates_People_FK`
 FOREIGN KEY (`DocumentID`) REFERENCES `People`(`DocumentID`)
 ON DELETE CASCADE;
-
-ALTER TABLE `Inmates`
-ADD CONSTRAINT `Inmates_Cells_FK`
-FOREIGN KEY (`CellSectorID`, `CellNumber`) REFERENCES `Cells`(`SectorID`, `Number`);
-
-ALTER TABLE `Movements`
-ADD CONSTRAINT `Movements_Inmates_FK`
-FOREIGN KEY (`InmateNumber`) REFERENCES `Inmates`(`Number`);
 
 ALTER TABLE `Movements`
 ADD CONSTRAINT `Movements_Cells_FK`
@@ -393,7 +395,33 @@ ALTER TABLE `Surveillances`
 ADD CONSTRAINT `Surveillances_Personnel_FK`
 FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);
 
+-- views
+
+DROP VIEW IF EXISTS `UsedDocumentIDs`;
+CREATE VIEW `UsedDocumentIDs` AS (
+    SELECT `DocumentID`
+    FROM `Inmates`
+    UNION 
+    SELECT `DocumentID`
+    FROM `Couriers`
+    UNION
+    SELECT `DocumentID`
+    FROM `Personnel`
+    UNION
+    SELECT `DocumentID`
+    FROM `Guests`
+);
+DROP VIEW IF EXISTS `FreeDocumentIDs`;
+CREATE VIEW `FreeDocumentIDs` AS (
+    SELECT `DocumentID`
+    FROM `People`
+    WHERE `DocumentID` NOT IN `UsedDocumentIDs`
+);
+
 -- checks
+
+
+
 
 -- data
 
@@ -609,58 +637,58 @@ VALUES
 ('SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 1, 1),
 ('SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1, 1);
 
-INSERT INTO `Inmates`(`Number`, `DocumentID`, `IncarcerationDate`, `SentenceDuration`, `CriminalRecord`, `CellSectorID`, `CellNumber`)
+INSERT INTO `Inmates`(`Number`, `DocumentID`, `IncarcerationDate`, `SentenceDuration`, `CriminalRecord`)
 VALUES
-('72-733-3969', 'IT-ABC12345A', '2020-03-06', 200, 'Forgery', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1),
-('83-628-8300', 'US-987654321', '2000-06-05', 53, 'Manslaughter', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 1),
-('78-047-9866', 'BR-345678901', '2014-01-07', 56, 'Espionage', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 2),
-('48-431-3619', 'ES-456789012', '2016-10-14', 74, 'Insider trading', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 2),
-('30-708-1634', 'IT-GHI34567C', '2000-03-26', 65, 'Fraud', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 3),
-('93-272-2218', 'AU-345678912', '2008-03-25', 325, 'Identity theft', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 3),
-('82-976-1119', 'IT-JKL90123D', '2015-05-20', 37, 'Homicide', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 3),
-('46-680-6938', 'US-234567890', '2005-06-10', 278, 'Insider trading', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 4),
-('99-401-1282', 'IN-456789013', '2019-02-21', 285, 'Counterfeiting', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 5),
-('56-432-9491', 'CN-567890124', '2004-07-09', 292, 'Harassment', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 5),
-('55-277-3626', 'ZA-678901235', '1994-07-22', 15, 'Vandalism', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 6),
-('71-174-5574', 'IT-MNO23456E', '2000-06-03', 311, 'Espionage', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 6),
-('10-456-4494', 'US-345678902', '2001-04-08', 193, 'Money laundering', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 6),
-('52-169-7632', 'DE-456789013', '1994-06-23', 32, 'Assault', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 7),
-('56-502-0544', 'JP-789012346', '2018-10-03', 180, 'Counterfeiting', 'SCT-8f5cbeb8-946d-45a2-9a74-a5711f2dfdf0', 7),
-('82-885-4760', 'CA-345678902', '1996-12-14', 106, 'Arson', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 1),
-('18-957-4095', 'IT-PQR56789F', '2010-08-29', 336, 'Blackmail', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 1),
-('95-652-1090', 'GB-678901235', '2014-08-11', 215, 'Perjury', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 2),
-('80-823-4362', 'FR-345678902', '1994-12-28', 211, 'Extortion', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 2),
-('56-920-5138', 'BR-678901235', '1998-10-22', 57, 'Smuggling', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 2),
-('70-236-6212', 'US-567890124', '2021-04-08', 329, 'Manslaughter', 'SCT-6c51df3f-f94c-4194-8fd4-2160194e0cd9', 3),
-('94-189-9016', 'AU-567890124', '2024-05-13', 359, 'Drug possession', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 1),
-('87-519-4678', 'ES-678901235', '2000-04-03', 50, 'Drug possession', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 1),
-('20-314-6930', 'DE-678901235', '1997-02-02', 195, 'Prostitution', 'SCT-43ea64e9-4da7-4664-9fcd-0adbba6a30ce', 2),
-('67-246-0233', 'BR-789012346', '1995-06-06', 166, 'Drug possession', 'SCT-1dfb25b9-d643-45b1-b25d-db8a53bef961', 1),
-('22-112-0638', 'GH-345672109', '2001-12-01', 39, 'Arson', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 1),
-('21-927-1468', 'TZ-567894321', '2008-04-27', 325, 'Homicide', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 1),
-('12-745-2335', 'ZW-789016543', '2016-09-11', 49, 'Smuggling', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 2),
-('95-153-1078', 'FR-123456789', '2021-02-25', 113, 'Burglary', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 2),
-('83-459-7312', 'DE-234567890', '1998-11-08', 189, 'Kidnapping', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 3),
-('18-777-3641', 'GB-567890123', '2024-02-23', 79, 'Racketeering', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 3),
-('32-441-3666', 'JP-678901234', '2008-04-09', 348, 'Manslaughter', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 3),
-('89-307-0469', 'IT-DEF67890B', '2000-12-14', 212, 'Perjury', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 4),
-('34-945-1865', 'US-123456789', '2011-11-19', 133, 'Prostitution', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 5),
-('82-245-7704', 'CA-234567891', '1994-04-07', 250, 'Fraud', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 5),
-('99-326-3310', 'RU-345678900', '1990-09-05', 130, 'Assault', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 6),
-('65-896-1353', 'EG-789012346', '2022-05-08', 173, 'Extortion', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 6),
-('73-326-3348', 'FR-234567891', '1991-05-02', 320, 'Kidnapping', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 6),
-('82-267-9978', 'BR-567890124', '2000-07-12', 52, 'Identity theft', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 7),
-('24-341-5703', 'AU-456789013', '2016-08-02', 259, 'Carjacking', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 7),
-('34-184-6391', 'ES-567890124', '2022-01-05', 136, 'Kidnapping', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1),
-('58-890-7687', 'US-456789013', '2002-06-04', 333, 'Blackmail', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 1),
-('93-786-7959', 'DE-567890124', '2003-03-21', 44, 'Manslaughter', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 2),
-('48-779-8501', 'JP-890123457', '2010-12-15', 360, 'Cybercrime', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 2),
-('16-219-0866', 'IT-STU89012G', '2010-05-04', 85, 'Vandalism', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 2),
-('75-971-7566', 'CA-456789013', '1995-11-03', 229, 'Harassment', 'SCT-afb7d3aa-29f3-4bb4-9275-648e30beb1df', 3),
-('78-509-3678', 'IT-VWX12345H', '1997-12-01', 318, 'Espionage', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 1),
-('64-022-1757', 'FR-456789013', '2024-11-20', 201, 'Stalking', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 1),
-('26-621-5306', 'IT-YZA45678I', '2020-11-20', 128, 'Carjacking', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 2),
-('22-897-5812', 'US-678901235', '2006-09-14', 246, 'Forgery', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1);
+('72-733-3969', 'IT-ABC12345A', '2020-03-06', 200, 'Forgery'),
+('83-628-8300', 'US-987654321', '2000-06-05', 53, 'Manslaughter'),
+('78-047-9866', 'BR-345678901', '2014-01-07', 56, 'Espionage'),
+('48-431-3619', 'ES-456789012', '2016-10-14', 74, 'Insider trading'),
+('30-708-1634', 'IT-GHI34567C', '2000-03-26', 65, 'Fraud'),
+('93-272-2218', 'AU-345678912', '2008-03-25', 325, 'Identity theft'),
+('82-976-1119', 'IT-JKL90123D', '2015-05-20', 37, 'Homicide'),
+('46-680-6938', 'US-234567890', '2005-06-10', 278, 'Insider trading'),
+('99-401-1282', 'IN-456789013', '2019-02-21', 285, 'Counterfeiting'),
+('56-432-9491', 'CN-567890124', '2004-07-09', 292, 'Harassment'),
+('55-277-3626', 'ZA-678901235', '1994-07-22', 15, 'Vandalism'),
+('71-174-5574', 'IT-MNO23456E', '2000-06-03', 311, 'Espionage'),
+('10-456-4494', 'US-345678902', '2001-04-08', 193, 'Money laundering'),
+('52-169-7632', 'DE-456789013', '1994-06-23', 32, 'Assault'),
+('56-502-0544', 'JP-789012346', '2018-10-03', 180, 'Counterfeiting'),
+('82-885-4760', 'CA-345678902', '1996-12-14', 106, 'Arson'),
+('18-957-4095', 'IT-PQR56789F', '2010-08-29', 336, 'Blackmail'),
+('95-652-1090', 'GB-678901235', '2014-08-11', 215, 'Perjury'),
+('80-823-4362', 'FR-345678902', '1994-12-28', 211, 'Extortion'),
+('56-920-5138', 'BR-678901235', '1998-10-22', 57, 'Smuggling'),
+('70-236-6212', 'US-567890124', '2021-04-08', 329, 'Manslaughter'),
+('94-189-9016', 'AU-567890124', '2024-05-13', 359, 'Drug possession'),
+('87-519-4678', 'ES-678901235', '2000-04-03', 50, 'Drug possession'),
+('20-314-6930', 'DE-678901235', '1997-02-02', 195, 'Prostitution'),
+('67-246-0233', 'BR-789012346', '1995-06-06', 166, 'Drug possession'),
+('22-112-0638', 'GH-345672109', '2001-12-01', 39, 'Arson'),
+('21-927-1468', 'TZ-567894321', '2008-04-27', 325, 'Homicide'),
+('12-745-2335', 'ZW-789016543', '2016-09-11', 49, 'Smuggling'),
+('95-153-1078', 'FR-123456789', '2021-02-25', 113, 'Burglary'),
+('83-459-7312', 'DE-234567890', '1998-11-08', 189, 'Kidnapping'),
+('18-777-3641', 'GB-567890123', '2024-02-23', 79, 'Racketeering'),
+('32-441-3666', 'JP-678901234', '2008-04-09', 348, 'Manslaughter'),
+('89-307-0469', 'IT-DEF67890B', '2000-12-14', 212, 'Perjury'),
+('34-945-1865', 'US-123456789', '2011-11-19', 133, 'Prostitution'),
+('82-245-7704', 'CA-234567891', '1994-04-07', 250, 'Fraud'),
+('99-326-3310', 'RU-345678900', '1990-09-05', 130, 'Assault'),
+('65-896-1353', 'EG-789012346', '2022-05-08', 173, 'Extortion'),
+('73-326-3348', 'FR-234567891', '1991-05-02', 320, 'Kidnapping'),
+('82-267-9978', 'BR-567890124', '2000-07-12', 52, 'Identity theft'),
+('24-341-5703', 'AU-456789013', '2016-08-02', 259, 'Carjacking'),
+('34-184-6391', 'ES-567890124', '2022-01-05', 136, 'Kidnapping'),
+('58-890-7687', 'US-456789013', '2002-06-04', 333, 'Blackmail'),
+('93-786-7959', 'DE-567890124', '2003-03-21', 44, 'Manslaughter'),
+('48-779-8501', 'JP-890123457', '2010-12-15', 360, 'Cybercrime'),
+('16-219-0866', 'IT-STU89012G', '2010-05-04', 85, 'Vandalism'),
+('75-971-7566', 'CA-456789013', '1995-11-03', 229, 'Harassment'),
+('78-509-3678', 'IT-VWX12345H', '1997-12-01', 318, 'Espionage'),
+('64-022-1757', 'FR-456789013', '2024-11-20', 201, 'Stalking'),
+('26-621-5306', 'IT-YZA45678I', '2020-11-20', 128, 'Carjacking'),
+('22-897-5812', 'US-678901235', '2006-09-14', 246, 'Forgery');
 
 INSERT INTO `Movements`(`Datetime`, `InmateNumber`, `CellSectorID`, `CellNumber`)
 VALUES 
