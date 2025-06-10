@@ -34,5 +34,6 @@
 			]
 		}
 	},
-	"updateRemoteUserUID": true
+	"updateRemoteUserUID": true,
+	"postCreateCommand": "cd app && rm -rf node_modules && npm ci"
 }

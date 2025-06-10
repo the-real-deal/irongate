@@ -3,7 +3,7 @@ import ScrollFillBox from "../../../components/ScrollFillBox"
 import DBTablePage, { DBTablePageProps } from "../../../components/tables/DBTablePage"
 import { useCellsDisplay } from "../../../core/tables"
 import { tableDetailsViewProps, tablePageViewProps } from "../../../core/utils"
-import InmatesPage from "../inmates/InmatesPage"
+import MovementsPage from "../inmates/MovementsPage"
 import SectorsPage from "./SectorsPage"
 
 export type CellsPageProps = Partial<DBTablePageProps<CellsEntry>>
@@ -22,7 +22,7 @@ export default function PeoplePage(props: CellsPageProps) {
                         {...tableDetailsViewProps()}
                         fixedData={{ ID: SectorID }}
                     />
-                    <InmatesPage
+                    <MovementsPage
                         {...tablePageViewProps()}
                         fixedData={{ CellSectorID: SectorID, CellNumber: Number }}
                     />
