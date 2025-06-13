@@ -197,7 +197,7 @@ export function useMovementsReference() {
 }
 
 export function useGuestsDisplay() {
-    const freePeople = usePeopleReference()
+    const freePeople = useFreePeopleReference()
 
     return createDisplay<GuestsEntry>(GUESTS_STRUCTURE, {
         detailTitle: "Guest",
@@ -291,7 +291,7 @@ export function useVisitorsReference() {
 
 export function usePersonnelDisplay() {
     const personnelTypes = useEnumReference("PersonnelTypes")
-    const freePeople = usePeopleReference()
+    const freePeople = useFreePeopleReference()
     const sectors = useSectorsReference()
 
     return createDisplay<PersonnelEntry>(PERSONNEL_STRUCTURE, {
@@ -526,7 +526,7 @@ export function useEngagedDevicesReference() {
 }
 
 export function useCouriersDisplay() {
-    const freePeople = usePeopleReference()
+    const freePeople = useFreePeopleReference()
 
     return createDisplay<CouriersEntry>(COURIERS_STRUCTURE, {
         detailTitle: "Courier",
