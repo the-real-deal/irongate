@@ -212,7 +212,12 @@ export function selectInputNode<
 
         return (
             <ControlledSelect
-                values={values}
+                values={
+                    value !== null && value !== undefined ?
+                        values.concat(value)
+                            .filter((value, index, array) => array.indexOf(value) === index)
+                        : values
+                }
                 map={(x) => x}
                 required={required}
                 placeholder={title + (required ? " *" : "")}

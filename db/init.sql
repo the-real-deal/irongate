@@ -97,7 +97,7 @@ CREATE TABLE `PersonnelTypes` (
     `ID` VARCHAR(30) PRIMARY KEY
 );
 
--- se il tipo != guardia trigger, conrolla che il documentID sia diverso dagli inmate
+-- se il tipo != guardia trigger
 DROP TABLE IF EXISTS `Personnel`;
 CREATE TABLE `Personnel` (
     `ID` VARCHAR(40) PRIMARY KEY DEFAULT (CONCAT('PER-', UUID())),
@@ -397,6 +397,7 @@ FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);
 
 -- views
 
+
 DROP VIEW IF EXISTS `UsedDocumentIDs`;
 CREATE VIEW `UsedDocumentIDs` AS (
     SELECT `DocumentID`
@@ -417,14 +418,299 @@ CREATE VIEW `FreeDocumentIDs` AS (
     SELECT `DocumentID`
     FROM `People`
     WHERE `DocumentID` NOT IN (
-        SELECT *
-        FROM `UsedDocumentIDs`
-    )
+        SELECT * 
+        FROM `UsedDocumentIDs` )
+);
+
+DROP VIEW IF EXISTS `InmatesLastMovement`;
+CREATE VIEW `InmatesLastMovement` AS (
+    SELECT M1.InmateNumber, M1.CellSectorID, M1.CellNumber
+    FROM Movements M1
+    WHERE M1.`Datetime` = (SELECT MAX(M2.`Datetime`)
+        FROM Movements M2
+        WHERE M1.InmateNumber=M2.InmateNumber)
+);
+
+DROP VIEW IF EXISTS `InmatesInCellCapacitiy`;
+CREATE VIEW `InmatesInCellCapacitiy` AS (
+    SELECT M.CellSectorID, M.CellNumber, COUNT(M.InmateNumber)
+    FROM `InmatesLastMovement` M
+    GROUP BY M.CellSectorID, M.CellNumber
 );
 
 -- checks
+DROP PROCEDURE IF EXISTS triggerDateTime; 
+CREATE PROCEDURE triggerDatetime(IN dt DATE)
+BEGIN
+    IF dt >= CURDATE() THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid date';
+    END IF;
+END;
 
 
+CREATE PROCEDURE triggerDocID(IN dcID VARCHAR(30))
+BEGIN
+    IF dcID NOT IN (
+        SELECT *
+        FROM FreeDocumentIDs) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid DocumentID';
+    END IF;
+END;
+
+-- People trigger
+DROP TRIGGER IF EXISTS CheckPeopleBeforeInsert;
+
+CREATE TRIGGER CheckPeopleBeforeInsert
+BEFORE INSERT ON People
+FOR EACH ROW
+BEGIN
+    CALL triggerDateTime(NEW.Birthday);
+END ;
+
+
+-- Personnel trigger
+DROP TRIGGER IF EXISTS CheckPersonnelBeforeInsert;
+
+CREATE TRIGGER CheckPersonnelBeforeInsert
+BEFORE INSERT ON Personnel
+FOR EACH ROW
+BEGIN
+    CALL triggerDocID(NEW.DocumentID);
+    IF NEW.PersonnelTypeID != 'Guard' AND NEW.SectorID IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The sector must be null';   
+    END IF;
+END;
+
+-- Guests trigger
+DROP TRIGGER IF EXISTS CheckGuestsBeforeInsert;
+
+CREATE TRIGGER CheckGuestsBeforeInsert
+BEFORE INSERT ON Guests
+FOR EACH ROW
+BEGIN
+   CALL triggerDocID(NEW.DocumentID);
+END;
+
+-- Courier trigger
+DROP TRIGGER IF EXISTS CheckCourierBeforeInsert;
+
+CREATE TRIGGER CheckCourierBeforeInsert
+BEFORE INSERT ON Couriers
+FOR EACH ROW
+BEGIN
+    CALL triggerDocID(NEW.DocumentID);
+END;
+
+-- trigger datetime <= currentdate
+-- before insert trigger controllo cella libera, view numinmate per cella
+-- controllo gender = o null
+-- Movements trigger
+DROP TRIGGER IF EXISTS CheckMovementsBeforeInsert;
+
+CREATE TRIGGER CheckMovementsBeforeInsert
+BEFORE INSERT ON Movements
+FOR EACH ROW
+BEGIN
+    DECLARE checkInmateGenderID VARCHAR(10);
+    DECLARE checkSectorGenderID VARCHAR(10);
+    DECLARE oldSectorID VARCHAR(40);
+
+    SELECT GenderID INTO checkInmateGenderID
+    FROM People
+    WHERE DocumentID = (SELECT DocumentID FROM Inmates WHERE `Number` = NEW.InmateNumber);
+
+    SELECT GenderID INTO checkSectorGenderID FROM Sectors WHERE ID = NEW.CellSectorID;
+
+    IF checkInmateGenderID <> checkSectorGenderID AND checkSectorGenderID IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid GenderID';
+    END IF;
+
+    SELECT CellSectorID INTO oldSectorID
+    FROM InmatesLastMovement
+    WHERE InmateNumber = NEW.InmateNumber;
+
+    UPDATE Sectors
+    SET TotalInmates = TotalInmates - 1
+    WHERE ID = oldSectorID;
+
+    UPDATE Sectors
+    SET TotalInmates = TotalInmates + 1
+    WHERE ID = NEW.CellSectorID;
+END;
+
+-- Partecipations trigger
+-- controllo attività disponibile per securitylevel, gender settore =/null gender settore della zona attuale
+-- DROP TRIGGER IF EXISTS CheckPartecipationsBeforeInsert;
+
+-- CREATE TRIGGER CheckPartecipationsBeforeInsert
+-- BEFORE INSERT ON Partecipations
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE checkSectSecLev VARCHAR(20);
+--     DECLARE checkAvaiSecLev VARCHAR(20);
+
+--     SELECT SecurityLevelID INTO checkSectSecLev FROM Sectors WHERE ID = NEW.SectorID;
+--     SELECT SecurityLevelID INTO checkAvaiSecLev FROM Availabilities WHERE ActivityID = (
+--         SELECT ActivityID FROM Routines WHERE 
+--             ZoneSectorID = NEW.RoutineZoneSectorID AND 
+--             ZoneNumber = NEW.RoutineZoneNumber AND 
+--             Datetime = NEW.RoutineDatetime
+--     ) AND SecurityLevelID = checkSectSecLev LIMIT 1;
+
+--     IF checkSectSecLev < checkAvaiSecLev THEN
+--        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The Sector has a too high security level for this activity';
+--     END IF;
+
+--     -- Coso sesso partecipations
+-- END;
+
+-- Inmate trigger
+DROP TRIGGER IF EXISTS CheckInmatesBeforeInsert;
+
+CREATE TRIGGER CheckInmatesBeforeInsert
+BEFORE INSERT ON Inmates
+FOR EACH ROW
+BEGIN
+    IF NEW.IncarcerationDate > NOW() THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not valid incarceration date';
+    END IF;
+    CALL triggerDocID(NEW.DocumentID);
+END;
+
+
+-- conteggio usando la view dei detenuti dei settore nel nuovo trigger after insert
+-- after insert e after update ricalcolo inmates nel settore
+
+
+-- BEFORE UPDATE TRIGGER
+
+DROP TRIGGER IF EXISTS CheckMovementsBeforeUpdate;
+
+CREATE TRIGGER CheckMovementsBeforeUpdate
+BEFORE UPDATE ON Movements
+FOR EACH ROW
+BEGIN
+    DECLARE checkInmateGenderID VARCHAR(10);
+    DECLARE checkSectorGenderID VARCHAR(10);
+    
+    IF NEW.CellSectorID != OLD.CellSectorID THEN
+        SELECT GenderID INTO checkInmateGenderID
+        FROM People
+        WHERE DocumentID = (SELECT DocumentID FROM Inmates WHERE `Number` = NEW.InmateNumber);
+
+        SELECT GenderID INTO checkSectorGenderID FROM Sectors WHERE ID = NEW.CellSectorID;
+
+
+        IF checkInmateGenderID <> checkSectorGenderID AND checkSectorGenderID IS NOT NULL THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid GenderID';
+        END IF;
+        
+        UPDATE Sectors
+        SET TotalInmates = TotalInmates - 1
+        WHERE ID = OLD.CellSectorID;
+
+        UPDATE Sectors
+        SET TotalInmates = TotalInmates + 1
+        WHERE ID = NEW.CellSectorID;
+    END IF;
+END;
+
+
+-- People trigger
+DROP TRIGGER IF EXISTS CheckPeopleBeforeUpdate;
+
+CREATE TRIGGER CheckPeopleBeforeUpdate
+BEFORE UPDATE ON People
+FOR EACH ROW
+BEGIN
+    CALL triggerDateTime(NEW.Birthday);
+END ;
+
+
+DROP TRIGGER IF EXISTS CheckPersonnelBeforeUpdate;
+
+CREATE TRIGGER CheckPersonnelBeforeUpdate
+BEFORE UPDATE ON Personnel
+FOR EACH ROW
+BEGIN
+    IF NEW.DocumentID != OLD.DocumentID THEN
+        CALL triggerDocID(NEW.DocumentID);
+    END IF;
+
+    IF NEW.PersonnelTypeID != 'Guard' AND NEW.SectorID IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'The sector must be null unless the personnel is a Guard';
+    END IF;
+END;
+
+
+-- Guests trigger
+DROP TRIGGER IF EXISTS CheckGuestsBeforeUpdate;
+
+CREATE TRIGGER CheckGuestsBeforeUpdate
+BEFORE UPDATE ON Guests
+FOR EACH ROW
+BEGIN
+    IF NEW.DocumentID != OLD.DocumentID THEN
+        CALL triggerDocID(NEW.DocumentID);
+    END IF;
+END;
+
+
+-- Courier trigger
+DROP TRIGGER IF EXISTS CheckCourierBeforeUpdate;
+
+CREATE TRIGGER CheckCourierBeforeUpdate
+BEFORE UPDATE ON Couriers
+FOR EACH ROW
+BEGIN
+    IF NEW.DocumentID != OLD.DocumentID THEN
+        CALL triggerDocID(NEW.DocumentID);
+    END IF;
+END;
+
+
+-- Partecipations trigger
+-- controllo attività disponibile per securitylevel, gender settore =/null gender settore della zona attuale
+-- DROP TRIGGER IF EXISTS CheckPartecipationsBeforeUpdate;
+
+-- CREATE TRIGGER CheckPartecipationsBeforeUpdate
+-- BEFORE UPDATE ON Partecipations
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE checkSectSecLev VARCHAR(20);
+--     DECLARE checkAvaiSecLev VARCHAR(20);
+
+--     SELECT SecurityLevelID INTO checkSectSecLev FROM Sectors WHERE ID = NEW.SectorID;
+--     SELECT SecurityLevelID INTO checkAvaiSecLev FROM Availabilities WHERE ActivityID = (
+--         SELECT ActivityID FROM Routines WHERE 
+--             ZoneSectorID = NEW.RoutineZoneSectorID AND 
+--             ZoneNumber = NEW.RoutineZoneNumber AND 
+--             Datetime = NEW.RoutineDatetime
+--     ) AND SecurityLevelID = checkSectSecLev LIMIT 1;
+
+--     IF checkSectSecLev < checkAvaiSecLev THEN
+--        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The Sector has a too high security level for this activity';
+--     END IF;
+-- END;
+
+-- Inmate trigger
+DROP TRIGGER IF EXISTS CheckInmatesBeforeUpdate;
+
+CREATE TRIGGER CheckInmatesBeforeUpdate
+BEFORE UPDATE ON Inmates
+FOR EACH ROW
+BEGIN
+    IF NEW.IncarcerationDate != OLD.IncarcerationDate THEN
+        IF NEW.IncarcerationDate > NOW() THEN 
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not valid incarceration date';
+        END IF;
+    END IF;
+    
+    IF NEW.DocumentID != OLD.DocumentID THEN
+        CALL triggerDocID(NEW.DocumentID);
+    END IF;
+END;
 
 
 -- data

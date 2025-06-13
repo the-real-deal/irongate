@@ -36,7 +36,11 @@ export function useTableReference<
                         params: filter === undefined ? undefined : entryRecord(filter)
                     }
                 )
-                setResult(fetchData.map(entry => entry[key]))
+                setResult(
+                    fetchData
+                        .map(entry => entry[key])
+                        .filter((value, index, array) => array.indexOf(value) === index)
+                )
             } else {
                 setResult([])
             }
