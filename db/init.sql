@@ -397,7 +397,6 @@ FOREIGN KEY (`PersonnelID`) REFERENCES `Personnel`(`ID`);
 
 -- views
 
-
 DROP VIEW IF EXISTS `UsedDocumentIDs`;
 CREATE VIEW `UsedDocumentIDs` AS (
     SELECT `DocumentID`
@@ -439,15 +438,17 @@ CREATE VIEW `InmatesInCellCapacitiy` AS (
 );
 
 -- checks
-DROP PROCEDURE IF EXISTS triggerDateTime; 
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS triggerDateTime$$
 CREATE PROCEDURE triggerDatetime(IN dt DATE)
 BEGIN
     IF dt >= CURDATE() THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid date';
     END IF;
-END;
+END$$
 
-
+DROP PROCEDURE IF EXISTS triggerDocID$$
 CREATE PROCEDURE triggerDocID(IN dcID VARCHAR(30))
 BEGIN
     IF dcID NOT IN (
@@ -455,22 +456,19 @@ BEGIN
         FROM FreeDocumentIDs) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid DocumentID';
     END IF;
-END;
+END$$
 
 -- People trigger
-DROP TRIGGER IF EXISTS CheckPeopleBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckPeopleBeforeInsert$$
 CREATE TRIGGER CheckPeopleBeforeInsert
 BEFORE INSERT ON People
 FOR EACH ROW
 BEGIN
     CALL triggerDateTime(NEW.Birthday);
-END ;
-
+END$$
 
 -- Personnel trigger
-DROP TRIGGER IF EXISTS CheckPersonnelBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckPersonnelBeforeInsert$$
 CREATE TRIGGER CheckPersonnelBeforeInsert
 BEFORE INSERT ON Personnel
 FOR EACH ROW
@@ -479,34 +477,31 @@ BEGIN
     IF NEW.PersonnelTypeID != 'Guard' AND NEW.SectorID IS NOT NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The sector must be null';   
     END IF;
-END;
+END$$
 
 -- Guests trigger
-DROP TRIGGER IF EXISTS CheckGuestsBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckGuestsBeforeInsert$$
 CREATE TRIGGER CheckGuestsBeforeInsert
 BEFORE INSERT ON Guests
 FOR EACH ROW
 BEGIN
    CALL triggerDocID(NEW.DocumentID);
-END;
+END$$
 
 -- Courier trigger
-DROP TRIGGER IF EXISTS CheckCourierBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckCourierBeforeInsert$$
 CREATE TRIGGER CheckCourierBeforeInsert
 BEFORE INSERT ON Couriers
 FOR EACH ROW
 BEGIN
     CALL triggerDocID(NEW.DocumentID);
-END;
+END$$
 
 -- trigger datetime <= currentdate
 -- before insert trigger controllo cella libera, view numinmate per cella
 -- controllo gender = o null
 -- Movements trigger
-DROP TRIGGER IF EXISTS CheckMovementsBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckMovementsBeforeInsert$$
 CREATE TRIGGER CheckMovementsBeforeInsert
 BEFORE INSERT ON Movements
 FOR EACH ROW
@@ -536,37 +531,10 @@ BEGIN
     UPDATE Sectors
     SET TotalInmates = TotalInmates + 1
     WHERE ID = NEW.CellSectorID;
-END;
-
--- Partecipations trigger
--- controllo attività disponibile per securitylevel, gender settore =/null gender settore della zona attuale
--- DROP TRIGGER IF EXISTS CheckPartecipationsBeforeInsert;
-
--- CREATE TRIGGER CheckPartecipationsBeforeInsert
--- BEFORE INSERT ON Partecipations
--- FOR EACH ROW
--- BEGIN
---     DECLARE checkSectSecLev VARCHAR(20);
---     DECLARE checkAvaiSecLev VARCHAR(20);
-
---     SELECT SecurityLevelID INTO checkSectSecLev FROM Sectors WHERE ID = NEW.SectorID;
---     SELECT SecurityLevelID INTO checkAvaiSecLev FROM Availabilities WHERE ActivityID = (
---         SELECT ActivityID FROM Routines WHERE 
---             ZoneSectorID = NEW.RoutineZoneSectorID AND 
---             ZoneNumber = NEW.RoutineZoneNumber AND 
---             Datetime = NEW.RoutineDatetime
---     ) AND SecurityLevelID = checkSectSecLev LIMIT 1;
-
---     IF checkSectSecLev < checkAvaiSecLev THEN
---        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The Sector has a too high security level for this activity';
---     END IF;
-
---     -- Coso sesso partecipations
--- END;
+END$$
 
 -- Inmate trigger
-DROP TRIGGER IF EXISTS CheckInmatesBeforeInsert;
-
+DROP TRIGGER IF EXISTS CheckInmatesBeforeInsert$$
 CREATE TRIGGER CheckInmatesBeforeInsert
 BEFORE INSERT ON Inmates
 FOR EACH ROW
@@ -575,17 +543,9 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not valid incarceration date';
     END IF;
     CALL triggerDocID(NEW.DocumentID);
-END;
+END$$
 
-
--- conteggio usando la view dei detenuti dei settore nel nuovo trigger after insert
--- after insert e after update ricalcolo inmates nel settore
-
-
--- BEFORE UPDATE TRIGGER
-
-DROP TRIGGER IF EXISTS CheckMovementsBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckMovementsBeforeUpdate$$
 CREATE TRIGGER CheckMovementsBeforeUpdate
 BEFORE UPDATE ON Movements
 FOR EACH ROW
@@ -613,22 +573,20 @@ BEGIN
         SET TotalInmates = TotalInmates + 1
         WHERE ID = NEW.CellSectorID;
     END IF;
-END;
+END$$
 
 
 -- People trigger
-DROP TRIGGER IF EXISTS CheckPeopleBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckPeopleBeforeUpdate$$
 CREATE TRIGGER CheckPeopleBeforeUpdate
 BEFORE UPDATE ON People
 FOR EACH ROW
 BEGIN
     CALL triggerDateTime(NEW.Birthday);
-END ;
+END$$
 
 
-DROP TRIGGER IF EXISTS CheckPersonnelBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckPersonnelBeforeUpdate$$
 CREATE TRIGGER CheckPersonnelBeforeUpdate
 BEFORE UPDATE ON Personnel
 FOR EACH ROW
@@ -641,12 +599,10 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'The sector must be null unless the personnel is a Guard';
     END IF;
-END;
-
+END$$
 
 -- Guests trigger
-DROP TRIGGER IF EXISTS CheckGuestsBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckGuestsBeforeUpdate$$
 CREATE TRIGGER CheckGuestsBeforeUpdate
 BEFORE UPDATE ON Guests
 FOR EACH ROW
@@ -654,12 +610,10 @@ BEGIN
     IF NEW.DocumentID != OLD.DocumentID THEN
         CALL triggerDocID(NEW.DocumentID);
     END IF;
-END;
-
+END$$
 
 -- Courier trigger
-DROP TRIGGER IF EXISTS CheckCourierBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckCourierBeforeUpdate$$
 CREATE TRIGGER CheckCourierBeforeUpdate
 BEFORE UPDATE ON Couriers
 FOR EACH ROW
@@ -667,36 +621,10 @@ BEGIN
     IF NEW.DocumentID != OLD.DocumentID THEN
         CALL triggerDocID(NEW.DocumentID);
     END IF;
-END;
-
-
--- Partecipations trigger
--- controllo attività disponibile per securitylevel, gender settore =/null gender settore della zona attuale
--- DROP TRIGGER IF EXISTS CheckPartecipationsBeforeUpdate;
-
--- CREATE TRIGGER CheckPartecipationsBeforeUpdate
--- BEFORE UPDATE ON Partecipations
--- FOR EACH ROW
--- BEGIN
---     DECLARE checkSectSecLev VARCHAR(20);
---     DECLARE checkAvaiSecLev VARCHAR(20);
-
---     SELECT SecurityLevelID INTO checkSectSecLev FROM Sectors WHERE ID = NEW.SectorID;
---     SELECT SecurityLevelID INTO checkAvaiSecLev FROM Availabilities WHERE ActivityID = (
---         SELECT ActivityID FROM Routines WHERE 
---             ZoneSectorID = NEW.RoutineZoneSectorID AND 
---             ZoneNumber = NEW.RoutineZoneNumber AND 
---             Datetime = NEW.RoutineDatetime
---     ) AND SecurityLevelID = checkSectSecLev LIMIT 1;
-
---     IF checkSectSecLev < checkAvaiSecLev THEN
---        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The Sector has a too high security level for this activity';
---     END IF;
--- END;
+END$$
 
 -- Inmate trigger
-DROP TRIGGER IF EXISTS CheckInmatesBeforeUpdate;
-
+DROP TRIGGER IF EXISTS CheckInmatesBeforeUpdate$$
 CREATE TRIGGER CheckInmatesBeforeUpdate
 BEFORE UPDATE ON Inmates
 FOR EACH ROW
@@ -710,8 +638,9 @@ BEGIN
     IF NEW.DocumentID != OLD.DocumentID THEN
         CALL triggerDocID(NEW.DocumentID);
     END IF;
-END;
+END$$
 
+DELIMITER ;
 
 -- data
 
@@ -1033,7 +962,9 @@ VALUES
 ('2024-11-20 17:55:19', '64-022-1757', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 1),
 ('2020-11-20 19:32:53', '26-621-5306', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 2),
 ('2006-09-14 18:16:21', '22-897-5812', 'SCT-fdc8350b-c31d-489b-ae98-3f3ee36e3343', 8),
-('2007-11-09 12:07:30', '22-897-5812', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1);
+('2007-11-09 12:07:30', '22-897-5812', 'SCT-2b1d0279-02a5-4ffa-a341-ce70af166dcc', 1),
+
+('2008-11-09 12:07:30', '22-897-5812', 'SCT-232ab27c-e7ea-4aee-b863-a7a369c609e7', 2);
 
 INSERT INTO `Guests`(`DocumentID`)
 VALUES 
@@ -1312,12 +1243,24 @@ VALUES
 ('2019-07-11 08:50:55', 'Inmates escape attempt trough multiple sectors busted', 'PER-b13327fc-9bf5-4b94-98db-57389a795034'),
 ('2008-01-28 12:41:14', 'Computers upgrade', 'PER-caafd732-cf23-4f3b-82ab-58e9194c90ea'),
 ('2018-11-21 09:01:54', 'Library inventory check', 'PER-207cc7f3-cdd3-493e-b842-60c9b564ae03'),
-('2020-03-14 10:26:10', 'Director summary of the week', 'PER-ecee39cb-5c88-4e17-aea8-3d04eab1a411');
+('2020-03-14 10:26:10', 'Director summary of the week', 'PER-ecee39cb-5c88-4e17-aea8-3d04eab1a411'),
+('2021-03-14 10:26:10', 'Overview showcase 1', 'PER-3e2a9969-c7a8-4668-b080-818118411238'),
+('2021-04-14 10:26:10', 'Overview showcase 2', 'PER-3e2a9969-c7a8-4668-b080-818118411238'),
+('2021-05-14 10:26:10', 'Overview showcase 3', 'PER-3e2a9969-c7a8-4668-b080-818118411238');
 
 INSERT INTO `EngagedInmates`(`ReportID`, `InmateNumber`)
 VALUES 
 (1, '72-733-3969'),
-(1, '83-628-8300');
+(1, '83-628-8300'),
+(5, '72-733-3969'),
+(5, '83-628-8300'),
+(5, '46-680-6938'),
+(6, '72-733-3969'),
+(6, '83-628-8300'),
+(6, '46-680-6938'),
+(7, '72-733-3969'),
+(7, '83-628-8300'),
+(7, '71-174-5574');
 
 INSERT INTO `EngagedPersonnel`(`ReportID`, `PersonnelID`)
 VALUES 

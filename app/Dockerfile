@@ -13,8 +13,6 @@ RUN useradd -Ums /bin/bash ${USER}
 
 USER ${USER}
 
-ENV APP_PORT=${APP_PORT}
-
 WORKDIR ${WORKDIR}
 
 COPY . .

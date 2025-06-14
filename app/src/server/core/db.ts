@@ -2,6 +2,7 @@ import { createPool, PoolConnection, PoolOptions, ResultSetHeader } from "mysql2
 import env from "../../common/env"
 import { Pool } from "mysql2/promise"
 import { ColumnValue, TableEntry, TableRecord } from "../../common/db"
+import { JSONstring } from "../../common/json"
 
 function defineForcedOptions<T extends Partial<PoolOptions>>(options: T): T {
     return options
@@ -90,6 +91,7 @@ export class DBManager {
             console.log("Values:", values)
             const [result] = await connection.query(query, values)
             await connection.commit()
+            console.log("Query result:", JSONstring(result))
             return result as T
         } catch (err) {
             await connection.rollback()

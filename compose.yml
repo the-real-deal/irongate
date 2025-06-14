@@ -16,6 +16,7 @@ services:
     env_file: ${APP_ROOT?APP_ROOT must exist}/.env
     environment:
       - DB_HOST=db
+      - APP_PORT=${APP_PORT}
     image: ${DOCKER_COMPOSE_NAME}/app
     container_name: ${DOCKER_COMPOSE_NAME}-app
     build:
