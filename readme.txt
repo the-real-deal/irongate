@@ -2,7 +2,7 @@
 
 Esistono due modi diversi per avviare l'applicazione, automaticamente tramite container o in maniera manuale.
 
-In entrambi i casi, l'applicazione sarà pronta quando verrà mostrato in console il messagggio `Server running on ...`.
+In entrambi i casi, l'applicazione sarà pronta quando verrà mostrato in console il messaggio `Server running on ...`.
 
 Appena pronta, aprire un browser sulla pagina specificata (default: http://localhost:3000).
 
