@@ -1,3 +1,5 @@
+import "dotenv/config"
+
 export type EnvValueType = "string" | "number" | "boolean"
 type EnvTypeMap = {
     string: string
